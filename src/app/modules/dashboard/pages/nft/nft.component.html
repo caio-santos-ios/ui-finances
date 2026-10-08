@@ -1,0 +1,9 @@
+<div>
+  <div class="grid grid-cols-12 gap-4">
+    @for (item of dashboards; track item.id) {
+      <div class="{{item.cardClass}}">
+        <app-dashboard-card [dashboard]="item" />
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<h3 class="mb-2 text-muted-foreground group-hover:text-primary truncate text-md font-semibold tracking-wide focus:outline-hidden">{{ dashboard.name }}</h3>
+
+@if (dashboard.error) {
+  <p class="text-sm text-red-500">{{ dashboard.error }}</p>
+} @else if (!rows.length) {
+  <p class="text-sm opacity-60">Sem dados no período.</p>
+} @else {
+  @switch (dashboard.type) {
+    @case ('pie') {
+      <apx-chart [series]="values" [labels]="labels" [tooltip]="tooltip"
+        [chart]="{ type: 'pie', height: 300 }" />
+    }
+    @case ('bar') {
+      <apx-chart [series]="[{ name: dashboard.name, data: values }]"
+        [xaxis]="{ categories: labels }" [yaxis]="yaxis"
+        [dataLabels]="dataLabels" [tooltip]="tooltip"
+        [chart]="{ type: 'bar', height: 300 }" />
+    }
+    @case ('line') {
+      <apx-chart [series]="[{ name: dashboard.name, data: values }]"
+        [xaxis]="{ categories: labels }" [yaxis]="yaxis" [tooltip]="tooltip"
+        [chart]="{ type: 'line', height: 300 }" />
+    }
+    @case ('kpi') {
+      <p class="text-3xl font-bold">{{ kpi }}</p>
+    }
+    @case ('table') {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-muted-foreground">
+          <thead>
+            <tr>@for (col of columns; track col) { <th class="py-1 truncate text-md font-semibold tracking-wide focus:outline-hidden">{{ col }}</th> }</tr>
+          </thead>
+          <tbody>
+            @for (row of tableRows; track $index) {
+              <tr>@for (col of columns; track col) { <td class="py-1">{{ row[col] }}</td> }</tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+}
