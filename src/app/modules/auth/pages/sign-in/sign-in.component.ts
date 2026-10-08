@@ -1,10 +1,11 @@
 import { NgClass } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { api } from 'src/app/shared/api/api';
+import { MyFinance } from 'src/app/core/utils/my-finance.util';
 
 @Component({
   selector: 'app-sign-in',
@@ -13,22 +14,17 @@ import { api } from 'src/app/shared/api/api';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, ReactiveFormsModule, RouterLink, AngularSvgIconModule, ButtonComponent, NgClass],
 })
-export class SignInComponent implements OnInit {
+export class SignInComponent extends MyFinance implements OnInit {
   form!: FormGroup;
   submitted = false;
   passwordTextType!: boolean;
 
-  constructor(
-    private readonly _formBuilder: FormBuilder,
-    private readonly _router: Router,
-  ) { }
-
-  onClick() {
-    console.log('Button clicked');
+  constructor() {
+    super();
   }
 
   ngOnInit(): void {
-    this.form = this._formBuilder.group({
+    this.form = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       rememberMe: [false],
@@ -57,10 +53,10 @@ export class SignInComponent implements OnInit {
       localStorage.setItem("refreshToken", data.data.refreshToken);
       localStorage.setItem("rememberMe", rememberMe);
       setTimeout(() => {
-        this._router.navigate(['/']);
+        this.router.navigate(['/']);
       }, 200);
     } catch (error) {
-
+      this.normalizeErr(error);
     }
   }
 }

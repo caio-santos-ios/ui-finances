@@ -16,11 +16,6 @@ const routes: Routes = [
     loadChildren: () => import('../category/category.module').then((m) => m.CategoryModule),
     canActivate: [AuthGuard],
   },
-  // {
-  //   path: 'components',
-  //   component: LayoutComponent,
-  //   loadChildren: () => import('../uikit/uikit.module').then((m) => m.UikitModule),
-  // },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },
 ];

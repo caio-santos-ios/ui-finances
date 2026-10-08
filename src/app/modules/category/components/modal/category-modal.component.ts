@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { api } from 'src/app/shared/api/api';
+import { MyFinance } from 'src/app/core/utils/my-finance.util';
 
 @Component({
   selector: 'app-category-modal',
@@ -10,15 +11,17 @@ import { api } from 'src/app/shared/api/api';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [ButtonComponent, FormsModule, ReactiveFormsModule],
 })
-export class CategoryModalComponent implements OnInit {
+export class CategoryModalComponent extends MyFinance implements OnInit {
   form!: FormGroup;
   category: any = {};
 
   constructor(
-    private readonly formBuilder: FormBuilder,
     private dialog: DialogRef,
     @Inject(DIALOG_DATA) public dialogData: { id: string },
-  ) {}
+    private cdr: ChangeDetectorRef,
+  ) {
+    super();
+  }
 
   get isEdit() {
     return !!this.dialogData?.id;
@@ -39,12 +42,15 @@ export class CategoryModalComponent implements OnInit {
     try {
       const { data } = await api.get(`/categories/${id}`);
       this.category = data.data;
-      console.log(data.data.type)
       this.form.patchValue({
         name: data.data.name,
-        type: data.data.type,
+        type: data.data.type?.toLowerCase(),
       });
-    } catch (error) {}
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.cdr.markForCheck();
+    }
   }
 
   async create() {
@@ -55,7 +61,9 @@ export class CategoryModalComponent implements OnInit {
       const body = this.form.value;
       await api.post('/categories', body);
       this.dialog.close(true);
-    } catch (error) {}
+    } catch (error) {
+      this.normalizeErr(error);
+    }
   }
 
   async update() {
@@ -66,7 +74,9 @@ export class CategoryModalComponent implements OnInit {
       const body = this.form.value;
       await api.put('/categories', { ...body, id: this.dialogData.id });
       this.dialog.close(true);
-    } catch (error) {}
+    } catch (error) {
+      this.normalizeErr(error);
+    }
   }
 
   close() {
