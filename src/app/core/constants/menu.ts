@@ -12,6 +12,11 @@ export class Menu {
           route: '/dashboard',
         },
         {
+          icon: 'building-columns',
+          label: 'Bancos',
+          route: '/banks',
+        },
+        {
           icon: 'layer-group',
           label: 'Categorias',
           route: '/categories',
@@ -25,11 +30,6 @@ export class Menu {
           icon: 'hand-holding-dollar',
           label: 'Orçamentos',
           route: '/budgets',
-        },
-        {
-          icon: 'building-columns',
-          label: 'Bancos',
-          route: '/banks',
         },
         // {
         //   icon: 'assets/icons/heroicons/outline/lock-closed.svg',
