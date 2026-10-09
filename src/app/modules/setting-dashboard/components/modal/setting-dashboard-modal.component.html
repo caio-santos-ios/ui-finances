@@ -1,0 +1,107 @@
+﻿<div class="border-muted/20 bg-card w-[600px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid {{isEdit ? 'fa-pen-to-square' : 'fa-plus'}} text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">{{isEdit ? 'Editar Configuração Dashboard' : 'Nova Configuração Dashboard'}}</h2>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="name">Nome</label>
+        <input
+          id="name"
+          type="text"
+          placeholder="Ex: Total de Receitas"
+          formControlName="name"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="type">Tipo</label>
+        <select
+          id="type"
+          formControlName="type"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="kpi">KPI (Indicador)</option>
+          <option value="bar">Barra (Gráfico)</option>
+          <option value="line">Linha (Gráfico)</option>
+          <option value="pie">Pizza (Gráfico)</option>
+          <option value="table">Tabela</option>
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="collection">Collection</label>
+        <select
+          id="collection"
+          formControlName="collection"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="operations">operations</option>
+          <option value="categories">categories</option>
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="sequence">Sequência</label>
+        <input
+          id="sequence"
+          type="text"
+          placeholder="Sequência"
+          formControlName="sequence"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+     
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cardClass">Card Class (CSS)</label>
+        <input
+          id="cardClass"
+          type="text"
+          placeholder="Ex: col-span-12 lg:col-span-6"
+          formControlName="cardClass"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12">
+        <div class="mb-1.5 flex items-center justify-between">
+          <label class="text-foreground block text-xs font-semibold">Query (Pipeline JSON)</label>
+          <button
+            type="button"
+            (click)="formatQuery()"
+            class="text-muted-foreground hover:text-foreground text-xs font-semibold underline transition-colors">
+            <i class="fa-solid fa-align-left mr-1"></i> Formatar JSON
+          </button>
+        </div>
+
+        <app-json-editor formControlName="query" />
+
+        @if (form.get('query')?.touched && form.get('query')?.invalid) {
+        <p class="mt-1 text-xs text-red-500">A query precisa ser um array JSON válido.</p>
+        }
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+
+      @if (isEdit) {
+      <app-button (buttonClick)="update()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Salvar Alterações
+      </app-button>
+      } @else {
+      <app-button (buttonClick)="create()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Salvar
+      </app-button>
+      }
+    </div>
+  </form>
+</div>

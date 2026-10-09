@@ -34,6 +34,12 @@ const routes: Routes = [
     loadChildren: () => import('../bank/bank.module').then((m) => m.BankModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'setting-dashboard',
+    component: LayoutComponent,
+    loadChildren: () => import('../setting-dashboard/setting-dashboard.module').then((m) => m.SettingDashboardModule),
+    canActivate: [AuthGuard],
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },
 ];

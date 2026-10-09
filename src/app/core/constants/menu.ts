@@ -31,6 +31,11 @@ export class Menu {
           label: 'Orçamentos',
           route: '/budgets',
         },
+        {
+          icon: 'sliders',
+          label: 'Configuração Dashboard',
+          route: '/setting-dashboard',
+        },
         // {
         //   icon: 'assets/icons/heroicons/outline/lock-closed.svg',
         //   label: 'Auth',
