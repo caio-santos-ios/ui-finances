@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "dist/ui-finance/browser",
+  "outputDirectory": "dist/angular-tailwind/browser",
   "rewrites": [
     {
       "source": "/(.*)",
