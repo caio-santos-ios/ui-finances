@@ -328,3 +328,8 @@ select {
   border-color: #f59e0b !important;
   color: #f59e0b !important;
 }
+
+[data-sonner-toast] {
+  --y: translateY(0) !important;
+  opacity: 1 !important;
+}

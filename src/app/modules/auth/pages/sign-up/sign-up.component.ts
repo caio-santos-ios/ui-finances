@@ -33,12 +33,20 @@ export class SignUpComponent extends MyFinance implements OnInit {
 
   async onSubmit() {
     try {
+      if (this.form.invalid) {
+        this.toastError('Preencha todos os campos obrigatórios.');
+        return;
+      }
       const body = this.form.value;
-      const { data } = await api.post("/auth/register", { ...body });
-      toast.success(data.message);
+      if (body.password !== body.confirmPassword) {
+        this.toastError('As senhas não conferem.');
+        return;
+      }
+      const { data } = await api.post('/auth/register', { ...body });
+      this.toastSuccess(data?.message || 'Usuário criado com sucesso.');
       setTimeout(() => {
         this.router.navigate(['/auth/sign-in']);
-      }, 201);
+      }, 1500);
     } catch (error) {
       this.normalizeErr(error);
     }

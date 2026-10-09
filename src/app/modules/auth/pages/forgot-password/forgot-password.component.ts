@@ -23,17 +23,21 @@ export class ForgotPasswordComponent extends MyFinance implements OnInit {
     });
   }
 
-    async onSubmit() {
-      try {
-        this.submitted = true;
-        const { email } = this.form.value;
-          
-        const { data } = await api.post("/auth/forgot-password", { email });
-        setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 200);
-      } catch (error) {
-        this.normalizeErr(error);
+  async onSubmit() {
+    try {
+      this.submitted = true;
+      if (this.form.invalid) {
+        this.toastError('Informe um e-mail válido.');
+        return;
       }
+      const { email } = this.form.value;
+      const { data } = await api.post('/auth/forgot-password', { email });
+      this.toastSuccess(data?.message || 'Código de verificação enviado para o e-mail.');
+      setTimeout(() => {
+        this.router.navigate(['/auth/sign-in']);
+      }, 1500);
+    } catch (error) {
+      this.normalizeErr(error);
     }
+  }
 }

@@ -16,6 +16,12 @@ const routes: Routes = [
     loadChildren: () => import('../category/category.module').then((m) => m.CategoryModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'operations',
+    component: LayoutComponent,
+    loadChildren: () => import('../operation/operation.module').then((m) => m.OperationModule),
+    canActivate: [AuthGuard],
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },
 ];

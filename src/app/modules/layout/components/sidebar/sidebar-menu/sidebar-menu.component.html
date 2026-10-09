@@ -13,9 +13,10 @@
         }"
             class="text-muted-foreground hover:text-foreground group relative flex grow items-center gap-4 rounded-lg px-2">
             <!-- Icon -->
-            <div [ngClass]="item.active && !menuService.showSideBar ? 'text-primary' : 'text-muted-foreground/50'">
+            <i class="fa-solid fa-{{item.icon}} {{item.active && !menuService.showSideBar ? 'text-primary' : 'text-muted-foreground/50'}}"></i>
+            <!-- <div [ngClass]="item.active && !menuService.showSideBar ? 'text-primary' : 'text-muted-foreground/50'">
               <svg-icon src="{{ item.icon }}" [svgClass]="'h-5 w-5'"> </svg-icon>
-            </div>
+            </div> -->
             <!-- Condition -->
             <ng-container
               [ngTemplateOutlet]="item.children ? childMenu : parentMenu"

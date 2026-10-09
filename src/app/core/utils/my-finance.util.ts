@@ -21,6 +21,21 @@ export class MyFinance {
     return this.formBuilderService;
   }
 
+  toastSuccess(message: string) {
+    toast.success(message);
+    this.appRef.tick();
+  }
+
+  toastError(message: string) {
+    toast.error(message);
+    this.appRef.tick();
+  }
+
+  toastWarning(message: string) {
+    toast.warning(message);
+    this.appRef.tick();
+  }
+
   normalizeErr(err: any) {
     const status = err?.response?.status;
     if (status == 401) {
@@ -42,7 +57,7 @@ export class MyFinance {
       if (!message) {
         message = data?.title || 'Ocorreu um erro na requisição.';
       }
-      toast.warning(message);
+      toast.error(message);
       this.appRef.tick();
     }
 

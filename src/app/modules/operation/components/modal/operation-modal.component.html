@@ -1,0 +1,55 @@
+<div class="border-muted/20 bg-card w-[480px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid {{isEdit ? 'fa-pen-to-square' : 'fa-plus'}} text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">{{isEdit ? 'Editar Operação' : 'Nova Operação'}}</h2>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="name">Nome</label>
+        <input
+          id="name"
+          type="text"
+          placeholder="Ex: Alimentação, Salário..."
+          formControlName="name"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="type">Tipo</label>
+        <select
+          id="type"
+          formControlName="type"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="income">Receita</option>
+          <option value="expense">Despesa</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+
+      @if (isEdit) {
+      <app-button (buttonClick)="update()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Salvar Alterações
+      </app-button>
+      } @else {
+      <app-button (buttonClick)="create()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Salvar
+      </app-button>
+      }
+    </div>
+  </form>
+</div>

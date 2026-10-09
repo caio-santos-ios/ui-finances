@@ -7,14 +7,19 @@ export class Menu {
       separator: false,
       items: [
         {
-          icon: 'assets/icons/heroicons/outline/chart-pie.svg',
+          icon: 'gauge',
           label: 'Dashboard',
           route: '/dashboard',
         },
         {
-          icon: 'assets/icons/heroicons/outline/bookmark.svg',
+          icon: 'layer-group',
           label: 'Categorias',
           route: '/categories',
+        },
+        {
+          icon: 'money-check-dollar',
+          label: 'Operações',
+          route: '/operations',
         },
         // {
         //   icon: 'assets/icons/heroicons/outline/lock-closed.svg',
