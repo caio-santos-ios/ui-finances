@@ -21,6 +21,16 @@ export class Menu {
           label: 'Operações',
           route: '/operations',
         },
+        {
+          icon: 'hand-holding-dollar',
+          label: 'Orçamentos',
+          route: '/budgets',
+        },
+        {
+          icon: 'building-columns',
+          label: 'Bancos',
+          route: '/banks',
+        },
         // {
         //   icon: 'assets/icons/heroicons/outline/lock-closed.svg',
         //   label: 'Auth',

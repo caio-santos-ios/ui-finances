@@ -22,6 +22,18 @@ const routes: Routes = [
     loadChildren: () => import('../operation/operation.module').then((m) => m.OperationModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'budgets',
+    component: LayoutComponent,
+    loadChildren: () => import('../budget/budget.module').then((m) => m.BudgetModule),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'banks',
+    component: LayoutComponent,
+    loadChildren: () => import('../bank/bank.module').then((m) => m.BankModule),
+    canActivate: [AuthGuard],
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },
 ];

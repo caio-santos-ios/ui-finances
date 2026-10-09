@@ -15,16 +15,6 @@
   <form [formGroup]="form">
     <div class="grid grid-cols-12 gap-4">
       <div class="col-span-12">
-        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="name">Nome</label>
-        <input
-          id="name"
-          type="text"
-          placeholder="Ex: Alimentação, Salário..."
-          formControlName="name"
-          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
-      </div>
-
-      <div class="col-span-12">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="type">Tipo</label>
         <select
           id="type"
@@ -34,6 +24,61 @@
           <option value="expense">Despesa</option>
         </select>
       </div>
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="category">Categoria</label>
+        <select
+          id="category"
+          formControlName="categoryId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Selecione</option>
+          @for (item of categories; track $index) {
+            <option value="{{item.id}}">{{item.name}}</option>
+          }
+        </select>
+      </div>
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="bank">Banco</label>
+        <select
+          id="bank"
+          formControlName="bankId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Selecione</option>
+          @for (item of banks; track $index) {
+            <option value="{{item.id}}">{{item.name}}</option>
+          }
+        </select>
+      </div>
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="value">Valor</label>
+        <input
+          id="value"
+          type="text"
+          placeholder="R$ 0,00"
+          formControlName="value"
+          mask="separator.2" 
+          thousandSeparator="." 
+          decimalMarker="," 
+          prefix="R$ "
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>      
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="createdAt">Data de Lançamento</label>
+        <input
+          id="createdAt"
+          type="date"
+          placeholder="Data de Lançamento"
+          formControlName="createdAt"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>      
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="description">Descrição</label>
+        <input
+          id="description"
+          type="text"
+          placeholder="Descrição"
+          formControlName="description"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>      
     </div>
 
     <div class="mt-6 flex justify-end gap-2">

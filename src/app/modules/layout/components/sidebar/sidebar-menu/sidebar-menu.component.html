@@ -1,10 +1,8 @@
 @for (menu of menuService.pagesMenu; track menu) {
   <div>
     <ul class="flex flex-col">
-      <!-- List items -->
       @for (item of menu.items; track item) {
         <li>
-          <!-- Menu List -->
           <div
             (click)="toggleMenu(item)"
         [ngClass]="{
@@ -12,12 +10,7 @@
           'hover:bg-card/50': !menuService.showSideBar
         }"
             class="text-muted-foreground hover:text-foreground group relative flex grow items-center gap-4 rounded-lg px-2">
-            <!-- Icon -->
             <i class="fa-solid fa-{{item.icon}} {{item.active && !menuService.showSideBar ? 'text-primary' : 'text-muted-foreground/50'}}"></i>
-            <!-- <div [ngClass]="item.active && !menuService.showSideBar ? 'text-primary' : 'text-muted-foreground/50'">
-              <svg-icon src="{{ item.icon }}" [svgClass]="'h-5 w-5'"> </svg-icon>
-            </div> -->
-            <!-- Condition -->
             <ng-container
               [ngTemplateOutlet]="item.children ? childMenu : parentMenu"
               [ngTemplateOutletContext]="{ item: item }">
