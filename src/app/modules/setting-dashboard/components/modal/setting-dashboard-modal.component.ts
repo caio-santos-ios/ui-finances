@@ -52,7 +52,7 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
       sequence: ['', [Validators.required]],
       type: ['kpi', [Validators.required]],
       collection: ['operations', [Validators.required]],
-      cardClass: ['col-span-12 lg:col-span-6 bg-card rounded-xl p-4 border border-border shadow-xs'],
+      cardClass: ['col-span-12 lg:col-span-6'],
       formats: ['', [jsonObjectOrEmpty]],
       query: ['[]', [Validators.required, jsonArray]],
     });

@@ -6,7 +6,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
   imports: [NgApexchartsModule],
   templateUrl: './dashboard-card.component.html',
   host: {
-    '[class]': 'dashboard.cardClass || "block rounded-xl bg-white p-4 shadow dark:bg-gray-800"',
+    '[class]': 'dashboard.cardClass || ""',
   },
 })
 export class DashboardCardComponent implements OnChanges {
@@ -18,6 +18,8 @@ export class DashboardCardComponent implements OnChanges {
   columns: string[] = [];
   tableRows: Record<string, string>[] = [];
   kpi = '';
+  kpiIcon = 'fa-solid fa-chart-line';
+  kpiIconBg = 'bg-primary/10 text-primary';
 
   yaxis: any = {};
   dataLabels: any = {};
@@ -44,6 +46,28 @@ export class DashboardCardComponent implements OnChanges {
     this.yaxis = { labels: { formatter: money } };
     this.dataLabels = { formatter: money };
     this.tooltip = { y: { formatter: money } };
+
+    this.resolveKpiStyle();
+  }
+
+  private resolveKpiStyle(): void {
+    const name = (this.dashboard?.name || '').toLowerCase();
+    if (name.includes('receita') || name.includes('entrada') || name.includes('lucro') || name.includes('ganho')) {
+      this.kpiIcon = 'fa-solid fa-arrow-trend-up';
+      this.kpiIconBg = 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+    } else if (name.includes('despesa') || name.includes('gasto') || name.includes('saída') || name.includes('saida') || name.includes('custo')) {
+      this.kpiIcon = 'fa-solid fa-arrow-trend-down';
+      this.kpiIconBg = 'bg-rose-500/10 text-rose-500 border border-rose-500/20';
+    } else if (name.includes('saldo') || name.includes('banco') || name.includes('carteira') || name.includes('total')) {
+      this.kpiIcon = 'fa-solid fa-wallet';
+      this.kpiIconBg = 'bg-primary/10 text-primary border border-primary/20';
+    } else if (name.includes('orçamento') || name.includes('orcamento') || name.includes('meta')) {
+      this.kpiIcon = 'fa-solid fa-bullseye';
+      this.kpiIconBg = 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
+    } else {
+      this.kpiIcon = 'fa-solid fa-chart-line';
+      this.kpiIconBg = 'bg-primary/10 text-primary border border-primary/20';
+    }
   }
 
   private fmt(key: string, value: any): string {

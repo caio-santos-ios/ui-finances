@@ -1,9 +1,32 @@
-<h3 class="mb-2 text-muted-foreground group-hover:text-primary truncate text-md font-semibold tracking-wide focus:outline-hidden">{{ dashboard.name }}</h3>
+@if (dashboard.type !== 'kpi') {
+  <div class="mb-3 flex items-center justify-between gap-2">
+    <h3 class="text-foreground truncate text-sm font-semibold tracking-wide">{{ dashboard.name }}</h3>
+    <span class="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+      {{ dashboard.type }}
+    </span>
+  </div>
+}
 
 @if (dashboard.error) {
-  <p class="text-sm text-red-500">{{ dashboard.error }}</p>
+  <div class="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-xs text-destructive">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>{{ dashboard.error }}</span>
+  </div>
 } @else if (!rows.length) {
-  <p class="text-sm opacity-60">Sem dados no período.</p>
+  @if (dashboard.type === 'kpi') {
+    <div class="flex items-center justify-between gap-4">
+      <div class="min-w-0 flex-1">
+        <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider">{{ dashboard.name }}</p>
+        <p class="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">R$ 0,00</p>
+        <span class="mt-1.5 inline-block text-[11px] text-muted-foreground">Sem dados no período</span>
+      </div>
+      <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl {{ kpiIconBg }} shadow-xs">
+        <i class="{{ kpiIcon }} text-lg"></i>
+      </div>
+    </div>
+  } @else {
+    <p class="text-xs text-muted-foreground">Sem dados no período.</p>
+  }
 } @else {
   @switch (dashboard.type) {
     @case ('pie') {
@@ -22,7 +45,19 @@
         [chart]="{ type: 'line', height: 300 }" />
     }
     @case ('kpi') {
-      <p class="text-3xl font-bold">{{ kpi }}</p>
+      <div class="flex items-center justify-between gap-4">
+        <div class="min-w-0 flex-1">
+          <p class="text-muted-foreground text-xs font-medium uppercase tracking-wider">{{ dashboard.name }}</p>
+          <p class="mt-2 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{{ kpi }}</p>
+          <div class="mt-1.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            <span>Atualizado</span>
+          </div>
+        </div>
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl {{ kpiIconBg }} shadow-xs">
+          <i class="{{ kpiIcon }} text-lg"></i>
+        </div>
+      </div>
     }
     @case ('table') {
       <div class="overflow-x-auto">
