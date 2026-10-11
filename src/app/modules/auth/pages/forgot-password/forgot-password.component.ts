@@ -32,7 +32,7 @@ export class ForgotPasswordComponent extends MyFinance implements OnInit {
       }
       const { email } = this.form.value;
       const { data } = await api.post('/auth/forgot-password', { email });
-      this.toastSuccess(data?.message || 'Código de verificação enviado para o e-mail.');
+      this.toastSuccess(data?.message);
       setTimeout(() => {
         this.router.navigate(['/auth/sign-in']);
       }, 1500);

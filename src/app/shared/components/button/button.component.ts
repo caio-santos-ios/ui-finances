@@ -9,6 +9,7 @@ type ButtonProps = {
   tone: 'primary' | 'danger' | 'success' | 'warning' | 'info' | 'light';
   shadow: 'none' | 'small' | 'medium' | 'large';
   type: 'button' | 'submit' | 'reset';
+  isLoading: boolean;
 };
 
 @Component({
@@ -24,6 +25,7 @@ export class ButtonComponent implements OnInit {
   shape = input<ButtonProps['shape']>('rounded');
   tone = input<ButtonProps['tone']>('primary');
   shadow = input<ButtonProps['shadow']>('none');
+  isLoading = input<ButtonProps['isLoading']>(false);
   type = input<String>('submit');
   full = input(false, {
     transform: (value: boolean | string) => (typeof value === 'string' ? value === '' : value),
@@ -31,7 +33,6 @@ export class ButtonComponent implements OnInit {
   disabled = input(false, {
     transform: (value: boolean | string) => (typeof value === 'string' ? value === '' : value),
   });
-
   @Output() buttonClick = new EventEmitter<void>();
 
   public classes: string = '';

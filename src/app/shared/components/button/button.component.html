@@ -1,3 +1,7 @@
 <button [disabled]="disabled()" [type]="type()" (click)="onButtonClick()" [ngClass]="classes">
-  <ng-content></ng-content>
+  @if (isLoading()) {
+    <ng-content></ng-content>
+  } @else {
+    <ng-content></ng-content>
+  }
 </button>

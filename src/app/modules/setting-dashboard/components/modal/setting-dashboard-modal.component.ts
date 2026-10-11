@@ -1,4 +1,4 @@
-﻿import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { AbstractControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
@@ -11,6 +11,16 @@ function jsonArray(control: AbstractControl): ValidationErrors | null {
     return Array.isArray(JSON.parse(control.value)) ? null : { json: true };
   } catch {
     return { json: true };
+  }
+}
+
+function jsonObjectOrEmpty(control: AbstractControl): ValidationErrors | null {
+  if (!control.value || !control.value.trim()) return null;
+  try {
+    const parsed = JSON.parse(control.value);
+    return typeof parsed === 'object' && !Array.isArray(parsed) && parsed !== null ? null : { jsonObject: true };
+  } catch {
+    return { jsonObject: true };
   }
 }
 
@@ -43,6 +53,7 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
       type: ['kpi', [Validators.required]],
       collection: ['operations', [Validators.required]],
       cardClass: ['col-span-12 lg:col-span-6 bg-card rounded-xl p-4 border border-border shadow-xs'],
+      formats: ['', [jsonObjectOrEmpty]],
       query: ['[]', [Validators.required, jsonArray]],
     });
 
@@ -57,6 +68,7 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
       this.dashboard = data.data;
       this.form.patchValue({
         ...this.dashboard,
+        formats: this.dashboard.formats ? (typeof this.dashboard.formats === 'string' ? this.dashboard.formats : JSON.stringify(this.dashboard.formats, null, 2)) : '',
         query: typeof data.data.query === 'string' ? data.data.query : JSON.stringify(data.data.query, null, 2),
       });
       this.formatQuery();
@@ -72,7 +84,15 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
       const query = this.form.value.query;
       this.form.patchValue({ query: JSON.stringify(JSON.parse(query), null, 2) });
     } catch {
-      // JSON inválido: o editor já marca o erro na linha
+    }
+  }
+
+  private parseFormats(value: any) {
+    if (!value || typeof value !== 'string' || !value.trim()) return null;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
     }
   }
 
@@ -82,7 +102,11 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
         this.form.markAllAsTouched();
         return;
       }
-      const body = this.form.value;
+      const raw = this.form.value;
+      const body = {
+        ...raw,
+        formats: this.parseFormats(raw.formats),
+      };
       await api.post('/dashboard', body);
       this.toastSuccess('Configuração de dashboard criada com sucesso.');
       this.dialog.close(true);
@@ -97,8 +121,13 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
         this.form.markAllAsTouched();
         return;
       }
-      const body = this.form.value;
-      await api.put('/dashboard', { ...body, id: this.dialogData.id });
+      const raw = this.form.value;
+      const body = {
+        ...raw,
+        formats: this.parseFormats(raw.formats),
+        id: this.dialogData.id,
+      };
+      await api.put('/dashboard', body);
       this.toastSuccess('Configuração de dashboard atualizada com sucesso.');
       this.dialog.close(true);
     } catch (error) {
