@@ -3,7 +3,7 @@ import { MenuItem } from '../models/menu.model';
 export class Menu {
   public static pages: MenuItem[] = [
     {
-      group: 'Base',
+      group: '',
       separator: false,
       items: [
         {
