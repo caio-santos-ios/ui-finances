@@ -8,13 +8,12 @@ import { ResetPagination, TPagination } from 'src/app/shared/models/pagination';
 import { api } from 'src/app/shared/api/api';
 import Swal from 'sweetalert2';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
-import { MoneyPipe } from '../../../shared/pipes/money.pipe';
 
 @Component({
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [CommonModule, BreadcrumbComponent, ButtonComponent, MoneyPipe],
+  imports: [CommonModule, BreadcrumbComponent, ButtonComponent],
 })
 export class BankComponent extends MyFinance implements OnInit  {
   constructor(
