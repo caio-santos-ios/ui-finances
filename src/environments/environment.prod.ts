@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '',
+  apiUrl: 'https://my-finances-caio-santos-ios.duckdns.org/api',
 };
