@@ -6,31 +6,19 @@
   <div class="space-y-3 text-left">
     <div class="form__group">
       <div class="relative">
-        <input type="text" id="email" [ngClass]="{ 'is__invalid-input': submitted && f['email'].errors }"
-          class="peer block" placeholder=" " formControlName="email" />
-        <label for="email" [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['email'].errors }"
+        <input type="text" id="email" class="peer block" placeholder=" " formControlName="email" />
+        <label for="email"
           class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-left -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
           E-mail
         </label>
       </div>
-      @if (submitted && f['email'].errors) {
-      <div class="is__invalid-error">
-        @if (f['email'].errors['required']) {
-        <div>E-mail é obrigatório</div>
-        }
-        @if (f['email'].errors['email']) {
-        <div>E-mail inválido</div>
-        }
-      </div>
-      }
     </div>
 
     <div class="form__group">
       <div class="relative">
-        <input [type]="passwordTextType ? 'text' : 'password'" id="password"
-          [ngClass]="{ 'is__invalid-input': submitted && f['password'].errors }" class="peer block" placeholder=" "
+        <input [type]="passwordTextType ? 'text' : 'password'" id="password" class="peer block" placeholder=" "
           formControlName="password" />
-        <label for="password" [ngClass]="{ 'peer-focus:text-destructive!': submitted && f['password'].errors }"
+        <label for="password"
           class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-left -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
           Senha
         </label>
@@ -44,13 +32,6 @@
           </svg-icon>
         </span>
       </div>
-      @if (submitted && f['password'].errors) {
-      <div class="is__invalid-error">
-        @if (f['password'].errors['required']) {
-        <div>Senha é obrigatória</div>
-        }
-      </div>
-      }
     </div>
   </div>
 
@@ -60,18 +41,19 @@
       <label for="remember-me" class="text-muted-foreground ml-2 block text-sm"> Lembre de mim </label>
     </div>
 
-    <app-button routerLink="/auth/forgot-password" impact="none" tone="primary" shape="rounded" size="small">
+    <app-button [type]="'button'" routerLink="/auth/forgot-password" impact="none" tone="primary" shape="rounded" size="small">
       Esqueceu sua senha?
     </app-button>
   </div>
-
+  
   <div>
-    <app-button [disabled]="submitted" [isLoading]="submitted" full impact="bold" tone="primary" shape="rounded" size="medium">Entrar</app-button>
+    <app-button [disabled]="submitted" [isLoading]="submitted" full impact="bold" tone="primary" shape="rounded"
+      size="medium">Entrar</app-button>
   </div>
-
-  <div class="text-muted-foreground flex items-center text-sm">
-    Ainda não tem conta?
-    <app-button routerLink="/auth/sign-up" impact="none" tone="primary" shape="rounded" size="small">
+  
+  <div class="text-muted-foreground flex items-center text-sm gap-2">
+    <span>Ainda não tem conta?</span>
+    <app-button [type]="'button'" routerLink="/auth/sign-up" impact="none" tone="primary" shape="rounded" size="small">
       Cadastre-se
     </app-button>
   </div>

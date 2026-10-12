@@ -26,19 +26,28 @@ export class MyFinance {
     return this.cdrService;
   }
 
-  toastSuccess(message: string) {
-    toast.success(message);
+  private showToast(type: 'success' | 'error' | 'warning', message: string, duration: number) {
+    const id = toast[type](message, { duration: Number.POSITIVE_INFINITY });
     this.appRef.tick();
+    setTimeout(() => {
+      this.appRef.tick();
+    }, 50);
+    setTimeout(() => {
+      toast.dismiss(id);
+      this.appRef.tick();
+    }, duration);
   }
 
-  toastError(message: string) {
-    toast.error(message);
-    this.appRef.tick();
+  toastSuccess(message: string, duration: number = 4000) {
+    this.showToast('success', message, duration);
   }
 
-  toastWarning(message: string) {
-    toast.warning(message);
-    this.appRef.tick();
+  toastError(message: string, duration: number = 5000) {
+    this.showToast('error', message, duration);
+  }
+
+  toastWarning(message: string, duration: number = 5000) {
+    this.showToast('warning', message, duration);
   }
 
   normalizeErr(err: any) {
@@ -51,19 +60,18 @@ export class MyFinance {
     if (status >= 400 && status < 500) {
       const data = err?.response?.data;
       let message = data?.message;
-      toast.warning(message, { duration: 6000 });
-      this.appRef.tick();
+      this.toastWarning(message, 6000);
+      return;
     }
 
     if (status >= 500 && status < 600) {
       const message = 'Ocorreu um erro interno no servidor. Tente novamente mais tarde.';
-      toast.error(message);
-      this.appRef.tick();
+      this.toastError(message, 5000);
+      return;
     }
 
     if (!status) {
-      toast.error(err?.message || 'Falha de comunicação com o servidor.');
-      this.appRef.tick();
+      this.toastError(err?.message || 'Falha de comunicação com o servidor.', 5000);
     }
   }
 }

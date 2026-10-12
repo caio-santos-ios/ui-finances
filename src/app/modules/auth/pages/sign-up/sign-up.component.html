@@ -47,16 +47,15 @@
   <div class="flex items-center justify-between space-x-3">
     <div class="flex items-center gap-1">
       <input id="accept-term" name="accept-term" type="checkbox" />
-      <label for="accept-term" class="text-muted-foreground ml-2 block text-sm"> Aceito os </label>
-      <app-button impact="none" tone="primary" shape="rounded" size="small"> Termos </app-button>
+      <label for="accept-term" class="text-muted-foreground ml-2 block text-sm"> Aceito os Termos </label>
     </div>
   </div>
 
   <div>
-    <app-button full impact="bold" tone="primary" shape="rounded" size="medium">Inscrever-se</app-button>
+    <app-button [disabled]="submitted" [isLoading]="submitted" full impact="bold" tone="primary" shape="rounded" size="medium">Inscrever-se</app-button>
   </div>
 
-  <div class="text-muted-foreground flex items-center text-sm">
+  <div class="text-muted-foreground flex items-center text-sm gap-2">
     Já tem uma conta?
     <app-button routerLink="/auth/sign-in" impact="none" tone="primary" shape="rounded" size="small">
       Fazer login

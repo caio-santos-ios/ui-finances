@@ -13,23 +13,19 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
   imports: [FormsModule, ReactiveFormsModule, RouterLink, ButtonComponent],
 })
 export class ForgotPasswordComponent extends MyFinance implements OnInit {
-  form!: FormGroup;
-  submitted = false;
-  passwordTextType!: boolean;
-  
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
     });
   }
+  
+  form!: FormGroup;
+  submitted = false;
+  passwordTextType!: boolean; 
 
   async onSubmit() {
     try {
       this.submitted = true;
-      if (this.form.invalid) {
-        this.toastError('Informe um e-mail válido.');
-        return;
-      }
       const { email } = this.form.value;
       const { data } = await api.post('/auth/forgot-password', { email });
       this.toastSuccess(data?.message);
@@ -38,6 +34,9 @@ export class ForgotPasswordComponent extends MyFinance implements OnInit {
       }, 1500);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.submitted = false;
+      this.cdr.markForCheck();
     }
   }
 }

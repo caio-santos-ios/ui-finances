@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -12,7 +11,7 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [FormsModule, ReactiveFormsModule, RouterLink, AngularSvgIconModule, ButtonComponent, NgClass],
+  imports: [FormsModule, ReactiveFormsModule, RouterLink, AngularSvgIconModule, ButtonComponent],
 })
 export class SignInComponent extends MyFinance implements OnInit {
   constructor() {

@@ -330,6 +330,12 @@ select {
 }
 
 [data-sonner-toast] {
-  --y: translateY(0) !important;
   opacity: 1 !important;
+  --y: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+[data-sonner-toast][data-removed='true'] {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

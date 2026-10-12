@@ -19,8 +19,6 @@ export class SignUpComponent extends MyFinance implements OnInit {
     super();
   }
 
-  form!: FormGroup;
-
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required]],
@@ -31,24 +29,27 @@ export class SignUpComponent extends MyFinance implements OnInit {
     });
   }
 
+  form!: FormGroup;
+  submitted = false;
+
   async onSubmit() {
     try {
-      if (this.form.invalid) {
-        this.toastError('Preencha todos os campos obrigatórios.');
-        return;
-      }
+      this.submitted = true;
       const body = this.form.value;
       if (body.password !== body.confirmPassword) {
-        this.toastError('As senhas não conferem.');
+        this.toastWarning('As senhas não conferem.');
         return;
       }
       const { data } = await api.post('/auth/register', { ...body });
-      this.toastSuccess(data?.message || 'Usuário criado com sucesso.');
+      this.toastSuccess(data?.message);
       setTimeout(() => {
         this.router.navigate(['/auth/sign-in']);
       }, 1500);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.cdr.markForCheck();
+      this.submitted = false;
     }
   }
 }
