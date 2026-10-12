@@ -2,6 +2,7 @@ import { ApplicationRef, ChangeDetectorRef, inject, Injectable } from '@angular/
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { toast } from 'ngx-sonner';
+import { jwtDecode } from "jwt-decode";
 
 @Injectable({
   providedIn: 'root',
@@ -17,11 +18,11 @@ export class MyFinance {
   get router() {
     return this.routerService;
   }
-  
+
   get formBuilder() {
     return this.formBuilderService;
   }
-  
+
   get cdr() {
     return this.cdrService;
   }
@@ -72,6 +73,26 @@ export class MyFinance {
 
     if (!status) {
       this.toastError(err?.message || 'Falha de comunicação com o servidor.', 5000);
+    }
+  }
+
+  getUser() {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      const decodedHeader: any = jwtDecode(token);
+
+      return {
+        name: decodedHeader.name,
+        photo: decodedHeader.photo,
+        email: decodedHeader.email
+      }
+    } else {
+      return {
+        name: "",
+        photo: "",
+        email: ""
+      }
     }
   }
 }

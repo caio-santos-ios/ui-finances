@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { ThemeService } from '../../../../../core/services/theme.service';
 import { ClickOutsideDirective } from '../../../../../shared/directives/click-outside.directive';
+import { MyFinance } from 'src/app/core/utils/my-finance.util';
 
 @Component({
   selector: 'app-profile-menu',
@@ -35,21 +36,16 @@ import { ClickOutsideDirective } from '../../../../../shared/directives/click-ou
     ]),
   ],
 })
-export class ProfileMenuComponent implements OnInit {
+export class ProfileMenuComponent extends MyFinance implements OnInit {
   public isOpen = false;
   public profileMenu = [
     {
-      title: 'Your Profile',
+      title: 'Meu Perfil',
       icon: './assets/icons/heroicons/outline/user-circle.svg',
       link: '/profile',
     },
     {
-      title: 'Settings',
-      icon: './assets/icons/heroicons/outline/cog-6-tooth.svg',
-      link: '/settings',
-    },
-    {
-      title: 'Log out',
+      title: 'Sair',
       icon: './assets/icons/heroicons/outline/logout.svg',
       link: '/auth',
     },
@@ -57,31 +53,31 @@ export class ProfileMenuComponent implements OnInit {
 
   public themeColors = [
     {
-      name: 'base',
+      name: 'Padrão',
       code: '#e11d48',
     },
     {
-      name: 'yellow',
+      name: 'Amarelo',
       code: '#f59e0b',
     },
     {
-      name: 'green',
+      name: 'Verde',
       code: '#22c55e',
     },
     {
-      name: 'blue',
+      name: 'Azul',
       code: '#3b82f6',
     },
     {
-      name: 'orange',
+      name: 'Laranja',
       code: '#ea580c',
     },
     {
-      name: 'red',
+      name: 'Vermelho',
       code: '#cc0022',
     },
     {
-      name: 'violet',
+      name: 'Violeta',
       code: '#6d28d9',
     },
   ];
@@ -89,9 +85,15 @@ export class ProfileMenuComponent implements OnInit {
   public themeMode = ['light', 'dark'];
   public themeDirection = ['ltr', 'rtl'];
 
-  constructor(public themeService: ThemeService) {}
+  constructor(public themeService: ThemeService) {
+    super();
+  }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.user = this.getUser();
+  }
+
+  user: any = { name: "", email: "", photo: "" }
 
   public toggleMenu(): void {
     this.isOpen = !this.isOpen;
