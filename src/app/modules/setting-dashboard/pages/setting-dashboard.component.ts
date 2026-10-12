@@ -18,7 +18,6 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
 export class SettingDashboardComponent extends MyFinance implements OnInit {
   constructor(
     private dialog: Dialog,
-    private cdr: ChangeDetectorRef,
   ) {
     super();
   }

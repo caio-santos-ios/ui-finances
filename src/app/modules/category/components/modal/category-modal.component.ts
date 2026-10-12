@@ -17,8 +17,7 @@ export class CategoryModalComponent extends MyFinance implements OnInit {
 
   constructor(
     private dialog: DialogRef,
-    @Inject(DIALOG_DATA) public dialogData: { id: string },
-    private cdr: ChangeDetectorRef,
+    @Inject(DIALOG_DATA) public dialogData: { id: string }
   ) {
     super();
   }

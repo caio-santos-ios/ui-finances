@@ -15,7 +15,7 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
   ],
 })
 export class NftComponent extends MyFinance implements OnInit {
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor() {
     super();
   }
 

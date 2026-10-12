@@ -66,7 +66,7 @@
   </div>
 
   <div>
-    <app-button full impact="bold" tone="primary" shape="rounded" size="medium">Entrar</app-button>
+    <app-button [disabled]="submitted" [isLoading]="submitted" full impact="bold" tone="primary" shape="rounded" size="medium">Entrar</app-button>
   </div>
 
   <div class="text-muted-foreground flex items-center text-sm">

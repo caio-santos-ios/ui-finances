@@ -24,12 +24,12 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       localStorage.removeItem('role');
       const path = window.location.pathname;
+      console.log(path)
       if (path !== '/login' && !path.startsWith('/reset-password') && !path.startsWith('/confirmation')) {
-        window.location.href = '/login';
+        window.location.href = '/auth/sign-in';
       }
     }
     return Promise.reject(error);

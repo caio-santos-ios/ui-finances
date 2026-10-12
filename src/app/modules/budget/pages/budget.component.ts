@@ -19,7 +19,6 @@ import { MoneyPipe } from '../../../shared/pipes/money.pipe';
 export class BudgetComponent extends MyFinance implements OnInit  {
   constructor(
     private dialog: Dialog,
-    private cdr: ChangeDetectorRef,
   ) {
     super();
   }

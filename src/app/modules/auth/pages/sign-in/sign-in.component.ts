@@ -15,10 +15,6 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
   imports: [FormsModule, ReactiveFormsModule, RouterLink, AngularSvgIconModule, ButtonComponent, NgClass],
 })
 export class SignInComponent extends MyFinance implements OnInit {
-  form!: FormGroup;
-  submitted = false;
-  passwordTextType!: boolean;
-
   constructor() {
     super();
   }
@@ -30,6 +26,10 @@ export class SignInComponent extends MyFinance implements OnInit {
       rememberMe: [false],
     });
   }
+
+  form!: FormGroup;
+  submitted = false;
+  passwordTextType!: boolean;
 
   get f() {
     return this.form.controls;
@@ -44,10 +44,6 @@ export class SignInComponent extends MyFinance implements OnInit {
       this.submitted = true;
       const { email, password, rememberMe } = this.form.value;
 
-      if (this.form.invalid) {
-        return;
-      }
-
       const { data } = await api.post("/auth/login", { email, password });
       localStorage.setItem("token", data.data.token);
       localStorage.setItem("refreshToken", data.data.refreshToken);
@@ -57,6 +53,9 @@ export class SignInComponent extends MyFinance implements OnInit {
       }, 200);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.cdr.markForCheck();
+      this.submitted = false;
     }
   }
 }
