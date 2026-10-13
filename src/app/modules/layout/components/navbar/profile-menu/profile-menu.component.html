@@ -51,7 +51,7 @@
           class="focus-visible:ring-ring border-border bg-background text-muted-foreground hover:bg-card hover:text-foreground shadow-xs inline-flex h-8 cursor-pointer items-center justify-start space-x-2 whitespace-nowrap rounded-md border border-dashed px-3 text-xs font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50">
           <span [style.backgroundColor]="item.code"
             class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"></span>
-          <p class="capitalize">{{ item.name }}</p>
+          <p class="capitalize">{{ normalizeNameColor(item.name) }}</p>
         </div>
         }
       </div>

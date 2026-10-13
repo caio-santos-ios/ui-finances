@@ -53,31 +53,31 @@ export class ProfileMenuComponent extends MyFinance implements OnInit {
 
   public themeColors = [
     {
-      name: 'Padrão',
+      name: 'base',
       code: '#e11d48',
     },
     {
-      name: 'Amarelo',
+      name: 'yellow',
       code: '#f59e0b',
     },
     {
-      name: 'Verde',
+      name: 'green',
       code: '#22c55e',
     },
     {
-      name: 'Azul',
+      name: 'blue',
       code: '#3b82f6',
     },
     {
-      name: 'Laranja',
+      name: 'orange',
       code: '#ea580c',
     },
     {
-      name: 'Vermelho',
+      name: 'red',
       code: '#cc0022',
     },
     {
-      name: 'Violeta',
+      name: 'violet',
       code: '#6d28d9',
     },
   ];
@@ -120,5 +120,13 @@ export class ProfileMenuComponent extends MyFinance implements OnInit {
     this.themeService.theme.update((theme) => {
       return { ...theme, direction: value };
     });
+  }
+
+  normalizeNameColor(color: string) {
+    switch(color) {
+      case "yellow": return "Amarelo";
+      default:
+        return "Padrão"
+    }
   }
 }
