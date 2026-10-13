@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MenuItem } from 'src/app/core/models/menu.model';
 import { MenuService } from '../../../services/menu.service';
@@ -9,7 +8,7 @@ import { NavbarSubmenuComponent } from '../navbar-submenu/navbar-submenu.compone
   templateUrl: './navbar-menu.component.html',
   styleUrls: ['./navbar-menu.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [NgClass, NavbarSubmenuComponent],
+  imports: [NavbarSubmenuComponent],
 })
 export class NavbarMenuComponent implements OnInit {
   private showMenuClass = ['scale-100', 'animate-fade-in-up', 'opacity-100', 'pointer-events-auto'];

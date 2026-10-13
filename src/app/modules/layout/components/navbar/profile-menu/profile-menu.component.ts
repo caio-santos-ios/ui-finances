@@ -1,5 +1,5 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { NgClass } from '@angular/common';
+import { NgClass, UpperCasePipe } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -11,7 +11,7 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
   selector: 'app-profile-menu',
   templateUrl: './profile-menu.component.html',
   styleUrls: ['./profile-menu.component.css'],
-  imports: [ClickOutsideDirective, NgClass, RouterLink, AngularSvgIconModule],
+  imports: [ClickOutsideDirective, NgClass, RouterLink, AngularSvgIconModule, UpperCasePipe],
   changeDetection: ChangeDetectionStrategy.Eager,
   animations: [
     trigger('openClose', [
@@ -91,6 +91,10 @@ export class ProfileMenuComponent extends MyFinance implements OnInit {
 
   ngOnInit(): void {
     this.user = this.getUser();
+    window.addEventListener('user-profile-updated', () => {
+      this.user = this.getUser();
+      this.cdr.markForCheck();
+    });
   }
 
   user: any = { name: "", email: "", photo: "" }

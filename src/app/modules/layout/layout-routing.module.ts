@@ -40,6 +40,12 @@ const routes: Routes = [
     loadChildren: () => import('../setting-dashboard/setting-dashboard.module').then((m) => m.SettingDashboardModule),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'profile',
+    component: LayoutComponent,
+    loadChildren: () => import('../profile/profile.module').then((m) => m.ProfileModule),
+    canActivate: [AuthGuard],
+  },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },
 ];

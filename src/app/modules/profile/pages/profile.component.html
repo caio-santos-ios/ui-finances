@@ -1,0 +1,100 @@
+<app-breadcrumb [module]="'Meu Perfil'" icon="fa-solid fa-user-circle"></app-breadcrumb>
+
+<div class="border-muted/20 bg-background rounded-xl border p-6">
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <!-- Seção de Foto -->
+    <div class="flex flex-col items-center justify-start border-b border-border/40 pb-6 lg:border-b-0 lg:border-r lg:pr-8">
+      <div class="relative mb-4 flex items-center justify-center">
+        @if (currentPhoto) {
+          <img [src]="currentPhoto" alt="Foto do Usuário"
+            class="h-32 w-32 rounded-full border-2 border-primary/40 object-cover shadow-sm" />
+        } @else {
+          <div class="h-32 w-32 rounded-full bg-primary/10 text-primary flex items-center justify-center border-2 border-primary/20 text-4xl font-bold">
+            {{ (form.get('name')?.value ? form.get('name')?.value[0] : 'U') | uppercase }}
+          </div>
+        }
+
+        @if (uploadingPhoto) {
+          <div class="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white">
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl"></i>
+          </div>
+        }
+      </div>
+
+      <div class="flex flex-col items-center gap-2 w-full max-w-xs">
+        <input #fileInput type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" />
+
+        <button type="button" (click)="fileInput.click()" [disabled]="uploadingPhoto || removingPhoto"
+          class="border-border bg-card text-foreground hover:bg-muted inline-flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors disabled:opacity-50">
+          <i class="fa-solid fa-camera text-primary"></i>
+          {{ uploadingPhoto ? 'Enviando...' : 'Alterar Foto' }}
+        </button>
+
+        @if (currentPhoto) {
+          <button type="button" (click)="removePhoto()" [disabled]="uploadingPhoto || removingPhoto"
+            class="text-destructive hover:bg-destructive/10 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-1.5 text-xs font-medium transition-colors disabled:opacity-50">
+            <i class="fa-solid fa-trash-can"></i>
+            {{ removingPhoto ? 'Removendo...' : 'Remover Foto' }}
+          </button>
+        }
+
+        <p class="text-muted-foreground mt-2 text-center text-[11px]">
+          Formatos aceitos: JPG, PNG, WEBP.
+        </p>
+      </div>
+    </div>
+
+    <!-- Seção de Dados e Senha -->
+    <div class="lg:col-span-2">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div>
+          <h3 class="text-foreground text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+            Dados Pessoais
+          </h3>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="sm:col-span-2">
+              <label for="name" class="text-foreground mb-1 block text-xs font-medium">Nome Completo</label>
+              <input type="text" id="name" formControlName="name" placeholder="Seu nome"
+                class="border-border bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-md border p-2.5 text-xs outline-hidden" />
+            </div>
+
+            <div>
+              <label for="email" class="text-foreground mb-1 block text-xs font-medium">E-mail</label>
+              <input type="email" id="email" formControlName="email" placeholder="seu@email.com"
+                class="border-border bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-md border p-2.5 text-xs outline-hidden" />
+            </div>
+
+            <div>
+              <label for="phone" class="text-foreground mb-1 block text-xs font-medium">Telefone / Celular</label>
+              <input type="tel" id="phone" formControlName="phone" placeholder="(00) 00000-0000"
+                class="border-border bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-md border p-2.5 text-xs outline-hidden" />
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-border/40 pt-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h3 class="text-foreground text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                Segurança
+              </h3>
+              <p class="text-muted-foreground text-xs">
+                Mantenha sua conta protegida alterando sua senha periodicamente.
+              </p>
+            </div>
+
+            <app-button type="button" (buttonClick)="openChangePasswordModal()" impact="bold" tone="light" shape="rounded" size="medium">
+              <i class="fa-solid fa-key mr-1.5 text-primary"></i> Alterar Senha
+            </app-button>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-4 border-t border-border/40">
+          <app-button [disabled]="submitted || loading" [isLoading]="submitted" impact="bold" tone="primary" shape="rounded" size="medium">
+            <i class="fa-solid fa-check mr-1.5"></i> Salvar Alterações
+          </app-button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

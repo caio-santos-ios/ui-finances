@@ -83,12 +83,14 @@ export class MyFinance {
       const decodedHeader: any = jwtDecode(token);
 
       return {
+        id: decodedHeader.sub,
         name: decodedHeader.name,
         photo: decodedHeader.photo,
         email: decodedHeader.email
       }
     } else {
       return {
+        id: "",
         name: "",
         photo: "",
         email: ""
