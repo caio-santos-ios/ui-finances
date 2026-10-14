@@ -45,6 +45,11 @@ export class ProfileMenuComponent extends MyFinance implements OnInit {
       link: '/profile',
     },
     {
+      title: 'Política de Privacidade',
+      icon: './assets/icons/heroicons/outline/shield-check.svg',
+      link: '/politica-de-privacidade',
+    },
+    {
       title: 'Sair',
       icon: './assets/icons/heroicons/outline/logout.svg',
       link: '/auth',

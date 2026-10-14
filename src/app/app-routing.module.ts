@@ -21,6 +21,18 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'politica-de-privacidade',
+    loadComponent: () =>
+      import('./modules/auth/pages/privacy-policy/privacy-policy.component').then(
+        (m) => m.PrivacyPolicyComponent,
+      ),
+  },
+  {
+    path: 'privacy-policy',
+    redirectTo: 'politica-de-privacidade',
+    pathMatch: 'full',
+  },
+  {
     path: 'errors',
     loadChildren: () => import('./modules/error/error.module').then((m) => m.ErrorModule),
   },
