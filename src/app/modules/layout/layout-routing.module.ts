@@ -47,7 +47,6 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: 'error/404' },
 ];
 
 @NgModule({

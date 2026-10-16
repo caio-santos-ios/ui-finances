@@ -23,6 +23,13 @@ const routes: Routes = [
       { path: 'confirm-account', component: ConfirmAccountComponent },
       { path: 'confirm-account/:code', component: ConfirmAccountComponent },
       { path: 'two-steps', component: TwoStepsComponent },
+      {
+        path: 'politica-de-privacidade',
+        loadComponent: () =>
+          import('./pages/privacy-policy/privacy-policy.component').then(
+            (m) => m.PrivacyPolicyComponent,
+          ),
+      },
       { path: '**', redirectTo: 'sign-in', pathMatch: 'full' },
     ],
   },
