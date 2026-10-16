@@ -31,8 +31,8 @@
           formControlName="categoryId"
           class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
           <option value="">Selecione</option>
-          @for (item of categories; track $index) {
-            <option value="{{item.id}}">{{item.name}}</option>
+          @for (item of categories; track item.id) {
+            <option [value]="item.id">{{item.name}}</option>
           }
         </select>
       </div>
@@ -43,8 +43,8 @@
           formControlName="bankId"
           class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
           <option value="">Selecione</option>
-          @for (item of banks; track $index) {
-            <option value="{{item.id}}">{{item.name}}</option>
+          @for (item of banks; track item.id) {
+            <option [value]="item.id">{{item.name}}</option>
           }
         </select>
       </div>

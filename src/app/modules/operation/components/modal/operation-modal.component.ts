@@ -39,23 +39,34 @@ export class OperationModalComponent extends MyFinance implements OnInit {
       description: ['', [Validators.required]],
     });
 
-    this.form.get('type')?.valueChanges.subscribe(async () => {
-      this.form.patchValue({ categoryId: '' });
-      await this.getCategories();
-    });
-
-    await this.getCategories();
     await this.getBanks();
     if (this.dialogData?.id) {
       await this.getById(this.dialogData.id);
+    } else {
+      await this.getCategories();
     }
+
+    this.form.get('type')?.valueChanges.subscribe(async () => {
+      this.form.patchValue({ categoryId: '' }, { emitEvent: false });
+      await this.getCategories();
+    });
   }
 
   async getById(id: string) {
     try {
       const { data } = await api.get(`/operations/${id}`);
       this.operation = data.data;
-      this.form.patchValue({ ...this.operation, createdAt: this.operation.createdAt.split("T")[0] });
+      this.form.patchValue({ type: this.operation.type }, { emitEvent: false });
+      await this.getCategories();
+      this.form.patchValue(
+        {
+          ...this.operation,
+          categoryId: this.operation.categoryId || '',
+          bankId: this.operation.bankId || '',
+          createdAt: this.operation.createdAt.split("T")[0],
+        },
+        { emitEvent: false }
+      );
     } catch (error) {
       this.normalizeErr(error);
     } finally {
