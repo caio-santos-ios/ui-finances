@@ -31,7 +31,7 @@ export class SettingDashboardComponent extends MyFinance implements OnInit {
 
   async loadData(page: number) {
     try {
-      const { data } = await api.get(`/dashboard?deleted=false&pageNumber=${page}&pageSize=10`);
+      const { data } = await api.get(`/dashboard?deleted=false&pageNumber=${page}&pageSize=10&orderBy=sequence`);
       this.pagination = data.data;
       const count = Number(this.pagination.totalPages) || 0;
       this.totalPages = Array.from({ length: count }, (_, i) => i + 1);
