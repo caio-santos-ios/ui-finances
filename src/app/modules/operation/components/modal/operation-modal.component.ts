@@ -32,8 +32,9 @@ export class OperationModalComponent extends MyFinance implements OnInit {
   async ngOnInit(): Promise<void> {
     this.form = this.formBuilder.group({
       type: ['income', [Validators.required]],
-      categoryId: ['', [Validators.required]],
+      categoryId: [''],
       bankId: ['', [Validators.required]],
+      destinationBankId: [''],
       value: ['', [Validators.required]],
       createdAt: [new Date().toISOString().split("T")[0], [Validators.required]],
       description: ['', [Validators.required]],
@@ -46,9 +47,14 @@ export class OperationModalComponent extends MyFinance implements OnInit {
       await this.getCategories();
     }
 
-    this.form.get('type')?.valueChanges.subscribe(async () => {
-      this.form.patchValue({ categoryId: '' }, { emitEvent: false });
-      await this.getCategories();
+    this.form.get('type')?.valueChanges.subscribe(async (type) => {
+      this.form.patchValue({ categoryId: '', destinationBankId: '' }, { emitEvent: false });
+      if (type !== 'transfer') {
+        await this.getCategories();
+      } else {
+        this.categories = [];
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -57,12 +63,15 @@ export class OperationModalComponent extends MyFinance implements OnInit {
       const { data } = await api.get(`/operations/${id}`);
       this.operation = data.data;
       this.form.patchValue({ type: this.operation.type }, { emitEvent: false });
-      await this.getCategories();
+      if (this.operation.type !== 'transfer') {
+        await this.getCategories();
+      }
       this.form.patchValue(
         {
           ...this.operation,
           categoryId: this.operation.categoryId || '',
           bankId: this.operation.bankId || '',
+          destinationBankId: this.operation.destinationBankId || '',
           createdAt: this.operation.createdAt.split("T")[0],
         },
         { emitEvent: false }
@@ -76,6 +85,10 @@ export class OperationModalComponent extends MyFinance implements OnInit {
 
   async getCategories() {
     try {
+      if (this.form.value.type === 'transfer') {
+        this.categories = [];
+        return;
+      }
       const { data } = await api.get(`/categories/select?deleted=false&type=${this.form.value.type}`);
       this.categories = data.data;
     } catch (error) {

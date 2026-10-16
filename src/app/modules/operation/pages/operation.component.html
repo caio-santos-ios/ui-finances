@@ -31,6 +31,10 @@
             <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
               <i class="fa-solid fa-arrow-trend-up text-[10px]"></i> Receita
             </span>
+            } @else if (item.type === 'transfer') {
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400">
+              <i class="fa-solid fa-arrow-right-arrow-left text-[10px]"></i> Transferência
+            </span>
             } @else {
             <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-600 dark:text-rose-400">
               <i class="fa-solid fa-arrow-trend-down text-[10px]"></i> Despesa

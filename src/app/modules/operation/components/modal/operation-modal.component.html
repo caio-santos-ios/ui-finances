@@ -22,8 +22,10 @@
           class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
           <option value="income">Receita</option>
           <option value="expense">Despesa</option>
+          <option value="transfer">Transferência</option>
         </select>
       </div>
+      @if (form.value.type !== 'transfer') {
       <div class="col-span-12">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="category">Categoria</label>
         <select
@@ -36,8 +38,9 @@
           }
         </select>
       </div>
+      }
       <div class="col-span-12">
-        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="bank">Banco</label>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="bank">{{form.value.type === 'transfer' ? 'Banco de Origem' : 'Banco'}}</label>
         <select
           id="bank"
           formControlName="bankId"
@@ -48,6 +51,20 @@
           }
         </select>
       </div>
+      @if (form.value.type === 'transfer') {
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="destinationBank">Banco de Destino</label>
+        <select
+          id="destinationBank"
+          formControlName="destinationBankId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Selecione</option>
+          @for (item of banks; track item.id) {
+            <option [value]="item.id">{{item.name}}</option>
+          }
+        </select>
+      </div>
+      }
       <div class="col-span-12">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="value">Valor</label>
         <input
