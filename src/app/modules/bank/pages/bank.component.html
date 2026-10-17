@@ -7,10 +7,10 @@
 @if (pagination.totalCount > 0) {
 <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
   <div
-    class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted grow overflow-x-auto px-5">
+    class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[calc(100vh-270px)] grow overflow-auto px-5">
     <table
       class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
-      <thead class="border-muted/20 text-muted-foreground border-b text-xs font-semibold uppercase">
+      <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
         <tr>
           <th class="py-3 px-4">Nome</th>
           <th class="py-3 px-4">Data de Criação</th>

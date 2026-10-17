@@ -60,10 +60,10 @@
       </div>
     }
     @case ('table') {
-      <div class="overflow-x-auto">
+      <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-72 overflow-auto">
         <table class="w-full text-left text-sm text-muted-foreground">
-          <thead>
-            <tr>@for (col of columns; track col) { <th class="py-1 truncate text-md font-semibold tracking-wide focus:outline-hidden">{{ col }}</th> }</tr>
+          <thead class="border-muted/20 bg-card sticky top-0 z-10 border-b">
+            <tr>@for (col of columns; track col) { <th class="py-1.5 truncate text-md font-semibold tracking-wide focus:outline-hidden">{{ col }}</th> }</tr>
           </thead>
           <tbody>
             @for (row of tableRows; track $index) {
