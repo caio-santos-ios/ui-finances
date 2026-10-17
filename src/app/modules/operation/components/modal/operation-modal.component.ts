@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -38,6 +38,8 @@ export class OperationModalComponent extends MyFinance implements OnInit {
       value: ['', [Validators.required]],
       createdAt: [new Date().toISOString().split("T")[0], [Validators.required]],
       description: ['', [Validators.required]],
+      repeat: [false],
+      recurrence: [''],
     });
 
     await this.getBanks();
@@ -52,9 +54,19 @@ export class OperationModalComponent extends MyFinance implements OnInit {
       if (type !== 'transfer') {
         await this.getCategories();
       } else {
+        this.form.patchValue({ repeat: false, recurrence: '' }, { emitEvent: false });
         this.categories = [];
         this.cdr.markForCheck();
       }
+    });
+
+    this.form.get('repeat')?.valueChanges.subscribe((repeat) => {
+      if (repeat && !this.form.value.recurrence) {
+        this.form.patchValue({ recurrence: 'monthly' }, { emitEvent: false });
+      } else if (!repeat) {
+        this.form.patchValue({ recurrence: '' }, { emitEvent: false });
+      }
+      this.cdr.markForCheck();
     });
   }
 
@@ -73,6 +85,8 @@ export class OperationModalComponent extends MyFinance implements OnInit {
           bankId: this.operation.bankId || '',
           destinationBankId: this.operation.destinationBankId || '',
           createdAt: this.operation.createdAt.split("T")[0],
+          repeat: !!this.operation.repeat,
+          recurrence: this.operation.recurrence || '',
         },
         { emitEvent: false }
       );
@@ -113,6 +127,7 @@ export class OperationModalComponent extends MyFinance implements OnInit {
     try {
       const body = { ...this.form.value };
       if (!body.value) body.value = 0;
+      if (!body.repeat) body.recurrence = '';
       await api.post('/operations', body);
       this.dialog.close(true);
     } catch (error) {
@@ -124,6 +139,7 @@ export class OperationModalComponent extends MyFinance implements OnInit {
     try {
       const body = { ...this.form.value };
       if (!body.value) body.value = 0;
+      if (!body.repeat) body.recurrence = '';
       await api.put('/operations', { ...body, id: this.dialogData.id });
       this.dialog.close(true);
     } catch (error) {

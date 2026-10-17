@@ -95,7 +95,36 @@
           placeholder="Descrição"
           formControlName="description"
           class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
-      </div>      
+      </div>
+      @if (form.value.type !== 'transfer') {
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="repeat">Repetir operação</label>
+        <label for="repeat" class="flex cursor-pointer items-center justify-between gap-3">
+          <span class="relative inline-flex shrink-0">
+            <input id="repeat" type="checkbox" role="switch" formControlName="repeat"
+              class="peer sr-only" />
+            <span
+              class="h-[1.8rem] w-11 rounded-full bg-slate-300 transition-colors dark:bg-slate-600 peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2"></span>
+            <span
+              class="absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4"></span>
+          </span>
+        </label>
+      </div>
+      @if (form.value.repeat) {
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="recurrence">Recorrência</label>
+        <select
+          id="recurrence"
+          formControlName="recurrence"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Selecione</option>
+          <option value="weekly">Semanal</option>
+          <option value="monthly">Mensal</option>
+          <option value="yearly">Anual</option>
+        </select>
+      </div>
+      }
+      }
     </div>
 
     <div class="mt-6 flex justify-end gap-2">
