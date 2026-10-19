@@ -15,6 +15,7 @@ export class DashboardCardComponent implements OnChanges {
   rows: any[] = [];
   labels: string[] = [];
   values: number[] = [];
+  stackedSeries: { name: string; data: number[] }[] = [];
   columns: string[] = [];
   tableRows: Record<string, string>[] = [];
   kpi = '';
@@ -38,16 +39,78 @@ export class DashboardCardComponent implements OnChanges {
     this.values = this.rows.map(r => Number(r[valueKey] ?? 0));
     this.kpi = this.rows.length ? this.fmt(valueKey, first[valueKey]) : '';
 
+    if (this.dashboard?.type === 'stacked-bar') {
+      this.buildStackedSeries(first, labelKey, valueKey);
+    }
+
     this.columns = Object.keys(first);
     this.tableRows = this.rows.map(r =>
       Object.fromEntries(this.columns.map(c => [c, this.fmt(c, r[c])])));
 
-    const money = (v: number) => this.fmt(valueKey, v);
+    const formats = this.dashboard?.formats ?? {};
+    const formatKey = (valueKey in formats)
+      ? valueKey
+      : (Object.keys(formats).find(k => k !== labelKey) ?? valueKey);
+    const money = (v: number) => this.fmt(formatKey, v);
     this.yaxis = { labels: { formatter: money } };
     this.dataLabels = { formatter: money };
     this.tooltip = { y: { formatter: money } };
 
     this.resolveKpiStyle();
+  }
+
+  private buildStackedSeries(first: any, labelKey: string, valueKey: string): void {
+    if (!this.rows.length) {
+      this.stackedSeries = [];
+      return;
+    }
+
+    const arrayKey = Object.keys(first).find(k => Array.isArray(first[k]));
+    if (arrayKey) {
+      const seriesNames = Array.from(
+        new Set(
+          this.rows.flatMap(r =>
+            (r[arrayKey] ?? []).map((item: any) => String(item.name ?? item.series ?? item.label ?? item._id ?? ''))
+          )
+        )
+      ).filter(Boolean);
+
+      this.stackedSeries = seriesNames.map(name => ({
+        name,
+        data: this.rows.map(r => {
+          const found = (r[arrayKey] ?? []).find(
+            (item: any) => String(item.name ?? item.series ?? item.label ?? item._id ?? '') === name
+          );
+          return Number(found?.[valueKey] ?? found?.total ?? found?.value ?? 0);
+        }),
+      }));
+      return;
+    }
+
+    const groupKey = ['series', 'category', 'group', 'type', 'bank', 'stack'].find(
+      k => k in first && k !== labelKey && k !== valueKey && typeof first[k] === 'string'
+    );
+
+    if (groupKey) {
+      const rawLabels = Array.from(new Set(this.rows.map(r => r[labelKey])));
+      this.labels = rawLabels.map(l => this.fmt(labelKey, l));
+      const seriesNames = Array.from(new Set(this.rows.map(r => String(r[groupKey] ?? ''))));
+
+      this.stackedSeries = seriesNames.map(name => ({
+        name,
+        data: rawLabels.map(l => {
+          const found = this.rows.find(r => r[labelKey] === l && String(r[groupKey] ?? '') === name);
+          return Number(found?.[valueKey] ?? 0);
+        }),
+      }));
+      return;
+    }
+
+    const seriesKeys = Object.keys(first).filter(k => k !== labelKey);
+    this.stackedSeries = seriesKeys.map(key => ({
+      name: key,
+      data: this.rows.map(r => Number(r[key] ?? 0)),
+    }));
   }
 
   private resolveKpiStyle(): void {
