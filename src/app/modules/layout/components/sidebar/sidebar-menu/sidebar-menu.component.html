@@ -10,7 +10,7 @@
           'hover:bg-card/50': !menuService.showSideBar
         }"
             class="text-muted-foreground hover:text-foreground group relative flex grow items-center gap-4 rounded-lg px-2">
-            <i class="fa-solid fa-{{item.icon}} {{item.active && !menuService.showSideBar ? 'text-primary' : 'text-muted-foreground/50'}}"></i>
+            <i class="fa-solid fa-{{item.icon}} {{item.active || menuService.isActive(item.route) ? 'text-primary' : 'text-muted-foreground/50'}} group-hover:text-primary"></i>
             <ng-container
               [ngTemplateOutlet]="item.children ? childMenu : parentMenu"
               [ngTemplateOutletContext]="{ item: item }">

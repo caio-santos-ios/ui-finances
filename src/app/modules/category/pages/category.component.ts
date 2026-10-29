@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadcrumb.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { Dialog } from '@angular/cdk/dialog';
@@ -13,9 +14,9 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
   selector: 'app-category',
   templateUrl: './category.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [CommonModule, BreadcrumbComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, BreadcrumbComponent, ButtonComponent],
 })
-export class CategoryComponent extends MyFinance implements OnInit  {
+export class CategoryComponent extends MyFinance implements OnInit {
   constructor(
     private dialog: Dialog
   ) {
@@ -24,14 +25,50 @@ export class CategoryComponent extends MyFinance implements OnInit  {
 
   pagination: TPagination = ResetPagination;
   totalPages: any[] = [];
+  showFilters = false;
+  filters = {
+    name: '',
+    type: '',
+    startDate: '',
+    endDate: '',
+  };
 
   async ngOnInit(): Promise<void> {
     await this.loadData(1);
   }
 
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  async applyFilters(): Promise<void> {
+    await this.loadData(1);
+  }
+
+  async clearFilters(): Promise<void> {
+    this.filters = {
+      name: '',
+      type: '',
+      startDate: '',
+      endDate: '',
+    };
+    await this.loadData(1);
+  }
+
   async loadData(page: number) {
     try {
-      const { data } = await api.get(`/categories?deleted=false&page=${page}`);
+      const params = new URLSearchParams({
+        deleted: 'false',
+        pageNumber: String(page),
+        pageSize: '10',
+      });
+
+      if (this.filters.name.trim()) params.append('regex$name', this.filters.name.trim());
+      if (this.filters.type) params.append('type', this.filters.type);
+      if (this.filters.startDate) params.append('gte$createdAt', this.filters.startDate);
+      if (this.filters.endDate) params.append('lte$createdAt', this.filters.endDate);
+
+      const { data } = await api.get(`/categories?${params.toString()}`);
       this.pagination = data.data;
       const count = Number(this.pagination.totalPages) || 0;
       this.totalPages = Array.from({ length: count }, (_, i) => i + 1);
@@ -45,6 +82,25 @@ export class CategoryComponent extends MyFinance implements OnInit  {
   onPageChange(page: number) {
     if (page < 1 || page > this.pagination.totalPages || page === this.pagination.currentPage) return;
     this.loadData(page);
+  }
+
+  get pages(): (number | '...')[] {
+    const { currentPage: c, totalPages: t } = this.pagination;
+
+    if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1);
+
+    let start = Math.max(2, c - 1);
+    let end = Math.min(t - 1, c + 1);
+    if (c <= 3) end = 4;
+    if (c >= t - 2) start = t - 3;
+
+    const pages: (number | '...')[] = [1];
+    if (start > 2) pages.push('...');
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (end < t - 1) pages.push('...');
+    pages.push(t);
+
+    return pages;
   }
 
   async openModal(id: string = '') {

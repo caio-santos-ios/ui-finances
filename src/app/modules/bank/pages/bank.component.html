@@ -1,8 +1,52 @@
 <app-breadcrumb [module]="'Bancos'" icon="fa-solid fa-building-columns">
+  <app-button (buttonClick)="toggleFilters()" impact="bold" tone="light" shape="rounded" size="medium">
+    <i class="fa-solid fa-filter mr-1.5"></i> Filtros
+  </app-button>
   <app-button (buttonClick)="openModal()" impact="bold" tone="primary" shape="rounded" size="medium">
     <i class="fa-solid fa-plus mr-1.5"></i> Adicionar Bancos
   </app-button>
 </app-breadcrumb>
+
+@if (showFilters) {
+<div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome</label>
+      <input
+        type="text"
+        [(ngModel)]="filters.name"
+        (keyup.enter)="applyFilters()"
+        placeholder="Buscar por nome..."
+        class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Inicial</label>
+      <input
+        type="date"
+        [(ngModel)]="filters.startDate"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Final</label>
+      <input
+        type="date"
+        [(ngModel)]="filters.endDate"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+  </div>
+
+  <div class="mt-4 flex justify-end gap-2">
+    <app-button (buttonClick)="clearFilters()" impact="bold" tone="light" shape="rounded" size="small">
+      <i class="fa-solid fa-rotate-left mr-1.5"></i> Limpar
+    </app-button>
+    <app-button (buttonClick)="applyFilters()" impact="bold" tone="primary" shape="rounded" size="small">
+      <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Filtrar
+    </app-button>
+  </div>
+</div>
+}
 
 @if (pagination.totalCount > 0) {
 <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
@@ -14,6 +58,7 @@
       <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
         <tr>
           <th class="py-3 px-4">Nome</th>
+          <th class="py-3 px-4">Saldo</th>
           <th class="py-3 px-4">Data de Criação</th>
           <th class="py-3 px-4 text-right">Ações</th>
         </tr>
@@ -22,16 +67,17 @@
         @for (item of pagination.data; track $index) {
         <tr class="hover:bg-card/50 transition-colors">
           <td class="py-3 px-4 font-medium text-foreground">{{item.name}}</td>
+          <td class="py-3 px-4 font-medium text-foreground">{{ (item.balance || 0) | moneyPipe }}</td>
           <td class="py-3 px-4 text-xs text-muted-foreground">{{item.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>
           <td class="py-3 px-4 text-right">
             <button type="button" (click)="openModal(item.id)"
               class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              title="Editar Categoria">
+              title="Editar Banco">
               <i class="fa-solid fa-pen-to-square text-sm"></i>
             </button>
             <button type="button" (click)="deleteConfirm(item.id)"
               class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              title="Editar Categoria">
+              title="Excluir Banco">
               <i class="fa-solid fa-trash text-sm"></i>
             </button>
           </td>
@@ -59,7 +105,7 @@
     @if (p === '...') {
     <span class="px-1 text-xs text-slate-400">…</span>
     } @else {
-    <button type="button" (click)="onPageChange(p)" [attr.aria-current]="p === pagination.currentPage ? 'page' : null"
+    <button type="button" (click)="onPageChange(+p)" [attr.aria-current]="p === pagination.currentPage ? 'page' : null"
       class="min-w-7 px-2 py-1 text-xs font-semibold rounded border transition-colors"
       [class]="p === pagination.currentPage
             ? 'border-primary bg-primary text-primary-foreground'
@@ -79,10 +125,10 @@
 } @else {
 <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
   <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
-    <i class="fa-solid fa-tags text-xl"></i>
+    <i class="fa-solid fa-building-columns text-xl"></i>
   </div>
-  <h3 class="text-foreground text-base font-semibold">Nenhuma banco encontrada</h3>
-  <p class="text-muted-foreground text-sm mt-1 mb-4">Comece adicionando uma nova banco para suas finanças.</p>
+  <h3 class="text-foreground text-base font-semibold">Nenhum banco encontrado</h3>
+  <p class="text-muted-foreground text-sm mt-1 mb-4">Comece adicionando um novo banco para suas finanças.</p>
   <app-button (buttonClick)="openModal()" impact="bold" tone="primary" shape="rounded" size="medium">
     <i class="fa-solid fa-plus mr-1.5"></i> Adicionar Banco
   </app-button>

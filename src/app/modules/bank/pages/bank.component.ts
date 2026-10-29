@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadcrumb.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { Dialog } from '@angular/cdk/dialog';
@@ -8,14 +9,15 @@ import { ResetPagination, TPagination } from 'src/app/shared/models/pagination';
 import { api } from 'src/app/shared/api/api';
 import Swal from 'sweetalert2';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
+import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 
 @Component({
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [CommonModule, BreadcrumbComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, BreadcrumbComponent, ButtonComponent, MoneyPipe],
 })
-export class BankComponent extends MyFinance implements OnInit  {
+export class BankComponent extends MyFinance implements OnInit {
   constructor(
     private dialog: Dialog,
   ) {
@@ -24,14 +26,47 @@ export class BankComponent extends MyFinance implements OnInit  {
 
   pagination: TPagination = ResetPagination;
   totalPages: any[] = [];
+  showFilters = false;
+  filters = {
+    name: '',
+    startDate: '',
+    endDate: '',
+  };
 
   async ngOnInit(): Promise<void> {
     await this.loadData(1);
   }
 
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  async applyFilters(): Promise<void> {
+    await this.loadData(1);
+  }
+
+  async clearFilters(): Promise<void> {
+    this.filters = {
+      name: '',
+      startDate: '',
+      endDate: '',
+    };
+    await this.loadData(1);
+  }
+
   async loadData(page: number) {
     try {
-      const { data } = await api.get(`/banks?deleted=false&pageNumber=${page}&pageSize=10`);
+      const params = new URLSearchParams({
+        deleted: 'false',
+        pageNumber: String(page),
+        pageSize: '10',
+      });
+
+      if (this.filters.name.trim()) params.append('regex$name', this.filters.name.trim());
+      if (this.filters.startDate) params.append('gte$createdAt', this.filters.startDate);
+      if (this.filters.endDate) params.append('lte$createdAt', this.filters.endDate);
+
+      const { data } = await api.get(`/banks?${params.toString()}`);
       this.pagination = data.data;
       const count = Number(this.pagination.totalPages) || 0;
       this.totalPages = Array.from({ length: count }, (_, i) => i + 1);
@@ -54,7 +89,7 @@ export class BankComponent extends MyFinance implements OnInit  {
 
     let start = Math.max(2, c - 1);
     let end = Math.min(t - 1, c + 1);
-    if (c <= 3) end = 4;           
+    if (c <= 3) end = 4;
     if (c >= t - 2) start = t - 3;
 
     const pages: (number | '...')[] = [1];
@@ -79,8 +114,8 @@ export class BankComponent extends MyFinance implements OnInit  {
   async deleteConfirm(id: string) {
     try {
       const result = await Swal.fire({
-        title: 'Excluir orçamento?',
-        text: 'Deseja realmente excluir a orçamento?',
+        title: 'Excluir banco?',
+        text: 'Deseja realmente excluir o banco?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Excluir',

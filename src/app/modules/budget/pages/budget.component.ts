@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadcrumb.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { Dialog } from '@angular/cdk/dialog';
@@ -14,9 +15,9 @@ import { MoneyPipe } from '../../../shared/pipes/money.pipe';
   selector: 'app-budget',
   templateUrl: './budget.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [CommonModule, BreadcrumbComponent, ButtonComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, BreadcrumbComponent, ButtonComponent, MoneyPipe],
 })
-export class BudgetComponent extends MyFinance implements OnInit  {
+export class BudgetComponent extends MyFinance implements OnInit {
   constructor(
     private dialog: Dialog,
   ) {
@@ -25,14 +26,65 @@ export class BudgetComponent extends MyFinance implements OnInit  {
 
   pagination: TPagination = ResetPagination;
   totalPages: any[] = [];
+  categories: any[] = [];
+  showFilters = false;
+  filters = {
+    name: '',
+    categoryId: '',
+    startDate: '',
+    endDate: '',
+  };
 
   async ngOnInit(): Promise<void> {
+    await Promise.all([
+      this.loadCategories(),
+      this.loadData(1),
+    ]);
+  }
+
+  async loadCategories(): Promise<void> {
+    try {
+      const { data } = await api.get('/categories/select?deleted=false&type=expense');
+      this.categories = data?.data ?? [];
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.cdr.markForCheck();
+    }
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  async applyFilters(): Promise<void> {
+    await this.loadData(1);
+  }
+
+  async clearFilters(): Promise<void> {
+    this.filters = {
+      name: '',
+      categoryId: '',
+      startDate: '',
+      endDate: '',
+    };
     await this.loadData(1);
   }
 
   async loadData(page: number) {
     try {
-      const { data } = await api.get(`/budgets?deleted=false&pageNumber=${page}&pageSize=10`);
+      const params = new URLSearchParams({
+        deleted: 'false',
+        pageNumber: String(page),
+        pageSize: '10',
+      });
+
+      if (this.filters.name.trim()) params.append('regex$name', this.filters.name.trim());
+      if (this.filters.categoryId) params.append('categoryId', this.filters.categoryId);
+      if (this.filters.startDate) params.append('gte$createdAt', this.filters.startDate);
+      if (this.filters.endDate) params.append('lte$createdAt', this.filters.endDate);
+
+      const { data } = await api.get(`/budgets?${params.toString()}`);
       this.pagination = data.data;
       const count = Number(this.pagination.totalPages) || 0;
       this.totalPages = Array.from({ length: count }, (_, i) => i + 1);
@@ -55,7 +107,7 @@ export class BudgetComponent extends MyFinance implements OnInit  {
 
     let start = Math.max(2, c - 1);
     let end = Math.min(t - 1, c + 1);
-    if (c <= 3) end = 4;           
+    if (c <= 3) end = 4;
     if (c >= t - 2) start = t - 3;
 
     const pages: (number | '...')[] = [1];
@@ -81,7 +133,7 @@ export class BudgetComponent extends MyFinance implements OnInit  {
     try {
       const result = await Swal.fire({
         title: 'Excluir orçamento?',
-        text: 'Deseja realmente excluir a orçamento?',
+        text: 'Deseja realmente excluir o orçamento?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Excluir',

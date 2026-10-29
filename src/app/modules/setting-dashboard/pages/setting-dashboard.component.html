@@ -1,8 +1,78 @@
 <app-breadcrumb [module]="'Configuração Dashboard'" icon="fa-solid fa-sliders">
+  <app-button (buttonClick)="toggleFilters()" impact="bold" tone="light" shape="rounded" size="medium">
+    <i class="fa-solid fa-filter mr-1.5"></i> Filtros
+  </app-button>
   <app-button (buttonClick)="openModal()" impact="bold" tone="primary" shape="rounded" size="medium">
     <i class="fa-solid fa-plus mr-1.5"></i> Adicionar Configuração
   </app-button>
 </app-breadcrumb>
+
+@if (showFilters) {
+<div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome</label>
+      <input
+        type="text"
+        [(ngModel)]="filters.name"
+        (keyup.enter)="applyFilters()"
+        placeholder="Buscar por nome..."
+        class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Tipo</label>
+      <select
+        [(ngModel)]="filters.type"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+        <option value="">Todos</option>
+        <option value="kpi">KPI (Indicador)</option>
+        <option value="bar">Barra (Gráfico)</option>
+        <option value="stacked-bar">Barra Empilhada (Gráfico)</option>
+        <option value="line">Linha (Gráfico)</option>
+        <option value="pie">Pizza (Gráfico)</option>
+        <option value="table">Tabela</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Collection</label>
+      <select
+        [(ngModel)]="filters.collection"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+        <option value="">Todas</option>
+        <option value="operations">operations</option>
+        <option value="categories">categories</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Inicial</label>
+      <input
+        type="date"
+        [(ngModel)]="filters.startDate"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Final</label>
+      <input
+        type="date"
+        [(ngModel)]="filters.endDate"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+  </div>
+
+  <div class="mt-4 flex justify-end gap-2">
+    <app-button (buttonClick)="clearFilters()" impact="bold" tone="light" shape="rounded" size="small">
+      <i class="fa-solid fa-rotate-left mr-1.5"></i> Limpar
+    </app-button>
+    <app-button (buttonClick)="applyFilters()" impact="bold" tone="primary" shape="rounded" size="small">
+      <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Filtrar
+    </app-button>
+  </div>
+</div>
+}
 
 @if (pagination.totalCount > 0) {
 <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">

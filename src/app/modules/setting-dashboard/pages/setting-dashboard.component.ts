@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadcrumb.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { Dialog } from '@angular/cdk/dialog';
@@ -13,7 +14,7 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
   selector: 'app-setting-dashboard',
   templateUrl: './setting-dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [CommonModule, BreadcrumbComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, BreadcrumbComponent, ButtonComponent],
 })
 export class SettingDashboardComponent extends MyFinance implements OnInit {
   constructor(
@@ -24,14 +25,55 @@ export class SettingDashboardComponent extends MyFinance implements OnInit {
 
   pagination: TPagination = ResetPagination;
   totalPages: any[] = [];
+  showFilters = false;
+  filters = {
+    name: '',
+    type: '',
+    collection: '',
+    startDate: '',
+    endDate: '',
+  };
 
   async ngOnInit(): Promise<void> {
     await this.loadData(1);
   }
 
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  async applyFilters(): Promise<void> {
+    await this.loadData(1);
+  }
+
+  async clearFilters(): Promise<void> {
+    this.filters = {
+      name: '',
+      type: '',
+      collection: '',
+      startDate: '',
+      endDate: '',
+    };
+    await this.loadData(1);
+  }
+
   async loadData(page: number) {
     try {
-      const { data } = await api.get(`/dashboard?deleted=false&pageNumber=${page}&pageSize=10&orderBy=sequence&sort=asc`);
+      const params = new URLSearchParams({
+        deleted: 'false',
+        pageNumber: String(page),
+        pageSize: '10',
+        orderBy: 'sequence',
+        sort: 'asc',
+      });
+
+      if (this.filters.name.trim()) params.append('regex$name', this.filters.name.trim());
+      if (this.filters.type) params.append('type', this.filters.type);
+      if (this.filters.collection) params.append('collection', this.filters.collection);
+      if (this.filters.startDate) params.append('gte$createdAt', this.filters.startDate);
+      if (this.filters.endDate) params.append('lte$createdAt', this.filters.endDate);
+
+      const { data } = await api.get(`/dashboard?${params.toString()}`);
       this.pagination = data.data;
       const count = Number(this.pagination.totalPages) || 0;
       this.totalPages = Array.from({ length: count }, (_, i) => i + 1);

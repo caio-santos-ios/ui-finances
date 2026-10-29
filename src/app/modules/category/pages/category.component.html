@@ -1,8 +1,63 @@
 <app-breadcrumb [module]="'Categorias'" icon="fa-solid fa-layer-group">
+  <app-button (buttonClick)="toggleFilters()" impact="bold" tone="light" shape="rounded" size="medium">
+    <i class="fa-solid fa-filter mr-1.5"></i> Filtros
+  </app-button>
   <app-button (buttonClick)="openModal()" impact="bold" tone="primary" shape="rounded" size="medium">
     <i class="fa-solid fa-plus mr-1.5"></i> Adicionar Categoria
   </app-button>
 </app-breadcrumb>
+
+@if (showFilters) {
+<div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome</label>
+      <input
+        type="text"
+        [(ngModel)]="filters.name"
+        (keyup.enter)="applyFilters()"
+        placeholder="Buscar por nome..."
+        class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Tipo</label>
+      <select
+        [(ngModel)]="filters.type"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+        <option value="">Todos</option>
+        <option value="income">Receita</option>
+        <option value="expense">Despesa</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Inicial</label>
+      <input
+        type="date"
+        [(ngModel)]="filters.startDate"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+
+    <div>
+      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Final</label>
+      <input
+        type="date"
+        [(ngModel)]="filters.endDate"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    </div>
+  </div>
+
+  <div class="mt-4 flex justify-end gap-2">
+    <app-button (buttonClick)="clearFilters()" impact="bold" tone="light" shape="rounded" size="small">
+      <i class="fa-solid fa-rotate-left mr-1.5"></i> Limpar
+    </app-button>
+    <app-button (buttonClick)="applyFilters()" impact="bold" tone="primary" shape="rounded" size="small">
+      <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Filtrar
+    </app-button>
+  </div>
+</div>
+}
 
 @if (pagination.totalCount > 0) {
 <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
@@ -47,7 +102,7 @@
               type="button"
               (click)="deleteConfirm(item.id)"
               class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              title="Editar Categoria">
+              title="Excluir Categoria">
               <i class="fa-solid fa-trash text-sm"></i>
             </button>
           </td>
@@ -59,31 +114,35 @@
 </div>
 
 <div
-  class="flex items-center justify-between px-5 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-b-xl">
-  <span class="text-xs text-slate-500 dark:text-slate-400">
+  class="flex flex-col gap-3 px-5 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-b-xl sm:flex-row sm:items-center sm:justify-between">
+  <span class="shrink-0 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400">
     Página <strong>{{ pagination.currentPage }}</strong> de <strong>{{ pagination.totalPages }}</strong>
     ({{ pagination.totalCount }} no total)
   </span>
 
-  <div class="flex items-center gap-1.5">
+  <div class="flex flex-wrap items-center gap-1.5 sm:justify-end">
     <button type="button" (click)="onPageChange(pagination.currentPage - 1)" [disabled]="pagination.currentPage <= 1"
-      class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+      class="inline-flex shrink-0 items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
       <i class="fa-solid fa-chevron-left text-[10px]"></i> Anterior
     </button>
 
-    @for (p of totalPages; track $index) {
-        <button type="button" (click)="onPageChange(p)" [attr.aria-current]="p === pagination.currentPage ? 'page' : null"
-        class="min-w-7 px-2 py-1 text-xs font-semibold rounded border transition-colors"
-        [class]="p === pagination.currentPage
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'">
-        {{ p }}
+    @for (p of pages; track $index) {
+      @if (p === '...') {
+        <span class="px-1 text-xs text-slate-400">…</span>
+      } @else {
+        <button type="button" (click)="onPageChange(+p)" [attr.aria-current]="p === pagination.currentPage ? 'page' : null"
+          class="min-w-7 px-2 py-1 text-xs font-semibold rounded border transition-colors"
+          [class]="p === pagination.currentPage
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'">
+          {{ p }}
         </button>
+      }
     }
 
     <button type="button" (click)="onPageChange(pagination.currentPage + 1)"
       [disabled]="pagination.currentPage >= pagination.totalPages"
-      class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+      class="inline-flex shrink-0 items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
       Próxima <i class="fa-solid fa-chevron-right text-[10px]"></i>
     </button>
   </div>
