@@ -30,13 +30,18 @@ export class OperationModalComponent extends MyFinance implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0];
+    const currentTime = now.toTimeString().slice(0, 5);
+
     this.form = this.formBuilder.group({
       type: ['income', [Validators.required]],
       categoryId: [''],
       bankId: ['', [Validators.required]],
       destinationBankId: [''],
       value: ['', [Validators.required]],
-      createdAt: [new Date().toISOString().split("T")[0], [Validators.required]],
+      createdAt: [currentDate, [Validators.required]],
+      time: [currentTime, [Validators.required]],
       description: ['', [Validators.required]],
       repeat: [false],
       recurrence: [''],
@@ -78,13 +83,16 @@ export class OperationModalComponent extends MyFinance implements OnInit {
       if (this.operation.type !== 'transfer') {
         await this.getCategories();
       }
+      const [datePart, timeFull] = (this.operation.createdAt || '').split('T');
+      const timePart = timeFull ? timeFull.slice(0, 5) : '00:00';
       this.form.patchValue(
         {
           ...this.operation,
           categoryId: this.operation.categoryId || '',
           bankId: this.operation.bankId || '',
           destinationBankId: this.operation.destinationBankId || '',
-          createdAt: this.operation.createdAt.split("T")[0],
+          createdAt: datePart,
+          time: timePart,
           repeat: !!this.operation.repeat,
           recurrence: this.operation.recurrence || '',
         },
@@ -123,11 +131,19 @@ export class OperationModalComponent extends MyFinance implements OnInit {
     }
   }
 
+  private buildPayload() {
+    const body = { ...this.form.value };
+    if (!body.value) body.value = 0;
+    if (!body.repeat) body.recurrence = '';
+    const time = body.time || '00:00';
+    body.createdAt = `${body.createdAt}T${time}:00Z`;
+    delete body.time;
+    return body;
+  }
+
   async create() {
     try {
-      const body = { ...this.form.value };
-      if (!body.value) body.value = 0;
-      if (!body.repeat) body.recurrence = '';
+      const body = this.buildPayload();
       await api.post('/operations', body);
       this.dialog.close(true);
     } catch (error) {
@@ -137,9 +153,7 @@ export class OperationModalComponent extends MyFinance implements OnInit {
 
   async update() {
     try {
-      const body = { ...this.form.value };
-      if (!body.value) body.value = 0;
-      if (!body.repeat) body.recurrence = '';
+      const body = this.buildPayload();
       await api.put('/operations', { ...body, id: this.dialogData.id });
       this.dialog.close(true);
     } catch (error) {

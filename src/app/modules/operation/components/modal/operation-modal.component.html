@@ -78,13 +78,22 @@
           prefix="R$ "
           class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
       </div>      
-      <div class="col-span-12">
+      <div class="col-span-12 sm:col-span-6">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="createdAt">Data de Lançamento</label>
         <input
           id="createdAt"
           type="date"
           placeholder="Data de Lançamento"
           formControlName="createdAt"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="time">Hora de Lançamento</label>
+        <input
+          id="time"
+          type="time"
+          placeholder="Hora de Lançamento"
+          formControlName="time"
           class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
       </div>      
       <div class="col-span-12">
