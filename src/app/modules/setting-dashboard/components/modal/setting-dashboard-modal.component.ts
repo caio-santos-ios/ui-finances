@@ -33,6 +33,7 @@ function jsonObjectOrEmpty(control: AbstractControl): ValidationErrors | null {
 export class SettingDashboardModalComponent extends MyFinance implements OnInit {
   form!: FormGroup;
   dashboard: any = {};
+  isLoading = false;
 
   constructor(
     private dialog: DialogRef,
@@ -96,11 +97,13 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
   }
 
   async create() {
+    if (this.isLoading) return;
     try {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
         return;
       }
+      this.isLoading = true;
       const raw = this.form.value;
       const body = {
         ...raw,
@@ -111,15 +114,20 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
   async update() {
+    if (this.isLoading) return;
     try {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
         return;
       }
+      this.isLoading = true;
       const raw = this.form.value;
       const body = {
         ...raw,
@@ -131,6 +139,9 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 

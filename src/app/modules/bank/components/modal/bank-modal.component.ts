@@ -23,6 +23,7 @@ export class BankModalComponent extends MyFinance implements OnInit {
   form!: FormGroup;
   bank: any = {};
   typeBanks: any[] = [];
+  isLoading = false;
 
   get isEdit() {
     return !!this.dialogData?.id;
@@ -63,6 +64,8 @@ export class BankModalComponent extends MyFinance implements OnInit {
   }
 
   async create() {
+    if (this.isLoading) return;
+    this.isLoading = true;
     try {
       const body = this.form.value;
       if (body.code) {
@@ -75,10 +78,15 @@ export class BankModalComponent extends MyFinance implements OnInit {
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
   async update() {
+    if (this.isLoading) return;
+    this.isLoading = true;
     try {
       const body = this.form.value;
       if (body.code) {
@@ -91,6 +99,9 @@ export class BankModalComponent extends MyFinance implements OnInit {
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 

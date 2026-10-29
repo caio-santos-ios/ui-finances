@@ -108,11 +108,11 @@
       </app-button>
 
       @if (isEdit) {
-      <app-button (buttonClick)="update()" impact="bold" tone="primary" shape="rounded" size="medium">
+      <app-button (buttonClick)="update()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
         <i class="fa-solid fa-check mr-1.5"></i> Salvar Alterações
       </app-button>
       } @else {
-      <app-button (buttonClick)="create()" impact="bold" tone="primary" shape="rounded" size="medium">
+      <app-button (buttonClick)="create()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
         <i class="fa-solid fa-check mr-1.5"></i> Salvar
       </app-button>
       }

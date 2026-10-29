@@ -24,6 +24,7 @@ export class BudgetModalComponent extends MyFinance implements OnInit {
   form!: FormGroup;
   budget: any = {};
   categories: any[] = [];
+  isLoading = false;
 
   get isEdit() {
     return !!this.dialogData?.id;
@@ -69,28 +70,38 @@ export class BudgetModalComponent extends MyFinance implements OnInit {
   }
 
   async create() {
+    if (this.isLoading) return;
     try {
       if (this.form.invalid) {
         return;
       }
+      this.isLoading = true;
       const body = this.form.value;
       await api.post('/budgets', body);
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
   async update() {
+    if (this.isLoading) return;
     try {
       if (this.form.invalid) {
         return;
       }
+      this.isLoading = true;
       const body = this.form.value;
       await api.put('/budgets', { ...body, id: this.dialogData.id });
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 

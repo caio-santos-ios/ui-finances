@@ -106,6 +106,7 @@ export class ButtonComponent implements OnInit {
   }
 
   onButtonClick() {
+    if (this.disabled() || this.isLoading()) return;
     this.buttonClick.emit();
   }
 }

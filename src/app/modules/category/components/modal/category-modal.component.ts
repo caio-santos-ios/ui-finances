@@ -14,6 +14,7 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
 export class CategoryModalComponent extends MyFinance implements OnInit {
   form!: FormGroup;
   category: any = {};
+  isLoading = false;
 
   constructor(
     private dialog: DialogRef,
@@ -53,28 +54,38 @@ export class CategoryModalComponent extends MyFinance implements OnInit {
   }
 
   async create() {
+    if (this.isLoading) return;
     try {
       if (this.form.invalid) {
         return;
       }
+      this.isLoading = true;
       const body = this.form.value;
       await api.post('/categories', body);
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
   async update() {
+    if (this.isLoading) return;
     try {
       if (this.form.invalid) {
         return;
       }
+      this.isLoading = true;
       const body = this.form.value;
       await api.put('/categories', { ...body, id: this.dialogData.id });
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 

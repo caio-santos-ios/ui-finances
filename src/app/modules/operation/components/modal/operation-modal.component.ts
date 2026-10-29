@@ -24,6 +24,7 @@ export class OperationModalComponent extends MyFinance implements OnInit {
   operation: any = {};
   categories: any[] = [];
   banks: any[] = [];
+  isLoading = false;
 
   get isEdit() {
     return !!this.dialogData?.id;
@@ -142,22 +143,32 @@ export class OperationModalComponent extends MyFinance implements OnInit {
   }
 
   async create() {
+    if (this.isLoading) return;
+    this.isLoading = true;
     try {
       const body = this.buildPayload();
       await api.post('/operations', body);
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
   async update() {
+    if (this.isLoading) return;
+    this.isLoading = true;
     try {
       const body = this.buildPayload();
       await api.put('/operations', { ...body, id: this.dialogData.id });
       this.dialog.close(true);
     } catch (error) {
       this.normalizeErr(error);
+    } finally {
+      this.isLoading = false;
+      this.cdr.markForCheck();
     }
   }
 
