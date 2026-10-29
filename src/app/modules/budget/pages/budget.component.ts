@@ -151,7 +151,11 @@ export class BudgetComponent extends MyFinance implements OnInit {
       if (!result.isConfirmed) return;
 
       await api.delete(`/budgets/${id}`);
-      await this.loadData(1);
+      const isLastItemOnPage = this.pagination.data?.length === 1;
+      const targetPage = isLastItemOnPage && this.pagination.currentPage > 1
+        ? this.pagination.currentPage - 1
+        : (this.pagination.currentPage || 1);
+      await this.loadData(targetPage);
     } catch (error) {
       this.normalizeErr(error);
     }
