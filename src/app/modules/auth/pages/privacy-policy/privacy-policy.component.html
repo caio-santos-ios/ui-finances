@@ -8,7 +8,7 @@
           <p class="text-xs text-muted-foreground">Termos e Políticas</p>
         </div>
       </div>
-      <app-button routerLink="/auth/sign-in" impact="bold" tone="primary" shape="rounded" size="small">
+      <app-button (buttonClick)="goBack()" impact="bold" tone="primary" shape="rounded" size="small">
         <i class="fa-solid fa-arrow-left mr-1.5"></i> Voltar
       </app-button>
     </div>
@@ -16,7 +16,7 @@
     <div class="bg-card border border-border/60 rounded-2xl shadow-sm p-6 sm:p-10 space-y-8">
       <div class="border-b border-border/60 pb-6">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
-          <svg-icon src="assets/icons/heroicons/outline/shield-check.svg" [svgClass]="'h-4 w-4'"> </svg-icon>
+          <i class="fa-solid fa-shield-halved text-sm"></i>
           LGPD & Segurança
         </div>
         <h2 class="text-2xl sm:text-3xl font-extrabold text-foreground">Política de Privacidade</h2>

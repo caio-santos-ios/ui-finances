@@ -25,10 +25,8 @@ const routes: Routes = [
       { path: 'two-steps', component: TwoStepsComponent },
       {
         path: 'politica-de-privacidade',
-        loadComponent: () =>
-          import('./pages/privacy-policy/privacy-policy.component').then(
-            (m) => m.PrivacyPolicyComponent,
-          ),
+        redirectTo: '/politica-de-privacidade',
+        pathMatch: 'full',
       },
       { path: '**', redirectTo: 'sign-in', pathMatch: 'full' },
     ],

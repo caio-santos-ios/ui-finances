@@ -1,7 +1,9 @@
 import { enableProdMode, importProvidersFrom, provideZonelessChangeDetection } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AppRoutingModule } from './app/app-routing.module';
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
@@ -16,11 +18,12 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(BrowserModule, AppRoutingModule),
+    importProvidersFrom(BrowserModule, AppRoutingModule, AngularSvgIconModule.forRoot()),
+    provideHttpClient(withXhr(), withInterceptorsFromDi()),
     provideAnimations(),
     provideZonelessChangeDetection(),
     DecimalPipe,
-    provideNgxMask()
+    provideNgxMask(),
   ],
 }).catch((err) => console.error(err));
 
