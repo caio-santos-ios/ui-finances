@@ -1,51 +1,52 @@
-<form class="my-10 space-y-6" [formGroup]="form" (ngSubmit)="onSubmit()">
-  <div class="text-center">
-    <h2 class="text-foreground mb-1 text-3xl font-semibold">Confirmar Conta</h2>
-    <p class="text-muted-foreground text-sm">
-      Insira o código que você recebeu por e-mail para ativar sua conta.
-    </p>
-  </div>
-
-  <div class="space-y-3 text-left">
-    <div class="relative">
-      <input type="text" id="code" class="peer block" placeholder=" " formControlName="code"/>
-      <label
-        for="code"
-        class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-left -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
-        Código de Confirmação
-      </label>
+<div class="my-10 space-y-6">
+  @if (status === 'loading') {
+    <div class="flex flex-col items-center justify-center space-y-4 py-8 text-center">
+      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-foreground text-2xl font-semibold">Confirmando sua conta</h2>
+        <p class="text-muted-foreground mt-2 text-sm">
+          Aguarde um momento enquanto validamos seu código...
+        </p>
+      </div>
     </div>
-
-    <div class="relative">
-      <input type="email" id="email" class="peer block" placeholder=" " formControlName="email"/>
-      <label
-        for="email"
-        class="bg-background text-muted-foreground peer-focus:text-primary absolute top-2 z-10 origin-left -translate-y-4 scale-95 transform px-2 text-sm duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 ltr:left-1 rtl:right-1">
-        E-mail (opcional)
-      </label>
+  } @else if (status === 'success') {
+    <div class="flex flex-col items-center justify-center space-y-4 py-8 text-center">
+      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
+        <i class="fa-solid fa-check text-2xl"></i>
+      </div>
+      <div>
+        <h2 class="text-foreground text-2xl font-semibold">Conta confirmada com sucesso!</h2>
+        <p class="text-muted-foreground mt-2 text-sm">
+          {{ message || 'Sua conta foi ativada. Você será redirecionado para o login em instantes.' }}
+        </p>
+      </div>
+      <div class="pt-4 text-center">
+        <a routerLink="/auth/sign-in" class="text-primary hover:underline text-sm font-medium cursor-pointer">
+          Ir para o login
+        </a>
+      </div>
     </div>
-  </div>
-
-  <div class="flex items-center justify-between text-xs">
-    <span class="text-muted-foreground">Não recebeu o código?</span>
-    <button
-      type="button"
-      (click)="resendCode()"
-      [disabled]="resending"
-      class="text-primary hover:underline cursor-pointer font-medium disabled:opacity-50">
-      {{ resending ? 'Reenviando...' : 'Reenviar código' }}
-    </button>
-  </div>
-
-  <div>
-    <app-button [disabled]="submitted" [isLoading]="submitted" full impact="bold" tone="primary" shape="rounded" size="medium">
-      Confirmar Conta
-    </app-button>
-  </div>
-
-  <div class="text-center text-sm">
-    <a class="text-muted-foreground hover:text-primary cursor-pointer" routerLink="/auth/sign-in">
-      Voltar para o login
-    </a>
-  </div>
-</form>
+  } @else {
+    <div class="flex flex-col items-center justify-center space-y-4 py-8 text-center">
+      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+        <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+      </div>
+      <div>
+        <h2 class="text-foreground text-2xl font-semibold">Falha na confirmação</h2>
+        <p class="text-muted-foreground mt-2 text-sm">
+          {{ message || 'Não foi possível confirmar sua conta.' }}
+        </p>
+      </div>
+      <div class="pt-4 text-center">
+        <a routerLink="/auth/sign-in" class="text-primary hover:underline text-sm font-medium cursor-pointer">
+          Voltar para o login
+        </a>
+      </div>
+    </div>
+  }
+</div>

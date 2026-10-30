@@ -1,7 +1,27 @@
 <div>
-  <div class="grid grid-cols-12 gap-4">
-    @for (item of dashboards; track item.id) {
-      <app-dashboard-card [dashboard]="item" />
-    }
-  </div>
+  @if (loading) {
+    <div class="border-muted/20 bg-background flex min-h-[350px] flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+      <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando dashboard...</p>
+    </div>
+  } @else if (dashboards.length > 0) {
+    <div class="grid grid-cols-12 gap-4">
+      @for (item of dashboards; track item.id) {
+        <app-dashboard-card [dashboard]="item" />
+      }
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
+        <i class="fa-solid fa-chart-pie text-xl"></i>
+      </div>
+      <h3 class="text-foreground text-base font-semibold">Nenhum dado encontrado</h3>
+      <p class="text-muted-foreground text-sm mt-1">Nenhum gráfico ou indicador disponível no momento.</p>
+    </div>
+  }
 </div>

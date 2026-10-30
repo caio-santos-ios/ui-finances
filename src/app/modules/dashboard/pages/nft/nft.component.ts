@@ -20,12 +20,15 @@ export class NftComponent extends MyFinance implements OnInit {
   }
 
   dashboards: any[] = [];
+  loading = true;
 
   async ngOnInit(): Promise<void> {
     await this.getAll()
   }
 
   async getAll() {
+    this.loading = true;
+    this.cdr.markForCheck();
     try {
       const { data } = await api.get("/dashboard/dash");
       const result = data.data;
@@ -33,6 +36,7 @@ export class NftComponent extends MyFinance implements OnInit {
     } catch (error) {
       this.normalizeErr(error);
     } finally {
+      this.loading = false;
       this.cdr.markForCheck();
     }
   }

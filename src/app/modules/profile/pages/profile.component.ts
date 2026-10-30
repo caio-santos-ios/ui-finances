@@ -21,7 +21,7 @@ export class ProfileComponent extends MyFinance implements OnInit {
   userId: string = '';
   currentPhoto: string = '';
   isAdmin: boolean = false;
-  loading: boolean = false;
+  loading: boolean = true;
   submitted: boolean = false;
   uploadingPhoto: boolean = false;
   removingPhoto: boolean = false;

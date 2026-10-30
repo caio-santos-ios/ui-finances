@@ -84,7 +84,17 @@
 </div>
 }
 
-@if (pagination.totalCount > 0) {
+@if (loading) {
+<div class="border-muted/20 bg-background flex min-h-[300px] flex-col items-center justify-center rounded-xl border p-12 text-center">
+  <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+    <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando lançamentos...</p>
+</div>
+} @else if (pagination.totalCount > 0) {
 <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
   <div
     style="max-height: calc(100vh - 15rem);"

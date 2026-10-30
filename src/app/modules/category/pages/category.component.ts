@@ -25,6 +25,7 @@ export class CategoryComponent extends MyFinance implements OnInit {
 
   pagination: TPagination = ResetPagination;
   totalPages: any[] = [];
+  loading = true;
   showFilters = false;
   filters = {
     name: '',
@@ -56,6 +57,8 @@ export class CategoryComponent extends MyFinance implements OnInit {
   }
 
   async loadData(page: number) {
+    this.loading = true;
+    this.cdr.markForCheck();
     try {
       const params = new URLSearchParams({
         deleted: 'false',
@@ -75,6 +78,7 @@ export class CategoryComponent extends MyFinance implements OnInit {
     } catch (error) {
       this.normalizeErr(error);
     } finally {
+      this.loading = false;
       this.cdr.markForCheck();
     }
   }
