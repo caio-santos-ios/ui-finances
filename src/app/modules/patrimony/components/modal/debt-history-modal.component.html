@@ -9,15 +9,9 @@
         <p class="text-muted-foreground text-xs">{{ debt.name }} &bull; Saldo Devedor: <span class="font-bold text-rose-500">{{ debt.remainingAmount | moneyPipe }}</span> &bull; {{ debt.paidInstallments }}/{{ debt.totalInstallments }} pagas</p>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <app-button (buttonClick)="toggleAddForm()" impact="bold" [tone]="showAddForm ? 'light' : 'primary'" shape="rounded" size="small">
-        <i class="fa-solid {{ showAddForm ? 'fa-xmark' : 'fa-plus' }} mr-1.5"></i>
-        {{ showAddForm ? 'Cancelar' : 'Novo Pagamento/Abatimento' }}
-      </app-button>
-      <button type="button" (click)="close(true)" class="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg flex items-center justify-center transition-colors">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-    </div>
+    <button type="button" (click)="close(true)" class="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg flex items-center justify-center transition-colors">
+      <i class="fa-solid fa-xmark text-lg"></i>
+    </button>
   </div>
 
   @if (showAddForm) {
@@ -97,7 +91,7 @@
       </div>
 
       <div class="mt-4 flex justify-end gap-2">
-        <app-button (buttonClick)="cancelForm()" impact="bold" tone="light" shape="rounded" size="small">
+        <app-button type="button" (buttonClick)="cancelForm()" impact="bold" tone="light" shape="rounded" size="small">
           Cancelar
         </app-button>
         <app-button type="submit" [isLoading]="isSaving" impact="bold" tone="primary" shape="rounded" size="small">
@@ -170,13 +164,25 @@
       <div class="border-muted/20 bg-card/40 flex min-h-[180px] flex-col items-center justify-center rounded-xl border p-6 text-center">
         <i class="fa-solid fa-clock-rotate-left text-muted-foreground text-2xl mb-2"></i>
         <p class="text-foreground text-sm font-semibold">Nenhum pagamento registrado</p>
-        <p class="text-muted-foreground text-xs mt-1">Clique em "Novo Pagamento/Abatimento" para registrar o pagamento de parcelas ou amortizações.</p>
+        <p class="text-muted-foreground text-xs mt-1 mb-3">Registre pagamentos de parcelas ou amortizações para esta dívida.</p>
+        @if (!showAddForm) {
+          <app-button type="button" (buttonClick)="toggleAddForm()" impact="bold" tone="primary" shape="rounded" size="small">
+            <i class="fa-solid fa-plus mr-1.5"></i> Novo Lançamento
+          </app-button>
+        }
       </div>
     }
   </div>
 
-  <div class="mt-6 flex justify-end border-t border-border pt-4">
-    <app-button (buttonClick)="close(true)" impact="bold" tone="light" shape="rounded" size="medium">
+  <div class="mt-6 flex items-center justify-between border-t border-border pt-4">
+    @if (!showAddForm) {
+      <app-button type="button" (buttonClick)="toggleAddForm()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-plus mr-1.5"></i> Novo Lançamento
+      </app-button>
+    } @else {
+      <div></div>
+    }
+    <app-button type="button" (buttonClick)="close(true)" impact="bold" tone="light" shape="rounded" size="medium">
       Fechar
     </app-button>
   </div>

@@ -111,7 +111,11 @@ export class AssetValuationModalComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
   }
 
-  cancelForm() {
+  cancelForm(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.editingId = null;
     this.showAddForm = false;
     this.form.reset({
@@ -125,7 +129,13 @@ export class AssetValuationModalComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
   }
 
-  async saveValuation() {
+  async saveValuation(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (!this.showAddForm) return;
+
     const raw = this.form.value;
     const mode = raw.mode;
 

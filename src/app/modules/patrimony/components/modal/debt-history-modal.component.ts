@@ -141,7 +141,11 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
   }
 
-  cancelForm() {
+  cancelForm(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.editingId = null;
     this.showAddForm = false;
     const defaultAmount = this.debt.installmentAmount > 0
@@ -160,7 +164,13 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
   }
 
-  async savePayment() {
+  async savePayment(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (!this.showAddForm) return;
+
     if (this.form.invalid) {
       this.toastWarning('Preencha os campos obrigatórios.');
       return;

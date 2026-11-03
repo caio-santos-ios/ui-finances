@@ -66,8 +66,18 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     this.summaryLoading = true;
     this.cdr.markForCheck();
     try {
-      const { data } = await api.get('/patrimony/summary');
-      this.summary = data?.data ?? data;
+      const res = await api.get('/patrimony/summary');
+      const payload = res.data?.data ?? res.data;
+      if (payload) {
+        this.summary = {
+          totalBankBalance: Number(payload.totalBankBalance ?? 0),
+          totalAssets: Number(payload.totalAssets ?? 0),
+          totalDebts: Number(payload.totalDebts ?? 0),
+          netWorth: Number(payload.netWorth ?? 0),
+          assetCount: Number(payload.assetCount ?? 0),
+          debtCount: Number(payload.debtCount ?? 0),
+        };
+      }
     } catch (error) {
       this.normalizeErr(error);
     } finally {
@@ -91,6 +101,13 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
 
       const { data } = await api.get(`/assets?${params.toString()}`);
       this.assetsPagination = data.data;
+
+      if (this.summary.totalAssets === 0 && this.assetsPagination?.data?.length > 0) {
+        const sum = this.assetsPagination.data.reduce((acc: number, item: any) => acc + (Number(item.currentValue) || 0), 0);
+        this.summary.totalAssets = sum;
+        this.summary.assetCount = this.assetsPagination.totalCount || this.assetsPagination.data.length;
+        this.summary.netWorth = this.summary.totalBankBalance + this.summary.totalAssets - this.summary.totalDebts;
+      }
     } catch (error) {
       this.normalizeErr(error);
     } finally {
@@ -114,6 +131,13 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
 
       const { data } = await api.get(`/debts?${params.toString()}`);
       this.debtsPagination = data.data;
+
+      if (this.summary.totalDebts === 0 && this.debtsPagination?.data?.length > 0) {
+        const sum = this.debtsPagination.data.reduce((acc: number, item: any) => acc + (Number(item.remainingAmount) || 0), 0);
+        this.summary.totalDebts = sum;
+        this.summary.debtCount = this.debtsPagination.totalCount || this.debtsPagination.data.length;
+        this.summary.netWorth = this.summary.totalBankBalance + this.summary.totalAssets - this.summary.totalDebts;
+      }
     } catch (error) {
       this.normalizeErr(error);
     } finally {

@@ -42,7 +42,7 @@
     </div>
     <div class="mt-3">
       <span class="text-foreground text-2xl font-bold">{{ summary.totalAssets | moneyPipe }}</span>
-      <p class="text-muted-foreground mt-1 text-xs">{{ summary.assetCount }} {{ summary.assetCount === 1 ? 'bem cadastrado' : 'bens cadastrados' }}</p>
+      <p class="text-muted-foreground mt-1 text-xs">{{ summary.assetCount ?? 0 }} {{ summary.assetCount === 1 ? 'bem cadastrado' : 'bens cadastrados' }}</p>
     </div>
   </div>
 
@@ -55,7 +55,7 @@
     </div>
     <div class="mt-3">
       <span class="text-foreground text-2xl font-bold">{{ summary.totalDebts | moneyPipe }}</span>
-      <p class="text-muted-foreground mt-1 text-xs">{{ summary.debtCount }} {{ summary.debtCount === 1 ? 'dívida ativa' : 'dívidas ativas' }}</p>
+      <p class="text-muted-foreground mt-1 text-xs">{{ summary.debtCount ?? 0 }} {{ summary.debtCount === 1 ? 'dívida ativa' : 'dívidas ativas' }}</p>
     </div>
   </div>
 
@@ -79,13 +79,13 @@
     class="flex items-center gap-2 border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer {{ activeTab === 'assets' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground' }}">
     <i class="fa-solid fa-car"></i>
     Bens & Ativos
-    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary font-bold">{{ summary.assetCount }}</span>
+    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary font-bold">{{ summary.assetCount ?? 0 }}</span>
   </button>
   <button type="button" (click)="setTab('debts')"
     class="flex items-center gap-2 border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer {{ activeTab === 'debts' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground' }}">
     <i class="fa-solid fa-file-invoice-dollar"></i>
     Dívidas & Financiamentos
-    <span class="rounded-full bg-rose-500/10 px-2 py-0.5 text-xs text-rose-500 font-bold">{{ summary.debtCount }}</span>
+    <span class="rounded-full bg-rose-500/10 px-2 py-0.5 text-xs text-rose-500 font-bold">{{ summary.debtCount ?? 0 }}</span>
   </button>
 </div>
 
