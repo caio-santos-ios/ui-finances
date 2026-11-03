@@ -1,0 +1,76 @@
+<div class="border-muted/20 bg-card w-[520px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid {{isEdit ? 'fa-pen-to-square' : 'fa-plus'}} text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">{{isEdit ? 'Editar Bem' : 'Novo Bem'}}</h2>
+    </div>
+    <button type="button" (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="name">Nome do Bem *</label>
+        <input id="name" type="text" formControlName="name" placeholder="Ex: Casa Própria, Veículo, Notebook..."
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="type">Tipo do Bem</label>
+        <select id="type" formControlName="type"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="vehicle">Veículo</option>
+          <option value="real_estate">Imóvel</option>
+          <option value="investment">Investimento / Aplicação</option>
+          <option value="equipment">Equipamento / Eletrônico</option>
+          <option value="other">Outro Ativo</option>
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="acquisitionDate">Data de Aquisição</label>
+        <input id="acquisitionDate" type="date" formControlName="acquisitionDate"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="purchaseValue">Valor de Aquisição</label>
+        <input id="purchaseValue" type="text" placeholder="R$ 0,00" formControlName="purchaseValue"
+          mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="currentValue">Valor Atual Estimado *</label>
+        <input id="currentValue" type="text" placeholder="R$ 0,00" formControlName="currentValue"
+          mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="description">Observações / Detalhes</label>
+        <textarea id="description" formControlName="description" rows="2" placeholder="Placa, endereço, especificações..."
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition"></textarea>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+
+      @if (isEdit) {
+      <app-button (buttonClick)="update()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Salvar Alterações
+      </app-button>
+      } @else {
+      <app-button (buttonClick)="create()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Salvar
+      </app-button>
+      }
+    </div>
+  </form>
+</div>

@@ -1,0 +1,318 @@
+<app-breadcrumb [module]="'Patrimônio Líquido'" icon="fa-solid fa-vault">
+  @if (activeTab === 'assets') {
+    <app-button (buttonClick)="assetsShowFilters = !assetsShowFilters" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-filter mr-1.5"></i> Filtros
+    </app-button>
+    <app-button (buttonClick)="openAssetModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+      <i class="fa-solid fa-plus mr-1.5"></i> Novo Bem
+    </app-button>
+  } @else {
+    <app-button (buttonClick)="debtsShowFilters = !debtsShowFilters" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-filter mr-1.5"></i> Filtros
+    </app-button>
+    <app-button (buttonClick)="openDebtModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+      <i class="fa-solid fa-plus mr-1.5"></i> Nova Dívida
+    </app-button>
+  }
+</app-breadcrumb>
+
+<!-- Cards de Resumo Patrimonial -->
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="border-muted/20 bg-background rounded-xl border p-4 shadow-xs">
+    <div class="flex items-center justify-between">
+      <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Patrimônio Líquido</span>
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <i class="fa-solid fa-scale-balanced text-base"></i>
+      </div>
+    </div>
+    <div class="mt-3">
+      <span class="text-2xl font-bold {{ summary.netWorth >= 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+        {{ summary.netWorth | moneyPipe }}
+      </span>
+      <p class="text-muted-foreground mt-1 text-xs">Bens + Contas - Dívidas</p>
+    </div>
+  </div>
+
+  <div class="border-muted/20 bg-background rounded-xl border p-4 shadow-xs">
+    <div class="flex items-center justify-between">
+      <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Total em Bens</span>
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+        <i class="fa-solid fa-gem text-base"></i>
+      </div>
+    </div>
+    <div class="mt-3">
+      <span class="text-foreground text-2xl font-bold">{{ summary.totalAssets | moneyPipe }}</span>
+      <p class="text-muted-foreground mt-1 text-xs">{{ summary.assetCount }} {{ summary.assetCount === 1 ? 'bem cadastrado' : 'bens cadastrados' }}</p>
+    </div>
+  </div>
+
+  <div class="border-muted/20 bg-background rounded-xl border p-4 shadow-xs">
+    <div class="flex items-center justify-between">
+      <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Saldo Devedor Total</span>
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-500/10 text-rose-500">
+        <i class="fa-solid fa-hand-holding-dollar text-base"></i>
+      </div>
+    </div>
+    <div class="mt-3">
+      <span class="text-foreground text-2xl font-bold">{{ summary.totalDebts | moneyPipe }}</span>
+      <p class="text-muted-foreground mt-1 text-xs">{{ summary.debtCount }} {{ summary.debtCount === 1 ? 'dívida ativa' : 'dívidas ativas' }}</p>
+    </div>
+  </div>
+
+  <div class="border-muted/20 bg-background rounded-xl border p-4 shadow-xs">
+    <div class="flex items-center justify-between">
+      <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Saldo em Contas</span>
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
+        <i class="fa-solid fa-building-columns text-base"></i>
+      </div>
+    </div>
+    <div class="mt-3">
+      <span class="text-foreground text-2xl font-bold">{{ summary.totalBankBalance | moneyPipe }}</span>
+      <p class="text-muted-foreground mt-1 text-xs">Liquidez imediata</p>
+    </div>
+  </div>
+</div>
+
+<!-- Abas de Navegação -->
+<div class="mb-4 flex border-b border-border">
+  <button type="button" (click)="setTab('assets')"
+    class="flex items-center gap-2 border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer {{ activeTab === 'assets' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground' }}">
+    <i class="fa-solid fa-car"></i>
+    Bens & Ativos
+    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary font-bold">{{ summary.assetCount }}</span>
+  </button>
+  <button type="button" (click)="setTab('debts')"
+    class="flex items-center gap-2 border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer {{ activeTab === 'debts' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground' }}">
+    <i class="fa-solid fa-file-invoice-dollar"></i>
+    Dívidas & Financiamentos
+    <span class="rounded-full bg-rose-500/10 px-2 py-0.5 text-xs text-rose-500 font-bold">{{ summary.debtCount }}</span>
+  </button>
+</div>
+
+<!-- Conteúdo da Aba BENS -->
+@if (activeTab === 'assets') {
+  @if (assetsShowFilters) {
+    <div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome do Bem</label>
+          <input type="text" [(ngModel)]="assetsFilters.name" (keyup.enter)="loadAssets(1)" placeholder="Buscar por nome..."
+            class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Tipo</label>
+          <select [(ngModel)]="assetsFilters.type" (change)="loadAssets(1)"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todos</option>
+            <option value="vehicle">Veículo</option>
+            <option value="real_estate">Imóvel</option>
+            <option value="investment">Investimento</option>
+            <option value="equipment">Equipamento</option>
+            <option value="other">Outro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (assetsLoading) {
+    <div class="border-muted/20 bg-background flex min-h-[300px] flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+      <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando bens...</p>
+    </div>
+  } @else if (assetsPagination.totalCount > 0) {
+    <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+      <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[calc(100vh_-_20rem)] grow overflow-auto px-5">
+        <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+          <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+            <tr>
+              <th class="py-3 px-4">Nome</th>
+              <th class="py-3 px-4">Tipo</th>
+              <th class="py-3 px-4">Valor de Compra</th>
+              <th class="py-3 px-4">Valor Atual</th>
+              <th class="py-3 px-4">Data Aquisição</th>
+              <th class="py-3 px-4 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-muted/10 divide-y text-sm">
+            @for (item of assetsPagination.data; track item.id) {
+              <tr class="hover:bg-card/50 transition-colors">
+                <td class="py-3 px-4 font-medium text-foreground">
+                  <div>{{ item.name }}</div>
+                  @if (item.description) {
+                    <div class="text-xs text-muted-foreground truncate max-w-xs">{{ item.description }}</div>
+                  }
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                    {{ getTypeAssetLabel(item.type) }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.purchaseValue > 0 ? (item.purchaseValue | moneyPipe) : '-' }}</td>
+                <td class="py-3 px-4 font-semibold text-emerald-500">{{ item.currentValue | moneyPipe }}</td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.acquisitionDate ? (item.acquisitionDate | date:'dd/MM/yyyy') : '-' }}</td>
+                <td class="py-3 px-4 text-right">
+                  <button type="button" (click)="openAssetValuationModal(item)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Histórico de Valorização">
+                    <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+                  </button>
+                  <button type="button" (click)="openAssetModal(item.id)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Editar Bem">
+                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                  </button>
+                  <button type="button" (click)="deleteAsset(item.id)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Excluir Bem">
+                    <i class="fa-solid fa-trash text-sm"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
+        <i class="fa-solid fa-car text-xl"></i>
+      </div>
+      <h3 class="text-foreground text-base font-semibold">Nenhum bem cadastrado</h3>
+      <p class="text-muted-foreground text-sm mt-1 mb-4">Cadastre veículos, imóveis, eletrônicos ou investimentos para acompanhar seu patrimônio.</p>
+      <app-button (buttonClick)="openAssetModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-plus mr-1.5"></i> Cadastrar Primeiro Bem
+      </app-button>
+    </div>
+  }
+}
+
+<!-- Conteúdo da Aba DÍVIDAS -->
+@if (activeTab === 'debts') {
+  @if (debtsShowFilters) {
+    <div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome da Dívida</label>
+          <input type="text" [(ngModel)]="debtsFilters.name" (keyup.enter)="loadDebts(1)" placeholder="Buscar por nome..."
+            class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Tipo</label>
+          <select [(ngModel)]="debtsFilters.type" (change)="loadDebts(1)"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todos</option>
+            <option value="financing">Financiamento</option>
+            <option value="personal_loan">Empréstimo</option>
+            <option value="credit_card">Cartão de Crédito</option>
+            <option value="family">Familiar / Terceiros</option>
+            <option value="other">Outro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (debtsLoading) {
+    <div class="border-muted/20 bg-background flex min-h-[300px] flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+      <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando dívidas...</p>
+    </div>
+  } @else if (debtsPagination.totalCount > 0) {
+    <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+      <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[calc(100vh_-_20rem)] grow overflow-auto px-5">
+        <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+          <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+            <tr>
+              <th class="py-3 px-4">Nome</th>
+              <th class="py-3 px-4">Tipo</th>
+              <th class="py-3 px-4">Saldo Devedor</th>
+              <th class="py-3 px-4">Parcela</th>
+              <th class="py-3 px-4">Progresso</th>
+              <th class="py-3 px-4">Vencimento</th>
+              <th class="py-3 px-4 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-muted/10 divide-y text-sm">
+            @for (item of debtsPagination.data; track item.id) {
+              <tr class="hover:bg-card/50 transition-colors">
+                <td class="py-3 px-4 font-medium text-foreground">
+                  <div>{{ item.name }}</div>
+                  @if (item.bankName) {
+                    <div class="text-xs text-muted-foreground flex items-center gap-1">
+                      <i class="fa-solid fa-building-columns text-[10px]"></i> {{ item.bankName }}
+                    </div>
+                  }
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-medium text-rose-500">
+                    {{ getTypeDebtLabel(item.type) }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 font-semibold text-rose-500">{{ item.remainingAmount | moneyPipe }}</td>
+                <td class="py-3 px-4 text-xs font-medium text-foreground">{{ item.installmentAmount > 0 ? (item.installmentAmount | moneyPipe) : '-' }}</td>
+                <td class="py-3 px-4">
+                  <div class="w-32">
+                    <div class="flex justify-between text-[11px] text-muted-foreground mb-1">
+                      <span>{{ item.paidInstallments }}/{{ item.totalInstallments }}</span>
+                      <span>{{ item.totalInstallments > 0 ? ((item.paidInstallments / item.totalInstallments) * 100 | number:'1.0-0') : 0 }}%</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                      <div class="h-full bg-primary rounded-full transition-all duration-300"
+                        [style.width.%]="item.totalInstallments > 0 ? (item.paidInstallments / item.totalInstallments) * 100 : 0"></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">Dia {{ item.dueDay }}</td>
+                <td class="py-3 px-4 text-right">
+                  <button type="button" (click)="openDebtHistoryModal(item)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Histórico de Pagamentos e Amortizações">
+                    <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+                  </button>
+                  <button type="button" (click)="openPayModal(item)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Pagar Parcela ou Amortizar">
+                    <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
+                  </button>
+                  <button type="button" (click)="openDebtModal(item.id)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Editar Dívida">
+                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                  </button>
+                  <button type="button" (click)="deleteDebt(item.id)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Excluir Dívida">
+                    <i class="fa-solid fa-trash text-sm"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
+        <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
+      </div>
+      <h3 class="text-foreground text-base font-semibold">Nenhuma dívida cadastrada</h3>
+      <p class="text-muted-foreground text-sm mt-1 mb-4">Você está livre de dívidas! Cadastre financiamentos ou empréstimos quando precisar acompanhá-los.</p>
+      <app-button (buttonClick)="openDebtModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-plus mr-1.5"></i> Cadastrar Dívida
+      </app-button>
+    </div>
+  }
+}

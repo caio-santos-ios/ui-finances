@@ -32,6 +32,11 @@ export class Menu {
           route: '/budgets',
         },
         {
+          icon: 'vault',
+          label: 'Patrimônio',
+          route: '/patrimony',
+        },
+        {
           icon: 'sliders',
           label: 'Configuração Dashboard',
           route: '/setting-dashboard',

@@ -35,6 +35,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'patrimony',
+    component: LayoutComponent,
+    loadChildren: () => import('../patrimony/patrimony.module').then((m) => m.PatrimonyModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'setting-dashboard',
     component: LayoutComponent,
     loadChildren: () => import('../setting-dashboard/setting-dashboard.module').then((m) => m.SettingDashboardModule),

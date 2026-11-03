@@ -1,0 +1,71 @@
+<div class="border-muted/20 bg-card w-[480px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-money-bill-transfer text-emerald-500 text-lg"></i>
+      <div>
+        <h2 class="text-foreground text-lg font-semibold">Pagar Parcela / Amortizar</h2>
+        <p class="text-xs text-muted-foreground">{{debt.name}}</p>
+      </div>
+    </div>
+    <button type="button" (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <div class="mb-4 rounded-lg bg-muted/40 p-3 flex justify-between items-center text-xs">
+    <div>
+      <span class="text-muted-foreground block">Saldo Devedor</span>
+      <span class="font-bold text-foreground text-sm">{{ (debt.remainingAmount || 0) | moneyPipe }}</span>
+    </div>
+    <div class="text-right">
+      <span class="text-muted-foreground block">Progresso</span>
+      <span class="font-bold text-primary">{{ debt.paidInstallments }} de {{ debt.totalInstallments }} pagas</span>
+    </div>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="amount">Valor do Pagamento *</label>
+        <input id="amount" type="text" placeholder="R$ 0,00" formControlName="amount"
+          mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition font-semibold" />
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="bankId">Conta / Banco de Débito</label>
+        <select id="bankId" formControlName="bankId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Nenhum banco (apenas atualizar saldo devedor)</option>
+          @for (bank of banks; track bank.id) {
+            <option [value]="bank.id">{{bank.name}}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="paymentDate">Data do Pagamento</label>
+        <input id="paymentDate" type="date" formControlName="paymentDate"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12">
+        <label class="flex items-center gap-2 cursor-pointer text-xs text-foreground font-medium select-none">
+          <input type="checkbox" formControlName="createExpenseOperation" class="rounded border-muted/30 text-primary focus:ring-primary h-4 w-4" />
+          <span>Registrar automaticamente como despesa em lançamentos</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+
+      <app-button (buttonClick)="confirmPayment()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Confirmar Pagamento
+      </app-button>
+    </div>
+  </form>
+</div>
