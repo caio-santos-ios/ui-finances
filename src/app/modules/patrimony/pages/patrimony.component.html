@@ -93,7 +93,7 @@
 @if (activeTab === 'assets') {
   @if (assetsShowFilters) {
     <div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
           <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome do Bem</label>
           <input type="text" [(ngModel)]="assetsFilters.name" (keyup.enter)="loadAssets(1)" placeholder="Buscar por nome..."
@@ -103,12 +103,21 @@
           <label class="text-foreground mb-1.5 block text-xs font-semibold">Tipo</label>
           <select [(ngModel)]="assetsFilters.type" (change)="loadAssets(1)"
             class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-            <option value="">Todos</option>
+            <option value="">Todos os tipos</option>
             <option value="vehicle">Veículo</option>
             <option value="real_estate">Imóvel</option>
             <option value="investment">Investimento</option>
             <option value="equipment">Equipamento</option>
             <option value="other">Outro</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Status</label>
+          <select [(ngModel)]="assetsFilters.status" (change)="loadAssets(1)"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todos os status</option>
+            <option value="active">Apenas Ativos</option>
+            <option value="disposed">Apenas Desfeitos</option>
           </select>
         </div>
       </div>
@@ -133,6 +142,7 @@
             <tr>
               <th class="py-3 px-4">Nome</th>
               <th class="py-3 px-4">Tipo</th>
+              <th class="py-3 px-4">Status</th>
               <th class="py-3 px-4">Valor de Compra</th>
               <th class="py-3 px-4">Valor Atual</th>
               <th class="py-3 px-4">Data Aquisição</th>
@@ -141,7 +151,7 @@
           </thead>
           <tbody class="divide-muted/10 divide-y text-sm">
             @for (item of assetsPagination.data; track item.id) {
-              <tr class="hover:bg-card/50 transition-colors">
+              <tr class="hover:bg-card/50 transition-colors {{ item.disposed ? 'opacity-70' : '' }}">
                 <td class="py-3 px-4 font-medium text-foreground">
                   <div>{{ item.name }}</div>
                   @if (item.description) {
@@ -153,10 +163,40 @@
                     {{ getTypeAssetLabel(item.type) }}
                   </span>
                 </td>
+                <td class="py-3 px-4">
+                  @if (item.disposed) {
+                    <span class="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-500"
+                      [title]="'Desfeito em ' + (item.disposalDate | date:'dd/MM/yyyy':'UTC') + ' - ' + (item.disposalReason || 'Venda')">
+                      <i class="fa-solid fa-handshake mr-1 text-[10px]"></i> Desfeito
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-500">
+                      <i class="fa-solid fa-circle-check mr-1 text-[10px]"></i> Ativo
+                    </span>
+                  }
+                </td>
                 <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.purchaseValue > 0 ? (item.purchaseValue | moneyPipe) : '-' }}</td>
-                <td class="py-3 px-4 font-semibold text-emerald-500">{{ item.currentValue | moneyPipe }}</td>
+                <td class="py-3 px-4 font-semibold {{ item.disposed ? 'text-muted-foreground line-through' : 'text-emerald-500' }}">
+                  {{ item.currentValue | moneyPipe }}
+                  @if (item.disposed && item.disposalValue) {
+                    <div class="text-[11px] text-amber-500 font-normal no-underline">Vendido por: {{ item.disposalValue | moneyPipe }}</div>
+                  }
+                </td>
                 <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.acquisitionDate ? (item.acquisitionDate | date:'dd/MM/yyyy':'UTC') : '-' }}</td>
                 <td class="py-3 px-4 text-right">
+                  @if (!item.disposed) {
+                    <button type="button" (click)="openDisposeAssetModal(item)"
+                      class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-amber-500 hover:bg-amber-500/10 transition-colors"
+                      title="Sinalizar Desfazimento / Venda">
+                      <i class="fa-solid fa-handshake text-sm"></i>
+                    </button>
+                  } @else {
+                    <button type="button" (click)="reactivateAsset(item)"
+                      class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                      title="Reativar Bem no Patrimônio">
+                      <i class="fa-solid fa-rotate-left text-sm"></i>
+                    </button>
+                  }
                   <button type="button" (click)="openAssetValuationModal(item)"
                     class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                     title="Histórico de Valorização">

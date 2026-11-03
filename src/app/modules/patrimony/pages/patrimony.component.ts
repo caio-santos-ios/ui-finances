@@ -9,6 +9,7 @@ import { DebtModalComponent } from '../components/modal/debt-modal.component';
 import { PayInstallmentModalComponent } from '../components/modal/pay-installment-modal.component';
 import { AssetValuationModalComponent } from '../components/modal/asset-valuation-modal.component';
 import { DebtHistoryModalComponent } from '../components/modal/debt-history-modal.component';
+import { DisposeAssetModalComponent } from '../components/modal/dispose-asset-modal.component';
 import { ResetPagination, TPagination } from 'src/app/shared/models/pagination';
 import { api } from 'src/app/shared/api/api';
 import Swal from 'sweetalert2';
@@ -44,6 +45,7 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
   assetsFilters = {
     name: '',
     type: '',
+    status: '',
   };
 
   debtsPagination: TPagination = ResetPagination;
@@ -98,14 +100,17 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
 
       if (this.assetsFilters.name.trim()) params.append('regex$name', this.assetsFilters.name.trim());
       if (this.assetsFilters.type) params.append('type', this.assetsFilters.type);
+      if (this.assetsFilters.status === 'active') params.append('disposed', 'false');
+      if (this.assetsFilters.status === 'disposed') params.append('disposed', 'true');
 
       const { data } = await api.get(`/assets?${params.toString()}`);
       this.assetsPagination = data.data;
 
       if (this.summary.totalAssets === 0 && this.assetsPagination?.data?.length > 0) {
-        const sum = this.assetsPagination.data.reduce((acc: number, item: any) => acc + (Number(item.currentValue) || 0), 0);
+        const activeItems = this.assetsPagination.data.filter((item: any) => !item.disposed);
+        const sum = activeItems.reduce((acc: number, item: any) => acc + (Number(item.currentValue) || 0), 0);
         this.summary.totalAssets = sum;
-        this.summary.assetCount = this.assetsPagination.totalCount || this.assetsPagination.data.length;
+        this.summary.assetCount = activeItems.length;
         this.summary.netWorth = this.summary.totalBankBalance + this.summary.totalAssets - this.summary.totalDebts;
       }
     } catch (error) {
@@ -206,6 +211,38 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
         await Promise.all([this.loadAssets(this.assetsPagination.currentPage || 1), this.loadSummary()]);
       }
     });
+  }
+
+  openDisposeAssetModal(asset: any) {
+    const ref = this.dialog.open(DisposeAssetModalComponent, { data: { asset } });
+    ref.closed.subscribe(async (res) => {
+      if (res) {
+        await Promise.all([this.loadAssets(this.assetsPagination.currentPage || 1), this.loadSummary()]);
+      }
+    });
+  }
+
+  async reactivateAsset(asset: any) {
+    try {
+      const result = await Swal.fire({
+        title: 'Reativar bem?',
+        text: `Deseja reativar "${asset.name}" no seu patrimônio ativo?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Sim, reativar',
+        cancelButtonText: 'Cancelar',
+      });
+
+      if (!result.isConfirmed) return;
+
+      const { data } = await api.patch(`/assets/${asset.id}/reactivate`, {});
+      this.toastSuccess(data?.message || 'Bem reativado com sucesso!');
+      await Promise.all([this.loadAssets(this.assetsPagination.currentPage || 1), this.loadSummary()]);
+    } catch (error) {
+      this.normalizeErr(error);
+    }
   }
 
   openDebtHistoryModal(debt: any) {
