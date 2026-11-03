@@ -71,6 +71,15 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     return isNaN(num) ? 0 : num;
   }
 
+  private parseDate(val: any): string {
+    if (!val || typeof val !== 'string' || !val.trim()) return new Date().toISOString();
+    if (val.includes('T')) {
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+    }
+    return `${val}T12:00:00.000Z`;
+  }
+
   async loadBanks() {
     try {
       const { data } = await api.get('/banks/select?deleted=false');
@@ -186,7 +195,7 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
         installmentsCount: Number(raw.installmentsCount || 0),
         bankId: raw.bankId || null,
         createExpenseOperation: !this.editingId && !!raw.createExpenseOperation,
-        paymentDate: raw.paymentDate ? new Date(raw.paymentDate).toISOString() : new Date().toISOString(),
+        paymentDate: this.parseDate(raw.paymentDate),
         note: raw.note || (raw.type === 'amortization' ? 'Amortização avulsa' : `Pagamento de parcela`),
       };
 

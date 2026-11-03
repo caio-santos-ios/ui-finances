@@ -74,8 +74,11 @@ export class AssetModalComponent extends MyFinance implements OnInit {
 
   private parseDate(val: any): string | null {
     if (!val || typeof val !== 'string' || !val.trim()) return null;
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d.toISOString();
+    if (val.includes('T')) {
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? null : d.toISOString();
+    }
+    return `${val}T12:00:00.000Z`;
   }
 
   async create() {

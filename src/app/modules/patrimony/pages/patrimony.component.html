@@ -155,7 +155,7 @@
                 </td>
                 <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.purchaseValue > 0 ? (item.purchaseValue | moneyPipe) : '-' }}</td>
                 <td class="py-3 px-4 font-semibold text-emerald-500">{{ item.currentValue | moneyPipe }}</td>
-                <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.acquisitionDate ? (item.acquisitionDate | date:'dd/MM/yyyy') : '-' }}</td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.acquisitionDate ? (item.acquisitionDate | date:'dd/MM/yyyy':'UTC') : '-' }}</td>
                 <td class="py-3 px-4 text-right">
                   <button type="button" (click)="openAssetValuationModal(item)"
                     class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"

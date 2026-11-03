@@ -58,6 +58,15 @@ export class AssetValuationModalComponent extends MyFinance implements OnInit {
     return isNaN(num) ? 0 : num;
   }
 
+  private parseDate(val: any): string {
+    if (!val || typeof val !== 'string' || !val.trim()) return new Date().toISOString();
+    if (val.includes('T')) {
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+    }
+    return `${val}T12:00:00.000Z`;
+  }
+
   async loadValuations() {
     try {
       this.isLoading = true;
@@ -162,7 +171,7 @@ export class AssetValuationModalComponent extends MyFinance implements OnInit {
         type: raw.type,
         amount,
         newValue,
-        date: raw.date ? new Date(raw.date).toISOString() : new Date().toISOString(),
+        date: this.parseDate(raw.date),
         note: raw.note,
       };
 

@@ -61,6 +61,15 @@ export class PayInstallmentModalComponent extends MyFinance implements OnInit {
     this.dialog.close(result);
   }
 
+  private parseDate(val: any): string {
+    if (!val || typeof val !== 'string' || !val.trim()) return new Date().toISOString();
+    if (val.includes('T')) {
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+    }
+    return `${val}T12:00:00.000Z`;
+  }
+
   async confirmPayment() {
     if (this.form.invalid) {
       this.toastWarning('Preencha os dados do pagamento.');
@@ -75,7 +84,7 @@ export class PayInstallmentModalComponent extends MyFinance implements OnInit {
         amount,
         bankId: raw.bankId,
         createExpenseOperation: !!raw.createExpenseOperation,
-        paymentDate: raw.paymentDate ? new Date(raw.paymentDate).toISOString() : new Date().toISOString(),
+        paymentDate: this.parseDate(raw.paymentDate),
       };
 
       const { data } = await api.post(`/debts/${this.debt.id}/pay-installment`, payload);
