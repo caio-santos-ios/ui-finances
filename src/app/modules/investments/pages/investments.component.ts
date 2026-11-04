@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Dialog } from '@angular/cdk/dialog';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadcrumb.component';
 import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import { api } from 'src/app/shared/api/api';
@@ -16,11 +17,12 @@ import { InvestmentAssetHistoryModalComponent } from '../components/modal/asset-
   standalone: true,
   templateUrl: './investments.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ButtonComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, ButtonComponent, BreadcrumbComponent, MoneyPipe],
 })
 export class InvestmentsComponent extends MyFinance implements OnInit {
   activeTab: 'positions' | 'transactions' | 'assets' = 'positions';
   isLoading = false;
+  showFilters = false;
 
   portfolio: any = {
     totalInvested: 0,
@@ -36,8 +38,14 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
   transactions: any[] = [];
   assets: any[] = [];
 
-  filterKind = '';
-  filterAssetId = '';
+  filters = {
+    positionsSearch: '',
+    positionsType: '',
+    transactionsKind: '',
+    transactionsAssetId: '',
+    assetsSearch: '',
+    assetsType: '',
+  };
 
   constructor(private dialog: Dialog) {
     super();
@@ -45,6 +53,56 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
 
   ngOnInit(): void {
     this.loadAll();
+  }
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
+    this.cdr.markForCheck();
+  }
+
+  clearFilters() {
+    if (this.activeTab === 'positions') {
+      this.filters.positionsSearch = '';
+      this.filters.positionsType = '';
+    } else if (this.activeTab === 'transactions') {
+      this.filters.transactionsKind = '';
+      this.filters.transactionsAssetId = '';
+      this.loadTransactions();
+    } else if (this.activeTab === 'assets') {
+      this.filters.assetsSearch = '';
+      this.filters.assetsType = '';
+    }
+    this.cdr.markForCheck();
+  }
+
+  get filteredPositions(): any[] {
+    let list = this.portfolio?.positions || [];
+    if (this.filters.positionsSearch) {
+      const q = this.filters.positionsSearch.toLowerCase();
+      list = list.filter((p: any) =>
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.ticker && p.ticker.toLowerCase().includes(q))
+      );
+    }
+    if (this.filters.positionsType) {
+      list = list.filter((p: any) => p.type === this.filters.positionsType);
+    }
+    return list;
+  }
+
+  get filteredAssets(): any[] {
+    let list = this.assets || [];
+    if (this.filters.assetsSearch) {
+      const q = this.filters.assetsSearch.toLowerCase();
+      list = list.filter((a: any) =>
+        (a.name && a.name.toLowerCase().includes(q)) ||
+        (a.ticker && a.ticker.toLowerCase().includes(q))
+      );
+    }
+    if (this.filters.assetsType) {
+      list = list.filter((a: any) => a.type === this.filters.assetsType);
+    }
+    return list;
   }
 
   setTab(tab: 'positions' | 'transactions' | 'assets') {
@@ -93,8 +151,8 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
   async loadTransactions() {
     try {
       let query = '';
-      if (this.filterKind) query += `&kind=${this.filterKind}`;
-      if (this.filterAssetId) query += `&assetId=${this.filterAssetId}`;
+      if (this.filters.transactionsKind) query += `&kind=${this.filters.transactionsKind}`;
+      if (this.filters.transactionsAssetId) query += `&assetId=${this.filters.transactionsAssetId}`;
 
       const { data } = await api.get(`/investments/transactions?${query}`);
       this.transactions = data?.data || [];

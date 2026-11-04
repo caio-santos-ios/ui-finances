@@ -3,6 +3,7 @@ import { DecimalPipe } from '@angular/common';
 import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AppRoutingModule } from './app/app-routing.module';
 import { AppComponent } from './app/app.component';
@@ -24,6 +25,10 @@ bootstrapApplication(AppComponent, {
     provideZonelessChangeDetection(),
     DecimalPipe,
     provideNgxMask(),
+    {
+      provide: OVERLAY_DEFAULT_CONFIG,
+      useValue: { usePopover: false },
+    },
   ],
 }).catch((err) => console.error(err));
 
