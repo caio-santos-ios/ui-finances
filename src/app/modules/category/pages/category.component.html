@@ -80,6 +80,7 @@
         <tr>
           <th class="py-3 px-4">Nome</th>
           <th class="py-3 px-4">Tipo</th>
+          <th class="py-3 px-4">Custo de Vida</th>
           <th class="py-3 px-4">Data de Criação</th>
           <th class="py-3 px-4 text-right">Ações</th>
         </tr>
@@ -97,6 +98,27 @@
             <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-600 dark:text-rose-400">
               <i class="fa-solid fa-arrow-trend-down text-[10px]"></i> Despesa
             </span>
+            }
+          </td>
+          <td class="py-3 px-4">
+            @if (item.type === 'expense' || item.type === 'saida') {
+              @if (item.lifeCostClass === 'ESSENTIAL') {
+                <span class="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-500">
+                  <i class="fa-solid fa-shield-halved text-[10px]"></i> Essencial
+                  <span class="text-[10px] text-muted-foreground">({{ item.lifeCostRecurrence === 'FIXED' ? 'Fixo' : 'Var.' }})</span>
+                </span>
+              } @else if (item.lifeCostClass === 'EXCLUDED') {
+                <span class="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                  <i class="fa-solid fa-ban text-[10px]"></i> Excluído
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-500">
+                  <i class="fa-solid fa-cart-shopping text-[10px]"></i> Discricionário
+                  <span class="text-[10px] text-muted-foreground">({{ item.lifeCostRecurrence === 'FIXED' ? 'Fixo' : 'Var.' }})</span>
+                </span>
+              }
+            } @else {
+              <span class="text-xs text-muted-foreground">-</span>
             }
           </td>
           <td class="py-3 px-4 text-xs text-muted-foreground">{{item.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>

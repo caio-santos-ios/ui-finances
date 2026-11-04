@@ -31,6 +31,8 @@ export class CategoryModalComponent extends MyFinance implements OnInit {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required]],
       type: ['income', [Validators.required]],
+      lifeCostClass: ['DISCRETIONARY'],
+      lifeCostRecurrence: ['VARIABLE'],
     });
 
     if (this.dialogData?.id) {
@@ -45,6 +47,8 @@ export class CategoryModalComponent extends MyFinance implements OnInit {
       this.form.patchValue({
         name: data.data.name,
         type: data.data.type?.toLowerCase(),
+        lifeCostClass: data.data.lifeCostClass || 'DISCRETIONARY',
+        lifeCostRecurrence: data.data.lifeCostRecurrence || 'VARIABLE',
       });
     } catch (error) {
       this.normalizeErr(error);

@@ -37,6 +37,11 @@ export class Menu {
           route: '/patrimony',
         },
         {
+          icon: 'scale-balanced',
+          label: 'Custo de Vida',
+          route: '/life-cost',
+        },
+        {
           icon: 'sliders',
           label: 'Configuração Dashboard',
           route: '/setting-dashboard',

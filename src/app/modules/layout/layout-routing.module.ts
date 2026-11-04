@@ -41,6 +41,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'life-cost',
+    component: LayoutComponent,
+    loadChildren: () => import('../life-cost/life-cost.module').then((m) => m.LifeCostModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'setting-dashboard',
     component: LayoutComponent,
     loadChildren: () => import('../setting-dashboard/setting-dashboard.module').then((m) => m.SettingDashboardModule),

@@ -34,6 +34,31 @@
           <option value="expense">Despesa</option>
         </select>
       </div>
+
+      @if (form.get('type')?.value === 'expense') {
+        <div class="col-span-12 sm:col-span-6">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="lifeCostClass">Custo de Vida</label>
+          <select
+            id="lifeCostClass"
+            formControlName="lifeCostClass"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="ESSENTIAL">Essencial</option>
+            <option value="DISCRETIONARY">Discricionário</option>
+            <option value="EXCLUDED">Excluído do Custo</option>
+          </select>
+        </div>
+
+        <div class="col-span-12 sm:col-span-6">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="lifeCostRecurrence">Recorrência</label>
+          <select
+            id="lifeCostRecurrence"
+            formControlName="lifeCostRecurrence"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="FIXED">Fixo</option>
+            <option value="VARIABLE">Variável</option>
+          </select>
+        </div>
+      }
     </div>
 
     <div class="mt-6 flex justify-end gap-2">
