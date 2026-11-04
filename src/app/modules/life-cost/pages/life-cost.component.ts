@@ -3,18 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Dialog } from '@angular/cdk/dialog';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadcrumb.component';
 import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import { api } from 'src/app/shared/api/api';
 import { CategoryClassificationModalComponent } from '../components/category-classification-modal/category-classification-modal.component';
 import { LifeCostSettingsModalComponent } from '../components/life-cost-settings-modal/life-cost-settings-modal.component';
+import { LifeCostOperationsModalComponent } from '../components/life-cost-operations-modal/life-cost-operations-modal.component';
 
 @Component({
   selector: 'app-life-cost',
   standalone: true,
   templateUrl: './life-cost.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ButtonComponent, MoneyPipe],
+  imports: [CommonModule, FormsModule, ButtonComponent, BreadcrumbComponent, MoneyPipe],
 })
 export class LifeCostComponent extends MyFinance implements OnInit {
   activeTab: 'monthly' | 'breakdown' = 'monthly';
@@ -111,6 +113,18 @@ export class LifeCostComponent extends MyFinance implements OnInit {
       if (res) {
         await this.loadAll();
       }
+    });
+  }
+
+  openOperationsModal(item: any, type: string, typeLabel: string) {
+    this.dialog.open(LifeCostOperationsModalComponent, {
+      data: {
+        year: item.year,
+        month: item.month,
+        monthLabel: item.label,
+        type,
+        typeLabel,
+      },
     });
   }
 }

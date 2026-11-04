@@ -1,16 +1,12 @@
-<div class="border-muted/20 bg-background w-[700px] max-w-[95vw] rounded-2xl border p-6 shadow-2xl">
-  <div class="flex items-center justify-between border-b border-border pb-4">
-    <div class="flex items-center gap-3">
-      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-        <i class="fa-solid fa-sliders text-lg"></i>
-      </div>
-      <div>
-        <h2 class="text-foreground text-lg font-bold">Configurações de Custo de Vida</h2>
-        <p class="text-muted-foreground text-xs">Ajuste os parâmetros dos cálculos e cadastre despesas extraordinárias pontuais</p>
-      </div>
+<div class="border-muted/20 bg-card w-[700px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-sliders text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">Configurações de Custo de Vida</h2>
     </div>
-    <button type="button" (click)="close(true)" class="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg flex items-center justify-center transition-colors">
-      <i class="fa-solid fa-xmark text-lg"></i>
+    <button type="button" (click)="close(true)"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
     </button>
   </div>
 
@@ -23,137 +19,101 @@
       <p class="text-muted-foreground mt-3 text-xs">Carregando configurações...</p>
     </div>
   } @else {
-    <div class="mt-4 space-y-6 max-h-[500px] overflow-y-auto pr-2">
+    <div class="space-y-6 max-h-[500px] overflow-y-auto pr-2">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="text-foreground mb-1 block text-xs font-semibold">Janela de Média Móvel</label>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Janela de Média Móvel</label>
           <select [(ngModel)]="settings.averageWindowMonths"
-            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-            <option [ngValue]="3">Últimos 3 meses completos</option>
-            <option [ngValue]="6">Últimos 6 meses completos (Padrão)</option>
-            <option [ngValue]="12">Últimos 12 meses completos</option>
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option [ngValue]="3">Últimos 3 meses</option>
+            <option [ngValue]="6">Últimos 6 meses (Padrão)</option>
+            <option [ngValue]="12">Últimos 12 meses</option>
           </select>
         </div>
 
         <div>
-          <label class="text-foreground mb-1 block text-xs font-semibold">Taxa Segura de Retirada (SWR)</label>
-          <select [(ngModel)]="settings.safeWithdrawalRate"
-            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-            <option [ngValue]="0.03">3,0% ao ano (Mais conservador)</option>
-            <option [ngValue]="0.035">3,5% ao ano</option>
-            <option [ngValue]="0.04">4,0% ao ano (Regra dos 4% / Padrão)</option>
-            <option [ngValue]="0.045">4,5% ao ano</option>
-            <option [ngValue]="0.05">5,0% ao ano</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-foreground mb-1 block text-xs font-semibold">Meta da Reserva de Emergência (Meses)</label>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Meta de Reserva de Emergência (meses)</label>
           <input type="number" min="1" max="60" [(ngModel)]="settings.emergencyReserveTargetMonths"
-            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
         </div>
 
-        <div class="flex items-center pt-5">
-          <label class="flex items-center gap-2 cursor-pointer">
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Taxa Segura de Retirada (% a.a. - FIRE)</label>
+          <input type="number" step="0.1" min="1" max="20" [ngModel]="settings.safeWithdrawalRate * 100" (ngModelChange)="settings.safeWithdrawalRate = $event / 100"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+
+        <div class="flex items-center pt-6">
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-foreground font-medium select-none">
             <input type="checkbox" [(ngModel)]="settings.includeDebtPayments"
-              class="h-4 w-4 rounded border-border text-primary focus:ring-primary" />
-            <span class="text-xs font-semibold text-foreground">Incluir parcelas de dívidas no custo de vida</span>
+              class="rounded border-muted/30 text-primary focus:ring-primary h-4 w-4" />
+            <span>Incluir parcelas de dívidas no custo de vida</span>
           </label>
         </div>
       </div>
 
-      <div class="flex justify-end">
-        <app-button type="button" (buttonClick)="saveSettings()" [isLoading]="isSaving" impact="bold" tone="primary" shape="rounded" size="small">
-          <i class="fa-solid fa-floppy-disk mr-1.5"></i> Salvar Preferências
-        </app-button>
-      </div>
+      <div class="border-t border-border/40 pt-4">
+        <h3 class="text-sm font-semibold text-foreground mb-2">Despesas Extraordinárias Abatidas (Pontuais)</h3>
+        <p class="text-xs text-muted-foreground mb-3">Abata eventos atípicos (ex: cirurgia, reforma única) para não distorcer seu custo de sobrevivência.</p>
 
-      <div class="border-t border-border pt-4">
-        <div class="flex items-center justify-between mb-3">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 mb-3">
           <div>
-            <h3 class="text-sm font-bold text-foreground">Ajustes Mensais Extraordinários</h3>
-            <p class="text-muted-foreground text-xs">Gastos atípicos (reforma, cirurgia) a abater da média para não distorcer o custo de vida</p>
+            <select [(ngModel)]="newAdjustment.month"
+              class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-2 py-1.5 text-xs outline-none transition">
+              @for (m of monthsList; track m.value) {
+                <option [ngValue]="m.value">{{ m.label }}</option>
+              }
+            </select>
           </div>
-          <app-button type="button" (buttonClick)="showAddAdjustment = !showAddAdjustment" impact="bold" tone="light" shape="rounded" size="small">
-            <i class="fa-solid fa-plus mr-1"></i> Novo Ajuste
+          <div>
+            <input type="number" [(ngModel)]="newAdjustment.year" placeholder="Ano"
+              class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-2 py-1.5 text-xs outline-none transition" />
+          </div>
+          <div>
+            <input type="text" [(ngModel)]="newAdjustment.amount" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ " placeholder="R$ 0,00"
+              class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-2 py-1.5 text-xs outline-none transition" />
+          </div>
+          <div>
+            <input type="text" [(ngModel)]="newAdjustment.reason" placeholder="Motivo (opcional)"
+              class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-2 py-1.5 text-xs outline-none transition" />
+          </div>
+        </div>
+
+        <div class="flex justify-end mb-3">
+          <app-button (buttonClick)="addAdjustment()" impact="bold" tone="light" shape="rounded" size="small">
+            <i class="fa-solid fa-plus mr-1"></i> Adicionar Abatimento
           </app-button>
         </div>
 
-        @if (showAddAdjustment) {
-          <div class="border-muted/20 bg-card/60 p-4 rounded-xl border mb-4">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <div>
-                <label class="text-foreground mb-1 block text-xs font-semibold">Mês</label>
-                <select [(ngModel)]="newAdjustment.month"
-                  class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-xs outline-none transition">
-                  @for (m of monthsList; track m.value) {
-                    <option [ngValue]="m.value">{{ m.label }}</option>
-                  }
-                </select>
-              </div>
-
-              <div>
-                <label class="text-foreground mb-1 block text-xs font-semibold">Ano</label>
-                <input type="number" [(ngModel)]="newAdjustment.year"
-                  class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-xs outline-none transition" />
-              </div>
-
-              <div>
-                <label class="text-foreground mb-1 block text-xs font-semibold">Valor (R$)</label>
-                <input type="text" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
-                  [(ngModel)]="newAdjustment.amount" placeholder="R$ 0,00"
-                  class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-xs outline-none transition" />
-              </div>
-
-              <div>
-                <label class="text-foreground mb-1 block text-xs font-semibold">Motivo</label>
-                <input type="text" [(ngModel)]="newAdjustment.reason" placeholder="Ex: Reforma da cozinha"
-                  class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-xs outline-none transition" />
-              </div>
-            </div>
-
-            <div class="mt-3 flex justify-end gap-2">
-              <app-button type="button" (buttonClick)="showAddAdjustment = false" impact="bold" tone="light" shape="rounded" size="small">
-                Cancelar
-              </app-button>
-              <app-button type="button" (buttonClick)="addAdjustment()" [isLoading]="isAddingAdjustment" impact="bold" tone="primary" shape="rounded" size="small">
-                Adicionar Ajuste
-              </app-button>
-            </div>
-          </div>
-        }
-
-        @if (settings.monthlyAdjustments?.length > 0) {
-          <div class="space-y-2">
+        @if (settings.monthlyAdjustments && settings.monthlyAdjustments.length > 0) {
+          <div class="divide-y divide-border/30 rounded-lg border border-border/40 bg-background p-2">
             @for (adj of settings.monthlyAdjustments; track adj.id) {
-              <div class="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-card/40">
-                <div class="flex items-center gap-3">
-                  <span class="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
-                    {{ adj.month | number:'2.0-0' }}/{{ adj.year }}
-                  </span>
-                  <div>
-                    <span class="font-semibold text-sm text-foreground">-{{ adj.amount | moneyPipe }}</span>
-                    <span class="text-xs text-muted-foreground ml-2">({{ adj.reason }})</span>
-                  </div>
+              <div class="flex items-center justify-between py-2 text-xs">
+                <div>
+                  <span class="font-bold text-foreground">{{ adj.month | number:'2.0-0' }}/{{ adj.year }}</span>
+                  <span class="text-muted-foreground ml-2">{{ adj.reason || 'Sem descrição' }}</span>
                 </div>
-                <button type="button" (click)="deleteAdjustment(adj.id)"
-                  class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  title="Excluir Ajuste">
-                  <i class="fa-solid fa-trash text-xs"></i>
-                </button>
+                <div class="flex items-center gap-3">
+                  <span class="font-semibold text-rose-500">-{{ adj.amount | moneyPipe }}</span>
+                  <button type="button" (click)="deleteAdjustment(adj.id)"
+                    class="text-muted-foreground hover:text-rose-500 transition-colors">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                  </button>
+                </div>
               </div>
             }
           </div>
-        } @else {
-          <p class="text-xs text-muted-foreground italic py-2">Nenhum ajuste extraordinário registrado.</p>
         }
       </div>
     </div>
   }
 
-  <div class="mt-6 flex justify-end border-t border-border pt-4">
-    <app-button type="button" (buttonClick)="close(true)" impact="bold" tone="light" shape="rounded" size="medium">
-      Fechar
+  <div class="mt-6 flex justify-end gap-2">
+    <app-button (buttonClick)="close(true)" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+    </app-button>
+    <app-button (buttonClick)="saveSettings()" [isLoading]="isSaving" impact="bold" tone="primary" shape="rounded" size="medium">
+      <i class="fa-solid fa-check mr-1.5"></i> Salvar
     </app-button>
   </div>
 </div>

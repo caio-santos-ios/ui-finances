@@ -1,0 +1,87 @@
+<div class="border-muted/20 bg-card w-[900px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-list-check text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">Lançamentos &bull; {{ data.typeLabel }} ({{ data.monthLabel }})</h2>
+    </div>
+    <button type="button" (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="flex min-h-[250px] flex-col items-center justify-center text-center">
+      <svg class="h-8 w-8 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+      <p class="text-muted-foreground mt-3 text-xs">Carregando lançamentos...</p>
+    </div>
+  } @else if (operations.length > 0) {
+    <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+      <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[420px] grow overflow-auto px-4">
+        <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+          <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+            <tr>
+              <th class="py-3 px-3">Categoria</th>
+              <th class="py-3 px-3">Banco</th>
+              <th class="py-3 px-3">Valor</th>
+              <th class="py-3 px-3">Descrição</th>
+              <th class="py-3 px-3">Tipo</th>
+              <th class="py-3 px-3">Data</th>
+            </tr>
+          </thead>
+          <tbody class="divide-muted/10 divide-y text-sm">
+            @for (item of operations; track item.id) {
+              <tr class="hover:bg-card/50 transition-colors">
+                <td class="py-2.5 px-3 font-medium text-foreground text-xs">{{ item.categoryName || '-' }}</td>
+                <td class="py-2.5 px-3 font-medium text-foreground text-xs">{{ item.bankName || '-' }}</td>
+                <td class="py-2.5 px-3 font-semibold text-foreground text-xs">{{ item.value | moneyPipe }}</td>
+                <td class="py-2.5 px-3 font-medium text-foreground text-xs max-w-[200px] truncate" [title]="item.description">
+                  {{ item.description || '-' }}
+                </td>
+                <td class="py-2.5 px-3">
+                  @if (item.type === 'income') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                      <i class="fa-solid fa-arrow-trend-up text-[10px]"></i> Receita
+                    </span>
+                  } @else if (item.type === 'transfer') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+                      <i class="fa-solid fa-arrow-right-arrow-left text-[10px]"></i> Transferência
+                    </span>
+                  } @else if (item.type === 'adjustment') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 px-2.5 py-0.5 text-xs font-medium text-purple-600 dark:text-purple-400">
+                      <i class="fa-solid fa-sliders text-[10px]"></i> Ajuste
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-medium text-rose-600 dark:text-rose-400">
+                      <i class="fa-solid fa-arrow-trend-down text-[10px]"></i> Despesa
+                    </span>
+                  }
+                </td>
+                <td class="py-2.5 px-3 text-xs text-muted-foreground">
+                  {{ item.createdAt | date: 'dd/MM/yyyy' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex min-h-[220px] flex-col items-center justify-center rounded-xl border p-8 text-center">
+      <div class="bg-muted flex h-12 w-12 items-center justify-center rounded-full text-muted-foreground mb-3">
+        <i class="fa-solid fa-receipt text-lg"></i>
+      </div>
+      <h4 class="text-foreground text-sm font-semibold">Nenhum lançamento encontrado</h4>
+      <p class="text-muted-foreground text-xs mt-1">Não existem operações registradas para esta classificação neste mês.</p>
+    </div>
+  }
+
+  <div class="mt-6 flex justify-end">
+    <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-xmark mr-1.5"></i> Fechar
+    </app-button>
+  </div>
+</div>

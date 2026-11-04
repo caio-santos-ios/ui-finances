@@ -1,21 +1,24 @@
-<div class="border-muted/20 bg-background w-full max-w-2xl rounded-2xl border p-6 shadow-2xl">
-  <div class="flex items-center justify-between border-b border-border pb-4">
-    <div class="flex items-center gap-3">
-      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-        <i class="fa-solid fa-chart-line text-lg"></i>
-      </div>
-      <div>
-        <h2 class="text-foreground text-lg font-bold">Histórico de Valorização</h2>
-        <p class="text-muted-foreground text-xs">{{ asset.name }} &bull; Valor Atual: <span class="font-bold text-emerald-500">{{ asset.currentValue | moneyPipe }}</span></p>
-      </div>
+<div class="border-muted/20 bg-card w-[680px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-chart-line text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">Histórico de Valorização &bull; {{ asset.name }}</h2>
     </div>
-    <button type="button" (click)="close(true)" class="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg flex items-center justify-center transition-colors">
-      <i class="fa-solid fa-xmark text-lg"></i>
-    </button>
+    <div class="flex items-center gap-2">
+      @if (!showAddForm) {
+        <app-button type="button" (buttonClick)="toggleAddForm()" impact="bold" tone="primary" shape="rounded" size="small">
+          <i class="fa-solid fa-plus mr-1"></i> Novo Lançamento
+        </app-button>
+      }
+      <button type="button" (click)="close(true)"
+        class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
   </div>
 
   @if (showAddForm) {
-    <form [formGroup]="form" (ngSubmit)="saveValuation()" class="border-muted/20 bg-card/60 my-4 rounded-xl border p-4">
+    <form [formGroup]="form" (ngSubmit)="saveValuation()" class="border-muted/20 bg-background/50 my-4 rounded-xl border p-4">
       <div class="flex items-center justify-between mb-3">
         <h3 class="text-foreground text-xs font-bold uppercase tracking-wider">
           {{ editingId ? 'Editar Lançamento de Valor' : 'Lançar Alteração de Valor' }}
@@ -30,7 +33,7 @@
         <div>
           <label class="text-foreground mb-1 block text-xs font-semibold">Tipo</label>
           <select formControlName="type"
-            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
             <option value="appreciation">Valorização (+)</option>
             <option value="depreciation">Desvalorização (-)</option>
           </select>
@@ -38,56 +41,54 @@
 
         <div>
           <label class="text-foreground mb-1 block text-xs font-semibold">Modo de Cálculo</label>
-          <select formControlName="mode"
-            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-            <option value="delta">Informar Variação (+ / -)</option>
-            <option value="newValue">Informar Novo Valor Total</option>
+          <select formControlName="calculationMode"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="difference">Informar Diferença / Variação</option>
+            <option value="total">Informar Novo Valor Total</option>
           </select>
         </div>
 
-        @if (form.get('mode')?.value === 'newValue') {
+        @if (form.get('calculationMode')?.value === 'total') {
           <div>
-            <label class="text-foreground mb-1 block text-xs font-semibold">Novo Valor Total (R$)</label>
-            <input type="text" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
-              formControlName="newValue" placeholder="R$ 0,00"
-              class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+            <label class="text-foreground mb-1 block text-xs font-semibold">Novo Valor Total do Bem</label>
+            <input type="text" formControlName="newTotalValue" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ " placeholder="R$ 0,00"
+              class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
           </div>
         } @else {
           <div>
             <label class="text-foreground mb-1 block text-xs font-semibold">Valor da Variação (R$)</label>
-            <input type="text" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
-              formControlName="amount" placeholder="R$ 0,00"
-              class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+            <input type="text" formControlName="amount" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ " placeholder="R$ 0,00"
+              class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
           </div>
         }
 
         <div>
-          <label class="text-foreground mb-1 block text-xs font-semibold">Data</label>
-          <input type="date" formControlName="date"
-            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+          <label class="text-foreground mb-1 block text-xs font-semibold">Data da Avaliação</label>
+          <input type="date" formControlName="valuationDate"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
         </div>
 
         <div class="sm:col-span-2">
-          <label class="text-foreground mb-1 block text-xs font-semibold">Motivo / Observação</label>
-          <input type="text" formControlName="note" placeholder="Ex: Tabela FIPE do mês, Reforma, Depreciação anual..."
-            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+          <label class="text-foreground mb-1 block text-xs font-semibold">Motivo / Observações</label>
+          <input type="text" formControlName="note" placeholder="Ex: Reforma da cozinha, tabela FIPE de out/2026..."
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
         </div>
       </div>
 
       <div class="mt-4 flex justify-end gap-2">
         <app-button type="button" (buttonClick)="cancelForm()" impact="bold" tone="light" shape="rounded" size="small">
-          Cancelar
+          <i class="fa-solid fa-xmark mr-1"></i> Cancelar
         </app-button>
         <app-button type="submit" [isLoading]="isSaving" impact="bold" tone="primary" shape="rounded" size="small">
-          <i class="fa-solid fa-check mr-1.5"></i> {{ editingId ? 'Salvar Alterações' : 'Salvar Lançamento' }}
+          <i class="fa-solid fa-check mr-1"></i> {{ editingId ? 'Salvar Edição' : 'Registrar' }}
         </app-button>
       </div>
     </form>
   }
 
-  <div class="mt-4">
+  <div>
     @if (isLoading) {
-      <div class="flex min-h-[200px] flex-col items-center justify-center text-center">
+      <div class="flex min-h-[220px] flex-col items-center justify-center text-center">
         <svg class="h-8 w-8 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
@@ -95,74 +96,61 @@
         <p class="text-muted-foreground mt-3 text-xs">Carregando histórico...</p>
       </div>
     } @else if (valuations.length > 0) {
-      <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[350px] overflow-y-auto pr-2">
-        <div class="relative pl-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-border">
+      <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+        <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[380px] space-y-2 grow overflow-y-auto px-2">
           @for (item of valuations; track item.id) {
-            <div class="relative mb-4 last:mb-0">
-              <span class="absolute -left-6 top-1.5 flex h-5 w-5 items-center justify-center rounded-full {{ item.type === 'appreciation' ? 'bg-emerald-500/20 text-emerald-500' : 'bg-rose-500/20 text-rose-500' }}">
-                <i class="fa-solid {{ item.type === 'appreciation' ? 'fa-arrow-up' : 'fa-arrow-down' }} text-[10px]"></i>
-              </span>
-              <div class="border-muted/20 bg-card rounded-xl border p-3">
-                <div class="flex items-center justify-between">
-                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold {{ item.type === 'appreciation' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500' }}">
+            <div class="border-muted/20 bg-card hover:bg-card/80 rounded-xl border p-3 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold {{ item.type === 'appreciation' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500' }}">
+                    <i class="fa-solid {{ item.type === 'appreciation' ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down' }} mr-1 text-[10px]"></i>
                     {{ item.type === 'appreciation' ? '+ Valorização' : '- Desvalorização' }}
                   </span>
-                  <div class="flex items-center gap-2">
-                    <span class="text-muted-foreground text-xs">{{ item.date | date:'dd/MM/yyyy':'UTC' }}</span>
-                    <button type="button" (click)="editValuation(item)"
-                      class="inline-flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                      title="Editar Item">
-                      <i class="fa-solid fa-pen-to-square text-xs"></i>
-                    </button>
-                    <button type="button" (click)="deleteValuation(item)"
-                      class="inline-flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                      title="Excluir Item">
-                      <i class="fa-solid fa-trash text-xs"></i>
-                    </button>
-                  </div>
+                  <span class="text-muted-foreground text-xs">{{ item.valuationDate | date:'dd/MM/yyyy':'UTC' }}</span>
                 </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                  <div>
-                    <span class="text-base font-bold {{ item.type === 'appreciation' ? 'text-emerald-500' : 'text-rose-500' }}">
-                      {{ item.type === 'appreciation' ? '+' : '-' }}{{ item.amount | moneyPipe }}
-                    </span>
-                    <span class="text-muted-foreground ml-2 text-xs">
-                      ({{ item.previousValue | moneyPipe }} &rarr; <span class="font-semibold text-foreground">{{ item.currentValue | moneyPipe }}</span>)
-                    </span>
-                  </div>
+
+                <div class="flex items-center gap-1">
+                  <button type="button" (click)="editValuation(item)"
+                    class="text-muted-foreground hover:bg-muted hover:text-foreground h-7 w-7 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                  </button>
+                  <button type="button" (click)="deleteValuation(item)"
+                    class="text-muted-foreground hover:bg-muted hover:text-foreground h-7 w-7 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                  </button>
                 </div>
-                @if (item.note) {
-                  <p class="text-muted-foreground mt-1 text-xs italic">{{ item.note }}</p>
-                }
               </div>
+              <div class="mt-2 flex items-baseline justify-between">
+                <div>
+                  <span class="text-base font-bold {{ item.type === 'appreciation' ? 'text-emerald-500' : 'text-rose-500' }}">
+                    {{ item.type === 'appreciation' ? '+' : '-' }}{{ item.amount | moneyPipe }}
+                  </span>
+                  <span class="text-muted-foreground ml-2 text-xs">
+                    ({{ item.previousValue | moneyPipe }} &rarr; <span class="font-semibold text-foreground">{{ item.currentValue | moneyPipe }}</span>)
+                  </span>
+                </div>
+              </div>
+              @if (item.note) {
+                <p class="text-muted-foreground mt-1 text-xs italic">{{ item.note }}</p>
+              }
             </div>
           }
         </div>
       </div>
     } @else {
-      <div class="border-muted/20 bg-card/40 flex min-h-[180px] flex-col items-center justify-center rounded-xl border p-6 text-center">
-        <i class="fa-solid fa-clock-rotate-left text-muted-foreground text-2xl mb-2"></i>
+      <div class="border-muted/20 bg-background flex min-h-[180px] flex-col items-center justify-center rounded-xl border p-6 text-center">
+        <div class="bg-muted flex h-12 w-12 items-center justify-center rounded-full text-muted-foreground mb-3">
+          <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+        </div>
         <p class="text-foreground text-sm font-semibold">Nenhum histórico registrado</p>
-        <p class="text-muted-foreground text-xs mt-1 mb-3">Cadastre uma valorização ou depreciação para acompanhar este bem.</p>
-        @if (!showAddForm) {
-          <app-button type="button" (buttonClick)="toggleAddForm()" impact="bold" tone="primary" shape="rounded" size="small">
-            <i class="fa-solid fa-plus mr-1.5"></i> Novo Lançamento
-          </app-button>
-        }
+        <p class="text-muted-foreground text-xs mt-1">Cadastre uma valorização ou depreciação para acompanhar este bem.</p>
       </div>
     }
   </div>
 
-  <div class="mt-6 flex items-center justify-between border-t border-border pt-4">
-    @if (!showAddForm) {
-      <app-button type="button" (buttonClick)="toggleAddForm()" impact="bold" tone="primary" shape="rounded" size="medium">
-        <i class="fa-solid fa-plus mr-1.5"></i> Novo Lançamento
-      </app-button>
-    } @else {
-      <div></div>
-    }
+  <div class="mt-6 flex justify-end">
     <app-button type="button" (buttonClick)="close(true)" impact="bold" tone="light" shape="rounded" size="medium">
-      Fechar
+      <i class="fa-solid fa-xmark mr-1.5"></i> Fechar
     </app-button>
   </div>
 </div>

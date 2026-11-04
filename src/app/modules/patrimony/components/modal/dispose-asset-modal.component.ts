@@ -6,13 +6,12 @@ import { FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angula
 import { api } from 'src/app/shared/api/api';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import { NgxMaskDirective } from 'ngx-mask';
-import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 
 @Component({
   selector: 'app-dispose-asset-modal',
   templateUrl: './dispose-asset-modal.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [CommonModule, ButtonComponent, FormsModule, ReactiveFormsModule, NgxMaskDirective, MoneyPipe],
+  imports: [CommonModule, ButtonComponent, FormsModule, ReactiveFormsModule, NgxMaskDirective],
 })
 export class DisposeAssetModalComponent extends MyFinance implements OnInit {
   constructor(

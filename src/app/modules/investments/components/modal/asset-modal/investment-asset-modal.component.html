@@ -1,17 +1,12 @@
 <div class="border-muted/20 bg-card w-[520px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
-  <div class="mb-5 flex items-center justify-between border-b border-border pb-4">
+  <div class="mb-5 flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-        <i class="fa-solid {{ isEdit ? 'fa-pen-to-square' : 'fa-plus' }} text-sm"></i>
-      </div>
-      <div>
-        <h2 class="text-foreground text-base font-semibold">{{ isEdit ? 'Editar Ativo' : 'Novo Ativo de Investimento' }}</h2>
-        <p class="text-muted-foreground text-xs">Cadastre ações, FIIs, renda fixa, criptos ou outros ativos</p>
-      </div>
+      <i class="fa-solid {{ isEdit ? 'fa-pen-to-square' : 'fa-plus' }} text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">{{ isEdit ? 'Editar Ativo' : 'Novo Ativo' }}</h2>
     </div>
     <button type="button" (click)="close()"
       class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
-      <i class="fa-solid fa-xmark text-sm"></i>
+      <i class="fa-solid fa-xmark"></i>
     </button>
   </div>
 
@@ -64,12 +59,12 @@
       }
     </div>
 
-    <div class="mt-6 flex justify-end gap-2 border-t border-border pt-4">
+    <div class="mt-6 flex justify-end gap-2">
       <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
-        Cancelar
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
       </app-button>
       <app-button (buttonClick)="save()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
-        <i class="fa-solid fa-check mr-1.5"></i> {{ isEdit ? 'Salvar Alterações' : 'Cadastrar Ativo' }}
+        <i class="fa-solid fa-check mr-1.5"></i> {{ isEdit ? 'Salvar Alterações' : 'Salvar' }}
       </app-button>
     </div>
   </form>

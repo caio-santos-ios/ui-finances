@@ -1,11 +1,8 @@
 <div class="border-muted/20 bg-card w-[480px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
   <div class="mb-5 flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <i class="fa-solid fa-money-bill-transfer text-emerald-500 text-lg"></i>
-      <div>
-        <h2 class="text-foreground text-lg font-semibold">Pagar Parcela / Amortizar</h2>
-        <p class="text-xs text-muted-foreground">{{debt.name}}</p>
-      </div>
+      <i class="fa-solid fa-money-bill-transfer text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">Pagar Parcela / Amortizar &bull; {{debt.name}}</h2>
     </div>
     <button type="button" (click)="close()"
       class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
@@ -13,7 +10,7 @@
     </button>
   </div>
 
-  <div class="mb-4 rounded-lg bg-muted/40 p-3 flex justify-between items-center text-xs">
+  <div class="mb-4 rounded-lg bg-background border border-muted/20 p-3 flex justify-between items-center text-xs">
     <div>
       <span class="text-muted-foreground block">Saldo Devedor</span>
       <span class="font-bold text-foreground text-sm">{{ (debt.remainingAmount || 0) | moneyPipe }}</span>
@@ -62,7 +59,6 @@
       <app-button type="button" (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
         <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
       </app-button>
-
       <app-button (buttonClick)="confirmPayment()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
         <i class="fa-solid fa-check mr-1.5"></i> Confirmar Pagamento
       </app-button>
