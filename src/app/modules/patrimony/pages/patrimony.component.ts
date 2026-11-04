@@ -137,16 +137,26 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     try {
       const params = new URLSearchParams({
         deleted: 'false',
-        status: 'active',
         pageNumber: String(page),
-        pageSize: '10',
+        pageSize: '20',
       });
 
       if (this.debtsFilters.name.trim()) params.append('regex$name', this.debtsFilters.name.trim());
       if (this.debtsFilters.type) params.append('type', this.debtsFilters.type);
 
       const { data } = await api.get(`/debts?${params.toString()}`);
-      this.debtsPagination = data.data;
+      const rawPagination = data?.data ?? ResetPagination;
+      const allItems: any[] = rawPagination?.data ?? [];
+
+      const activeItems = allItems.filter(
+        (item: any) => !item.settled && (item.remainingAmount === undefined || Number(item.remainingAmount) > 0)
+      );
+
+      this.debtsPagination = {
+        ...rawPagination,
+        data: activeItems,
+        totalCount: activeItems.length,
+      };
 
       if (this.summary.totalDebts === 0 && this.debtsPagination?.data?.length > 0) {
         const sum = this.debtsPagination.data.reduce((acc: number, item: any) => acc + (Number(item.remainingAmount) || 0), 0);
@@ -188,12 +198,22 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     try {
       const params = new URLSearchParams({
         deleted: 'false',
-        status: 'settled',
         pageNumber: String(page),
-        pageSize: '10',
+        pageSize: '50',
       });
       const { data } = await api.get(`/debts?${params.toString()}`);
-      this.historyDebtsPagination = data.data;
+      const rawPagination = data?.data ?? ResetPagination;
+      const allItems: any[] = rawPagination?.data ?? [];
+
+      const settledItems = allItems.filter(
+        (item: any) => item.settled === true || (item.remainingAmount !== undefined && Number(item.remainingAmount) <= 0)
+      );
+
+      this.historyDebtsPagination = {
+        ...rawPagination,
+        data: settledItems,
+        totalCount: settledItems.length,
+      };
     } catch (error) {
       this.normalizeErr(error);
     } finally {

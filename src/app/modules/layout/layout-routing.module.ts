@@ -53,6 +53,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'goals',
+    component: LayoutComponent,
+    loadChildren: () => import('../goals/goals.module').then((m) => m.GoalsModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'setting-dashboard',
     component: LayoutComponent,
     loadChildren: () => import('../setting-dashboard/setting-dashboard.module').then((m) => m.SettingDashboardModule),

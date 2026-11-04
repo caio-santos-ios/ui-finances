@@ -1,0 +1,112 @@
+<div class="border-muted/20 bg-card w-[520px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid {{isEdit ? 'fa-pen-to-square' : 'fa-bullseye'}} text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">{{isEdit ? 'Editar Meta' : 'Nova Meta'}}</h2>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="name">Nome da Meta</label>
+        <input
+          id="name"
+          type="text"
+          placeholder="Ex: Viagem Europa, Reserva de Emergência, Carro Novo..."
+          formControlName="name"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div [class]="isEdit ? 'col-span-12 sm:col-span-6' : 'col-span-12 sm:col-span-6'">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="targetAmount">Valor Desejado (R$)</label>
+        <input
+          id="targetAmount"
+          type="text"
+          placeholder="R$ 0,00"
+          formControlName="targetAmount"
+          mask="separator.2"
+          thousandSeparator="."
+          decimalMarker=","
+          prefix="R$ "
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      @if (!isEdit) {
+        <div class="col-span-12 sm:col-span-6">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="initialAmount">Valor Já Poupado (Opcional)</label>
+          <input
+            id="initialAmount"
+            type="text"
+            placeholder="R$ 0,00"
+            formControlName="initialAmount"
+            mask="separator.2"
+            thousandSeparator="."
+            decimalMarker=","
+            prefix="R$ "
+            class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+      }
+
+      <div [class]="isEdit ? 'col-span-12 sm:col-span-6' : 'col-span-12'">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="targetDate">Prazo Estimado (Opcional)</label>
+        <input
+          id="targetDate"
+          type="date"
+          formControlName="targetDate"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="icon">Ícone</label>
+        <select
+          id="icon"
+          formControlName="icon"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          @for (item of icons; track item.value) {
+            <option [value]="item.value">{{ item.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold">Cor de Destaque</label>
+        <div class="flex items-center gap-2 pt-1">
+          @for (c of colors; track c) {
+            <button
+              type="button"
+              (click)="form.get('color')?.setValue(c)"
+              [style.backgroundColor]="c"
+              [class.ring-2]="form.get('color')?.value === c"
+              [class.ring-foreground]="form.get('color')?.value === c"
+              [class.ring-offset-2]="form.get('color')?.value === c"
+              class="h-6 w-6 rounded-full transition-transform hover:scale-110">
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+
+      @if (isEdit) {
+        <app-button (buttonClick)="update()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+          <i class="fa-solid fa-check mr-1.5"></i> Salvar Alterações
+        </app-button>
+      } @else {
+        <app-button (buttonClick)="create()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+          <i class="fa-solid fa-check mr-1.5"></i> Salvar
+        </app-button>
+      }
+    </div>
+  </form>
+</div>

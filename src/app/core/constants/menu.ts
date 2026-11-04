@@ -47,6 +47,11 @@ export class Menu {
           route: '/investments',
         },
         {
+          icon: 'bullseye',
+          label: 'Metas',
+          route: '/goals',
+        },
+        {
           icon: 'sliders',
           label: 'Configuração Dashboard',
           route: '/setting-dashboard',

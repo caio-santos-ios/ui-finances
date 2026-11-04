@@ -1,0 +1,80 @@
+<div class="border-muted/20 bg-card w-[480px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-piggy-bank text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">Novo Aporte / Movimentação</h2>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <div class="border-muted/20 bg-muted/30 mb-5 rounded-lg border p-3">
+    <div class="text-foreground text-sm font-semibold">{{ dialogData.goalName }}</div>
+    <div class="text-muted-foreground mt-1 flex items-center justify-between text-xs">
+      <span>Acumulado: <strong class="text-foreground">{{ dialogData.currentAmount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong></span>
+      <span>Alvo: <strong class="text-foreground">{{ dialogData.targetAmount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong></span>
+    </div>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="type">Tipo de Operação</label>
+        <select
+          id="type"
+          formControlName="type"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="deposit">Aporte (+)</option>
+          <option value="withdraw">Resgate (-)</option>
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="value">Valor (R$)</label>
+        <input
+          id="value"
+          type="text"
+          placeholder="R$ 0,00"
+          formControlName="value"
+          mask="separator.2"
+          thousandSeparator="."
+          decimalMarker=","
+          prefix="R$ "
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="date">Data</label>
+        <input
+          id="date"
+          type="date"
+          formControlName="date"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="note">Observação (Opcional)</label>
+        <input
+          id="note"
+          type="text"
+          placeholder="Ex: Aporte mensal, sobra de salário..."
+          formControlName="note"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+
+      <app-button (buttonClick)="submit()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> Confirmar
+      </app-button>
+    </div>
+  </form>
+</div>

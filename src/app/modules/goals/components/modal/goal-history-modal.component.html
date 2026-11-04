@@ -1,0 +1,75 @@
+<div class="border-muted/20 bg-card w-[600px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-clock-rotate-left text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">Histórico de Aportes • {{ dialogData.goalName }}</h2>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="flex items-center justify-center py-10">
+      <i class="fa-solid fa-spinner text-primary animate-spin text-2xl"></i>
+    </div>
+  } @else if (transactions.length === 0) {
+    <div class="flex flex-col items-center justify-center py-8 text-center">
+      <div class="bg-muted/40 mb-3 flex h-12 w-12 items-center justify-center rounded-full">
+        <i class="fa-solid fa-receipt text-muted-foreground text-xl"></i>
+      </div>
+      <p class="text-foreground font-semibold">Nenhum aporte registrado</p>
+      <p class="text-muted-foreground mt-1 text-xs">Os aportes realizados aparecerão aqui.</p>
+    </div>
+  } @else {
+    <div class="max-h-[360px] overflow-y-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="text-muted-foreground border-muted/20 border-b font-semibold uppercase">
+          <tr>
+            <th class="py-2.5 pr-2">Data</th>
+            <th class="py-2.5 px-2">Tipo</th>
+            <th class="py-2.5 px-2">Valor</th>
+            <th class="py-2.5 px-2">Observação</th>
+            <th class="py-2.5 pl-2 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-muted/10 divide-y">
+          @for (tx of transactions; track tx.id) {
+            <tr class="hover:bg-muted/30 transition-colors">
+              <td class="text-foreground py-2.5 pr-2">{{ tx.date | date:'dd/MM/yyyy' }}</td>
+              <td class="py-2.5 px-2">
+                <span
+                  [class]="tx.type === 'deposit' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'"
+                  class="rounded-md border px-2 py-0.5 text-[10px] font-semibold">
+                  {{ tx.type === 'deposit' ? 'Aporte' : 'Resgate' }}
+                </span>
+              </td>
+              <td class="py-2.5 px-2 font-semibold" [class]="tx.type === 'deposit' ? 'text-emerald-400' : 'text-red-400'">
+                {{ tx.type === 'deposit' ? '+' : '-' }} {{ tx.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+              </td>
+              <td class="text-muted-foreground py-2.5 px-2 truncate max-w-[140px]">{{ tx.note || '—' }}</td>
+              <td class="py-2.5 pl-2 text-right">
+                <button
+                  type="button"
+                  (click)="deleteTransaction(tx.id)"
+                  title="Excluir"
+                  class="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <div class="mt-6 flex justify-end">
+    <app-button (buttonClick)="close(true)" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-xmark mr-1.5"></i> Fechar
+    </app-button>
+  </div>
+</div>
