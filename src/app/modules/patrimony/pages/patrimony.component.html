@@ -131,7 +131,7 @@
       </div>
       <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando bens...</p>
     </div>
-  } @else if (assetsPagination.totalCount > 0) {
+  } @else if (assetsPagination.totalCount > 0 || (assetsPagination.data && assetsPagination.data.length > 0)) {
     <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
       <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[calc(100vh_-_20rem)] grow overflow-auto px-5">
         <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
@@ -242,7 +242,7 @@
       </div>
       <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando dívidas...</p>
     </div>
-  } @else if (debtsPagination.totalCount > 0) {
+  } @else if (debtsPagination.totalCount > 0 || (debtsPagination.data && debtsPagination.data.length > 0)) {
     <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
       <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[calc(100vh_-_20rem)] grow overflow-auto px-5">
         <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
