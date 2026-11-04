@@ -1,0 +1,101 @@
+<div class="border-muted/20 bg-background w-[760px] max-w-[95vw] rounded-2xl border p-6 shadow-2xl">
+  <div class="flex items-center justify-between border-b border-border pb-4">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+      </div>
+      <div>
+        <h2 class="text-foreground text-lg font-bold">Histórico de Movimentações</h2>
+        <p class="text-muted-foreground text-xs">{{ asset.ticker ? (asset.ticker + ' - ') : '' }}{{ asset.name }}</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <app-button type="button" (buttonClick)="openNewTransaction()" impact="bold" tone="primary" shape="rounded" size="small">
+        <i class="fa-solid fa-plus mr-1"></i> Nova Operação
+      </app-button>
+      <button type="button" (click)="close(true)" class="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="flex min-h-[220px] flex-col items-center justify-center text-center">
+      <svg class="h-8 w-8 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+      <p class="text-muted-foreground mt-3 text-xs">Carregando movimentações...</p>
+    </div>
+  } @else if (transactions.length > 0) {
+    <div class="mt-4 max-h-[420px] overflow-y-auto pr-2">
+      <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+        <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+          <tr>
+            <th class="py-3 px-3">Data</th>
+            <th class="py-3 px-3">Tipo</th>
+            <th class="py-3 px-3">Corretora</th>
+            <th class="py-3 px-3">Qtd</th>
+            <th class="py-3 px-3">Preço Unit.</th>
+            <th class="py-3 px-3">Taxas</th>
+            <th class="py-3 px-3 font-bold">Total</th>
+            <th class="py-3 px-3 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-muted/10 divide-y text-sm">
+          @for (item of transactions; track item.id) {
+            <tr class="hover:bg-card/50 transition-colors">
+              <td class="py-2.5 px-3 text-xs text-muted-foreground">
+                {{ item.date | date:'dd/MM/yyyy':'UTC' }}
+              </td>
+              <td class="py-2.5 px-3">
+                @if (item.kind === 'BUY') {
+                  <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-bold text-emerald-500">
+                    <i class="fa-solid fa-arrow-up text-[10px]"></i> Compra
+                  </span>
+                } @else if (item.kind === 'SELL') {
+                  <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2 py-0.5 text-xs font-bold text-rose-500">
+                    <i class="fa-solid fa-arrow-down text-[10px]"></i> Venda
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-bold text-blue-500">
+                    <i class="fa-solid fa-coins text-[10px]"></i> {{ item.kind }}
+                  </span>
+                }
+              </td>
+              <td class="py-2.5 px-3 text-xs text-foreground font-medium">{{ item.brokerName }}</td>
+              <td class="py-2.5 px-3 text-xs text-foreground">{{ item.quantity > 0 ? item.quantity : '-' }}</td>
+              <td class="py-2.5 px-3 text-xs text-muted-foreground">{{ item.unitPrice > 0 ? (item.unitPrice | moneyPipe) : '-' }}</td>
+              <td class="py-2.5 px-3 text-xs text-muted-foreground">{{ item.fees > 0 ? (item.fees | moneyPipe) : '-' }}</td>
+              <td class="py-2.5 px-3 text-xs font-bold text-foreground">{{ item.amount | moneyPipe }}</td>
+              <td class="py-2.5 px-3 text-right">
+                <button type="button" (click)="editTransaction(item)"
+                  class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title="Editar">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>
+                </button>
+                <button type="button" (click)="deleteTransaction(item.id)"
+                  class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title="Excluir">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="mt-4 border-muted/20 bg-card/40 flex min-h-[180px] flex-col items-center justify-center rounded-xl border p-6 text-center">
+      <i class="fa-solid fa-clock-rotate-left text-muted-foreground text-2xl mb-2"></i>
+      <p class="text-foreground text-sm font-semibold">Nenhuma movimentação registrada</p>
+      <p class="text-muted-foreground text-xs mt-1 mb-3">Lance compras ou proventos para este ativo.</p>
+    </div>
+  }
+
+  <div class="mt-6 flex justify-end border-t border-border pt-4">
+    <app-button type="button" (buttonClick)="close(true)" impact="bold" tone="light" shape="rounded" size="medium">
+      Fechar
+    </app-button>
+  </div>
+</div>

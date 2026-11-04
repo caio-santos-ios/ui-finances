@@ -47,6 +47,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'investments',
+    component: LayoutComponent,
+    loadChildren: () => import('../investments/investments.module').then((m) => m.InvestmentsModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'setting-dashboard',
     component: LayoutComponent,
     loadChildren: () => import('../setting-dashboard/setting-dashboard.module').then((m) => m.SettingDashboardModule),

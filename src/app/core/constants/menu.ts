@@ -42,6 +42,11 @@ export class Menu {
           route: '/life-cost',
         },
         {
+          icon: 'chart-line',
+          label: 'Investimentos',
+          route: '/investments',
+        },
+        {
           icon: 'sliders',
           label: 'Configuração Dashboard',
           route: '/setting-dashboard',

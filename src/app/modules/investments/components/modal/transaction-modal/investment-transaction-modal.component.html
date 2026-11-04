@@ -1,0 +1,117 @@
+<div class="border-muted/20 bg-card w-[560px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between border-b border-border pb-4">
+    <div class="flex items-center gap-2">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <i class="fa-solid {{ isEdit ? 'fa-pen-to-square' : 'fa-plus' }} text-sm"></i>
+      </div>
+      <div>
+        <h2 class="text-foreground text-base font-semibold">{{ isEdit ? 'Editar Movimentação' : 'Nova Movimentação' }}</h2>
+        <p class="text-muted-foreground text-xs">Registre compras, vendas ou proventos recebidos</p>
+      </div>
+    </div>
+    <button type="button" (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark text-sm"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="kind">Tipo de Operação</label>
+        <select id="kind" formControlName="kind" (change)="onKindChange()"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="BUY">Compra (+)</option>
+          <option value="SELL">Venda (-)</option>
+          <option value="DIVIDEND">Dividendo</option>
+          <option value="JCP">Juros sobre Capital Próprio (JCP)</option>
+          <option value="INCOME">Rendimento / Cupom</option>
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="investmentAssetId">Ativo</label>
+        <select id="investmentAssetId" formControlName="investmentAssetId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Selecione o ativo...</option>
+          @for (a of assets; track a.id) {
+            <option [value]="a.id">{{ a.ticker ? (a.ticker + ' - ' + a.name) : a.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="brokerId">Corretora / Banco</label>
+        <select id="brokerId" formControlName="brokerId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Selecione a corretora...</option>
+          @for (b of banks; track b.id) {
+            <option [value]="b.id">{{ b.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="date">Data da Operação</label>
+        <input id="date" type="date" formControlName="date"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      @if (isBuyOrSell) {
+        <div class="col-span-12 sm:col-span-4">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="quantity">Quantidade</label>
+          <input id="quantity" type="number" step="any" formControlName="quantity" (input)="recalculateTotal()"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+
+        <div class="col-span-12 sm:col-span-4">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="unitPrice">Preço Unitário (R$)</label>
+          <input id="unitPrice" type="text" mask="separator.4" thousandSeparator="." decimalMarker="," prefix="R$ "
+            formControlName="unitPrice" (input)="recalculateTotal()" placeholder="R$ 0,00"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+
+        <div class="col-span-12 sm:col-span-4">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="fees">Taxas / Corretagem (R$)</label>
+          <input id="fees" type="text" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+            formControlName="fees" (input)="recalculateTotal()" placeholder="R$ 0,00"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+      }
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="amount">
+          {{ isBuyOrSell ? 'Valor Total da Operação (R$)' : 'Valor Líquido do Provento (R$)' }}
+        </label>
+        <input id="amount" type="text" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+          formControlName="amount" placeholder="R$ 0,00"
+          class="border-muted/20 bg-background text-foreground font-bold focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6 flex items-center pt-5">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" formControlName="createOperation"
+            class="h-4 w-4 rounded border-border text-primary focus:ring-primary" />
+          <span class="text-xs font-semibold text-foreground">
+            {{ isBuyOrSell ? 'Lançar saída/entrada no extrato da conta' : 'Lançar crédito de provento na conta' }}
+          </span>
+        </label>
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="notes">Observações</label>
+        <input id="notes" type="text" placeholder="Ex: Aporte mensal, dividendo semestral..." formControlName="notes"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2 border-t border-border pt-4">
+      <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        Cancelar
+      </app-button>
+      <app-button (buttonClick)="save()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> {{ isEdit ? 'Salvar Alterações' : 'Confirmar Lançamento' }}
+      </app-button>
+    </div>
+  </form>
+</div>

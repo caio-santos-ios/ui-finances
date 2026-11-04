@@ -1,0 +1,402 @@
+<div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <h1 class="text-foreground text-2xl font-bold tracking-tight">Investimentos</h1>
+    <p class="text-muted-foreground text-xs">Acompanhamento consolidado da sua carteira, movimentações e proventos</p>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <app-button (buttonClick)="openAssetModal()" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-folder-plus mr-1.5"></i> Novo Ativo
+    </app-button>
+    <app-button (buttonClick)="openTransactionModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+      <i class="fa-solid fa-plus mr-1.5"></i> Nova Movimentação
+    </app-button>
+  </div>
+</div>
+
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="border-muted/20 bg-background flex flex-col justify-between rounded-xl border p-5">
+    <div>
+      <div class="flex items-center justify-between">
+        <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Total Investido</span>
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <i class="fa-solid fa-coins text-sm"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <span class="text-foreground text-2xl font-bold tracking-tight">
+          {{ portfolio.totalInvested | moneyPipe }}
+        </span>
+      </div>
+    </div>
+    <div class="mt-4 border-t border-border/40 pt-3">
+      <p class="text-muted-foreground text-xs">Custo de aquisição da carteira ativa</p>
+    </div>
+  </div>
+
+  <div class="border-muted/20 bg-background flex flex-col justify-between rounded-xl border p-5">
+    <div>
+      <div class="flex items-center justify-between">
+        <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Valor Atual da Carteira</span>
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+          <i class="fa-solid fa-wallet text-sm"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <span class="text-foreground text-2xl font-bold tracking-tight">
+          {{ portfolio.currentValue | moneyPipe }}
+        </span>
+      </div>
+    </div>
+    <div class="mt-4 border-t border-border/40 pt-3">
+      <p class="text-muted-foreground text-xs">{{ portfolio.positions.length }} ativo(s) com posição aberta</p>
+    </div>
+  </div>
+
+  <div class="border-muted/20 bg-background flex flex-col justify-between rounded-xl border p-5">
+    <div>
+      <div class="flex items-center justify-between">
+        <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Lucro / Prejuízo em Aberto</span>
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg {{ portfolio.unrealizedProfit >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500' }}">
+          <i class="fa-solid {{ portfolio.unrealizedProfit >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down' }} text-sm"></i>
+        </div>
+      </div>
+      <div class="mt-3 flex items-baseline gap-2">
+        <span class="text-2xl font-bold tracking-tight {{ portfolio.unrealizedProfit >= 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+          {{ portfolio.unrealizedProfit >= 0 ? '+' : '' }}{{ portfolio.unrealizedProfit | moneyPipe }}
+        </span>
+        <span class="text-xs font-bold {{ portfolio.unrealizedProfit >= 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+          ({{ portfolio.unrealizedProfit >= 0 ? '+' : '' }}{{ portfolio.unrealizedProfitPercent }}%)
+        </span>
+      </div>
+    </div>
+    <div class="mt-4 border-t border-border/40 pt-3">
+      <p class="text-muted-foreground text-xs">Variação de cotação não realizada</p>
+    </div>
+  </div>
+
+  <div class="border-muted/20 bg-background flex flex-col justify-between rounded-xl border p-5">
+    <div>
+      <div class="flex items-center justify-between">
+        <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Proventos Recebidos</span>
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500">
+          <i class="fa-solid fa-hand-holding-dollar text-sm"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <span class="text-foreground text-2xl font-bold tracking-tight">
+          {{ portfolio.incomeReceived | moneyPipe }}
+        </span>
+      </div>
+    </div>
+    <div class="mt-4 border-t border-border/40 pt-3">
+      <div class="flex items-center justify-between text-xs">
+        <span class="text-muted-foreground">Retorno Total:</span>
+        <span class="font-bold {{ portfolio.totalReturn >= 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+          {{ portfolio.totalReturn >= 0 ? '+' : '' }}{{ portfolio.totalReturn | moneyPipe }} ({{ portfolio.totalReturnPercent }}%)
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mb-4 flex border-b border-border">
+  <button type="button" (click)="setTab('positions')"
+    class="flex items-center gap-2 border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer {{ activeTab === 'positions' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground' }}">
+    <i class="fa-solid fa-chart-pie"></i>
+    Posições na Carteira
+    <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary font-bold">{{ portfolio.positions.length }}</span>
+  </button>
+  <button type="button" (click)="setTab('transactions')"
+    class="flex items-center gap-2 border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer {{ activeTab === 'transactions' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground' }}">
+    <i class="fa-solid fa-list-check"></i>
+    Extrato de Movimentações
+    <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground font-bold">{{ transactions.length }}</span>
+  </button>
+  <button type="button" (click)="setTab('assets')"
+    class="flex items-center gap-2 border-b-2 px-6 py-3 text-sm font-semibold transition-colors cursor-pointer {{ activeTab === 'assets' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground' }}">
+    <i class="fa-solid fa-cubes"></i>
+    Cadastro de Ativos
+    <span class="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground font-bold">{{ assets.length }}</span>
+  </button>
+</div>
+
+@if (activeTab === 'positions') {
+  @if (portfolio.positions.length > 0) {
+    <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+      <div class="max-h-[calc(100vh_-_22rem)] grow overflow-auto px-5">
+        <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+          <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+            <tr>
+              <th class="py-3 px-4">Ativo</th>
+              <th class="py-3 px-4">Tipo</th>
+              <th class="py-3 px-4">Corretoras</th>
+              <th class="py-3 px-4">Qtd.</th>
+              <th class="py-3 px-4">Preço Médio</th>
+              <th class="py-3 px-4">Preço Atual</th>
+              <th class="py-3 px-4 font-bold">Valor Atual</th>
+              <th class="py-3 px-4">Rentabilidade</th>
+              <th class="py-3 px-4 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-muted/10 divide-y text-sm">
+            @for (item of portfolio.positions; track item.investmentAssetId) {
+              <tr class="hover:bg-card/50 transition-colors">
+                <td class="py-3 px-4 font-medium text-foreground">
+                  <div class="font-bold">{{ item.ticker ? item.ticker : item.name }}</div>
+                  @if (item.ticker && item.name) {
+                    <div class="text-xs text-muted-foreground">{{ item.name }}</div>
+                  }
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                    {{ getAssetTypeLabel(item.type) }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">
+                  {{ item.brokerNames.length > 0 ? item.brokerNames.join(', ') : '-' }}
+                </td>
+                <td class="py-3 px-4 font-semibold text-foreground">
+                  {{ item.quantity }}
+                </td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">
+                  {{ item.averagePrice | moneyPipe }}
+                </td>
+                <td class="py-3 px-4 text-xs text-foreground font-medium">
+                  {{ item.lastPrice | moneyPipe }}
+                  @if (item.isEstimated) {
+                    <span class="ml-1 text-[10px] text-amber-500 font-bold">(Estimado)</span>
+                  }
+                </td>
+                <td class="py-3 px-4 font-bold text-foreground">
+                  {{ item.currentValue | moneyPipe }}
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-bold text-xs {{ item.unrealizedProfit >= 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+                    {{ item.unrealizedProfit >= 0 ? '+' : '' }}{{ item.unrealizedProfit | moneyPipe }}
+                    <span class="text-[11px]">({{ item.unrealizedProfit >= 0 ? '+' : '' }}{{ item.profitPercent }}%)</span>
+                  </div>
+                  @if (item.incomeReceived > 0) {
+                    <div class="text-[11px] text-blue-500">
+                      +{{ item.incomeReceived | moneyPipe }} proventos
+                    </div>
+                  }
+                </td>
+                <td class="py-3 px-4 text-right">
+                  <button type="button" (click)="openAssetHistory(item)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Histórico de Movimentações">
+                    <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+                  </button>
+                  <button type="button" (click)="openTransactionModal(item.investmentAssetId)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Nova Operação neste Ativo">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
+        <i class="fa-solid fa-chart-pie text-xl"></i>
+      </div>
+      <h3 class="text-foreground text-base font-semibold">Nenhuma posição em aberto</h3>
+      <p class="text-muted-foreground mt-1 text-xs max-w-sm">Cadastre um ativo e lance suas compras de ações, FIIs ou renda fixa para visualizar sua carteira consolidada.</p>
+      <div class="mt-4 flex gap-2">
+        <app-button (buttonClick)="openAssetModal()" impact="bold" tone="light" shape="rounded" size="medium">
+          <i class="fa-solid fa-folder-plus mr-1.5"></i> Cadastrar Ativo
+        </app-button>
+        <app-button (buttonClick)="openTransactionModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+          <i class="fa-solid fa-plus mr-1.5"></i> Nova Movimentação
+        </app-button>
+      </div>
+    </div>
+  }
+} @else if (activeTab === 'transactions') {
+  <div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div>
+        <label class="text-foreground mb-1 block text-xs font-semibold">Filtrar por Operação</label>
+        <select [(ngModel)]="filterKind" (change)="loadTransactions()"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Todas as operações</option>
+          <option value="BUY">Compras</option>
+          <option value="SELL">Vendas</option>
+          <option value="DIVIDEND">Dividendos</option>
+          <option value="JCP">Juros s/ Capital (JCP)</option>
+          <option value="INCOME">Rendimentos / Cupons</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-foreground mb-1 block text-xs font-semibold">Filtrar por Ativo</label>
+        <select [(ngModel)]="filterAssetId" (change)="loadTransactions()"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Todos os ativos</option>
+          @for (a of assets; track a.id) {
+            <option [value]="a.id">{{ a.ticker ? (a.ticker + ' - ' + a.name) : a.name }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (transactions.length > 0) {
+    <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+      <div class="max-h-[calc(100vh_-_26rem)] grow overflow-auto px-5">
+        <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+          <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+            <tr>
+              <th class="py-3 px-4">Data</th>
+              <th class="py-3 px-4">Tipo</th>
+              <th class="py-3 px-4">Ativo</th>
+              <th class="py-3 px-4">Corretora</th>
+              <th class="py-3 px-4">Qtd.</th>
+              <th class="py-3 px-4">Preço Unit.</th>
+              <th class="py-3 px-4">Taxas</th>
+              <th class="py-3 px-4 font-bold">Valor Total</th>
+              <th class="py-3 px-4 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-muted/10 divide-y text-sm">
+            @for (item of transactions; track item.id) {
+              <tr class="hover:bg-card/50 transition-colors">
+                <td class="py-3 px-4 text-xs text-muted-foreground">
+                  {{ item.date | date:'dd/MM/yyyy':'UTC' }}
+                </td>
+                <td class="py-3 px-4">
+                  @if (item.kind === 'BUY') {
+                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-500">
+                      <i class="fa-solid fa-arrow-up text-[10px]"></i> Compra
+                    </span>
+                  } @else if (item.kind === 'SELL') {
+                    <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-bold text-rose-500">
+                      <i class="fa-solid fa-arrow-down text-[10px]"></i> Venda
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-bold text-blue-500">
+                      <i class="fa-solid fa-coins text-[10px]"></i> {{ item.kind }}
+                    </span>
+                  }
+                </td>
+                <td class="py-3 px-4 font-medium text-foreground">
+                  <div class="font-bold">{{ item.assetTicker ? item.assetTicker : item.assetName }}</div>
+                  @if (item.assetTicker && item.assetName) {
+                    <div class="text-xs text-muted-foreground">{{ item.assetName }}</div>
+                  }
+                </td>
+                <td class="py-3 px-4 text-xs text-foreground font-medium">{{ item.brokerName }}</td>
+                <td class="py-3 px-4 text-xs text-foreground">{{ item.quantity > 0 ? item.quantity : '-' }}</td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.unitPrice > 0 ? (item.unitPrice | moneyPipe) : '-' }}</td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">{{ item.fees > 0 ? (item.fees | moneyPipe) : '-' }}</td>
+                <td class="py-3 px-4 font-bold text-foreground">{{ item.amount | moneyPipe }}</td>
+                <td class="py-3 px-4 text-right">
+                  <button type="button" (click)="editTransaction(item)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Editar Movimentação">
+                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                  </button>
+                  <button type="button" (click)="deleteTransaction(item.id)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Excluir Movimentação">
+                    <i class="fa-solid fa-trash text-sm"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
+        <i class="fa-solid fa-list-check text-xl"></i>
+      </div>
+      <h3 class="text-foreground text-base font-semibold">Nenhuma movimentação encontrada</h3>
+      <p class="text-muted-foreground mt-1 text-xs">Lance uma compra, venda ou provento para começar a movimentar a carteira.</p>
+    </div>
+  }
+} @else if (activeTab === 'assets') {
+  @if (assets.length > 0) {
+    <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+      <div class="max-h-[calc(100vh_-_22rem)] grow overflow-auto px-5">
+        <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+          <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+            <tr>
+              <th class="py-3 px-4">Ticker</th>
+              <th class="py-3 px-4">Nome</th>
+              <th class="py-3 px-4">Tipo</th>
+              <th class="py-3 px-4">Preço Manual</th>
+              <th class="py-3 px-4">Taxa / Vencimento</th>
+              <th class="py-3 px-4 text-right">Ações</th>
+            </tr>
+          </thead>
+          <tbody class="divide-muted/10 divide-y text-sm">
+            @for (item of assets; track item.id) {
+              <tr class="hover:bg-card/50 transition-colors">
+                <td class="py-3 px-4 font-bold text-foreground">{{ item.ticker || '-' }}</td>
+                <td class="py-3 px-4 font-medium text-foreground">{{ item.name }}</td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                    {{ getAssetTypeLabel(item.type) }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-xs text-foreground">{{ item.manualPrice > 0 ? (item.manualPrice | moneyPipe) : '-' }}</td>
+                <td class="py-3 px-4 text-xs text-muted-foreground">
+                  @if (item.type === 'FIXED_INCOME') {
+                    <span>{{ item.contractedRate ? ((item.contractedRate * 100).toFixed(2) + '% a.a.') : '-' }}</span>
+                    @if (item.maturityDate) {
+                      <span class="ml-1">({{ item.maturityDate | date:'dd/MM/yyyy':'UTC' }})</span>
+                    }
+                  } @else {
+                    <span>-</span>
+                  }
+                </td>
+                <td class="py-3 px-4 text-right">
+                  <button type="button" (click)="openAssetHistory(item)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Histórico de Movimentações">
+                    <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+                  </button>
+                  <button type="button" (click)="openTransactionModal(item.id)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Nova Operação">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                  </button>
+                  <button type="button" (click)="openAssetModal(item)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Editar Ativo">
+                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                  </button>
+                  <button type="button" (click)="deleteAsset(item.id)"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Excluir Ativo">
+                    <i class="fa-solid fa-trash text-sm"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+      <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
+        <i class="fa-solid fa-cubes text-xl"></i>
+      </div>
+      <h3 class="text-foreground text-base font-semibold">Nenhum ativo cadastrado</h3>
+      <p class="text-muted-foreground mt-1 text-xs">Cadastre seu primeiro ativo de investimento para começar.</p>
+      <div class="mt-4">
+        <app-button (buttonClick)="openAssetModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+          <i class="fa-solid fa-folder-plus mr-1.5"></i> Cadastrar Ativo
+        </app-button>
+      </div>
+    </div>
+  }
+}
