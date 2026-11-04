@@ -27,7 +27,8 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     super();
   }
 
-  activeTab: 'assets' | 'debts' = 'assets';
+  activeTab: 'assets' | 'debts' | 'history' = 'assets';
+  historySubTab: 'all' | 'assets' | 'debts' = 'all';
 
   summary = {
     totalBankBalance: 0,
@@ -36,6 +37,9 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     netWorth: 0,
     assetCount: 0,
     debtCount: 0,
+    disposedAssetCount: 0,
+    settledDebtCount: 0,
+    historyCount: 0,
   };
   summaryLoading = true;
 
@@ -45,7 +49,6 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
   assetsFilters = {
     name: '',
     type: '',
-    status: '',
   };
 
   debtsPagination: TPagination = ResetPagination;
@@ -55,6 +58,11 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     name: '',
     type: '',
   };
+
+  historyAssetsPagination: TPagination = ResetPagination;
+  historyDebtsPagination: TPagination = ResetPagination;
+  historyAssetsLoading = false;
+  historyDebtsLoading = false;
 
   async ngOnInit(): Promise<void> {
     await Promise.all([
@@ -78,6 +86,9 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
           netWorth: Number(payload.netWorth ?? 0),
           assetCount: Number(payload.assetCount ?? 0),
           debtCount: Number(payload.debtCount ?? 0),
+          disposedAssetCount: Number(payload.disposedAssetCount ?? 0),
+          settledDebtCount: Number(payload.settledDebtCount ?? 0),
+          historyCount: Number(payload.historyCount ?? (Number(payload.disposedAssetCount ?? 0) + Number(payload.settledDebtCount ?? 0))),
         };
       }
     } catch (error) {
@@ -94,14 +105,13 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     try {
       const params = new URLSearchParams({
         deleted: 'false',
+        status: 'active',
         pageNumber: String(page),
         pageSize: '10',
       });
 
       if (this.assetsFilters.name.trim()) params.append('regex$name', this.assetsFilters.name.trim());
       if (this.assetsFilters.type) params.append('type', this.assetsFilters.type);
-      if (this.assetsFilters.status === 'active') params.append('disposed', 'false');
-      if (this.assetsFilters.status === 'disposed') params.append('disposed', 'true');
 
       const { data } = await api.get(`/assets?${params.toString()}`);
       this.assetsPagination = data.data;
@@ -127,6 +137,7 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     try {
       const params = new URLSearchParams({
         deleted: 'false',
+        status: 'active',
         pageNumber: String(page),
         pageSize: '10',
       });
@@ -151,8 +162,63 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     }
   }
 
-  setTab(tab: 'assets' | 'debts') {
+  async loadHistoryAssets(page: number) {
+    this.historyAssetsLoading = true;
+    this.cdr.markForCheck();
+    try {
+      const params = new URLSearchParams({
+        deleted: 'false',
+        status: 'disposed',
+        pageNumber: String(page),
+        pageSize: '10',
+      });
+      const { data } = await api.get(`/assets?${params.toString()}`);
+      this.historyAssetsPagination = data.data;
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.historyAssetsLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  async loadHistoryDebts(page: number) {
+    this.historyDebtsLoading = true;
+    this.cdr.markForCheck();
+    try {
+      const params = new URLSearchParams({
+        deleted: 'false',
+        status: 'settled',
+        pageNumber: String(page),
+        pageSize: '10',
+      });
+      const { data } = await api.get(`/debts?${params.toString()}`);
+      this.historyDebtsPagination = data.data;
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.historyDebtsLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  setTab(tab: 'assets' | 'debts' | 'history') {
     this.activeTab = tab;
+    if (tab === 'history') {
+      this.loadHistoryAssets(1);
+      this.loadHistoryDebts(1);
+    }
+  }
+
+  setHistorySubTab(subTab: 'all' | 'assets' | 'debts') {
+    this.historySubTab = subTab;
+    this.cdr.markForCheck();
+  }
+
+  parseDate(dateStr: string | null | undefined): Date | null {
+    if (!dateStr) return null;
+    const clean = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    return new Date(`${clean}T12:00:00.000Z`);
   }
 
   getTypeAssetLabel(type: string): string {
@@ -177,48 +243,48 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     return map[type] || 'Outro';
   }
 
+  async reloadAll() {
+    await Promise.all([
+      this.loadSummary(),
+      this.loadAssets(this.assetsPagination.currentPage || 1),
+      this.loadDebts(this.debtsPagination.currentPage || 1),
+      this.loadHistoryAssets(this.historyAssetsPagination.currentPage || 1),
+      this.loadHistoryDebts(this.historyDebtsPagination.currentPage || 1),
+    ]);
+  }
+
   openAssetModal(id: string = '') {
     const ref = this.dialog.open(AssetModalComponent, { data: { id } });
     ref.closed.subscribe(async (res) => {
-      if (res) {
-        await Promise.all([this.loadAssets(this.assetsPagination.currentPage || 1), this.loadSummary()]);
-      }
+      if (res) await this.reloadAll();
     });
   }
 
   openDebtModal(id: string = '') {
     const ref = this.dialog.open(DebtModalComponent, { data: { id } });
     ref.closed.subscribe(async (res) => {
-      if (res) {
-        await Promise.all([this.loadDebts(this.debtsPagination.currentPage || 1), this.loadSummary()]);
-      }
+      if (res) await this.reloadAll();
     });
   }
 
   openPayModal(debt: any) {
     const ref = this.dialog.open(PayInstallmentModalComponent, { data: { debt } });
     ref.closed.subscribe(async (res) => {
-      if (res) {
-        await Promise.all([this.loadDebts(this.debtsPagination.currentPage || 1), this.loadSummary()]);
-      }
+      if (res) await this.reloadAll();
     });
   }
 
   openAssetValuationModal(asset: any) {
     const ref = this.dialog.open(AssetValuationModalComponent, { data: { asset } });
     ref.closed.subscribe(async (res) => {
-      if (res) {
-        await Promise.all([this.loadAssets(this.assetsPagination.currentPage || 1), this.loadSummary()]);
-      }
+      if (res) await this.reloadAll();
     });
   }
 
   openDisposeAssetModal(asset: any) {
     const ref = this.dialog.open(DisposeAssetModalComponent, { data: { asset } });
     ref.closed.subscribe(async (res) => {
-      if (res) {
-        await Promise.all([this.loadAssets(this.assetsPagination.currentPage || 1), this.loadSummary()]);
-      }
+      if (res) await this.reloadAll();
     });
   }
 
@@ -239,7 +305,7 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
 
       const { data } = await api.patch(`/assets/${asset.id}/reactivate`, {});
       this.toastSuccess(data?.message || 'Bem reativado com sucesso!');
-      await Promise.all([this.loadAssets(this.assetsPagination.currentPage || 1), this.loadSummary()]);
+      await this.reloadAll();
     } catch (error) {
       this.normalizeErr(error);
     }
@@ -248,9 +314,7 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
   openDebtHistoryModal(debt: any) {
     const ref = this.dialog.open(DebtHistoryModalComponent, { data: { debt } });
     ref.closed.subscribe(async (res) => {
-      if (res) {
-        await Promise.all([this.loadDebts(this.debtsPagination.currentPage || 1), this.loadSummary()]);
-      }
+      if (res) await this.reloadAll();
     });
   }
 
@@ -271,12 +335,7 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
 
       await api.delete(`/assets/${id}`);
       this.toastSuccess('Bem excluído com sucesso!');
-
-      const currentPage = this.assetsPagination.currentPage || 1;
-      const willBeEmpty = this.assetsPagination.data.length === 1 && currentPage > 1;
-      const nextPage = willBeEmpty ? currentPage - 1 : currentPage;
-
-      await Promise.all([this.loadAssets(nextPage), this.loadSummary()]);
+      await this.reloadAll();
     } catch (error) {
       this.normalizeErr(error);
     }
@@ -299,12 +358,7 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
 
       await api.delete(`/debts/${id}`);
       this.toastSuccess('Dívida excluída com sucesso!');
-
-      const currentPage = this.debtsPagination.currentPage || 1;
-      const willBeEmpty = this.debtsPagination.data.length === 1 && currentPage > 1;
-      const nextPage = willBeEmpty ? currentPage - 1 : currentPage;
-
-      await Promise.all([this.loadDebts(nextPage), this.loadSummary()]);
+      await this.reloadAll();
     } catch (error) {
       this.normalizeErr(error);
     }
