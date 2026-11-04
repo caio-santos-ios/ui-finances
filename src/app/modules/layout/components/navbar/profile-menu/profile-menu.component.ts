@@ -128,10 +128,15 @@ export class ProfileMenuComponent extends MyFinance implements OnInit {
   }
 
   normalizeNameColor(color: string) {
-    switch(color) {
-      case "yellow": return "Amarelo";
-      default:
-        return "Padrão"
-    }
+    const map: Record<string, string> = {
+      base: 'Padrão',
+      yellow: 'Amarelo',
+      green: 'Verde',
+      blue: 'Azul',
+      orange: 'Laranja',
+      red: 'Vermelho',
+      violet: 'Violeta',
+    };
+    return map[color] || color;
   }
 }
