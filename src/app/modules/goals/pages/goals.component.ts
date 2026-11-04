@@ -8,6 +8,7 @@ import { GoalModalComponent } from '../components/modal/goal-modal.component';
 import { GoalDepositModalComponent } from '../components/modal/goal-deposit-modal.component';
 import { GoalHistoryModalComponent } from '../components/modal/goal-history-modal.component';
 import { ResetPagination, TPagination } from 'src/app/shared/models/pagination';
+import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import { api } from 'src/app/shared/api/api';
 import Swal from 'sweetalert2';
@@ -16,7 +17,7 @@ import Swal from 'sweetalert2';
   selector: 'app-goals',
   templateUrl: './goals.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, BreadcrumbComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, BreadcrumbComponent, ButtonComponent, MoneyPipe],
 })
 export class GoalsComponent extends MyFinance implements OnInit {
   pagination: TPagination = ResetPagination;
@@ -115,12 +116,14 @@ export class GoalsComponent extends MyFinance implements OnInit {
         const current = Number(goal.currentAmount) || 0;
         const percent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
         const remaining = Math.max(0, target - current);
+        const isCompleted = goal.status === 'completed' || current >= target;
         return {
           ...goal,
-          targetAmountNum: target,
-          currentAmountNum: current,
+          targetAmount: target,
+          currentAmount: current,
           percent,
           remaining,
+          isCompleted,
         };
       });
 

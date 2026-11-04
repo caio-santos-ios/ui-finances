@@ -48,7 +48,7 @@
                 </span>
               </td>
               <td class="py-2.5 px-2 font-semibold" [class]="tx.type === 'deposit' ? 'text-emerald-400' : 'text-red-400'">
-                {{ tx.type === 'deposit' ? '+' : '-' }} {{ tx.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+                {{ tx.type === 'deposit' ? '+' : '-' }} {{ tx.value | moneyPipe }}
               </td>
               <td class="text-muted-foreground py-2.5 px-2 truncate max-w-[140px]">{{ tx.note || '—' }}</td>
               <td class="py-2.5 pl-2 text-right">

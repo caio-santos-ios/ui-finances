@@ -15,8 +15,8 @@
   <div class="border-muted/20 bg-muted/30 mb-5 rounded-lg border p-3">
     <div class="text-foreground text-sm font-semibold">{{ dialogData.goalName }}</div>
     <div class="text-muted-foreground mt-1 flex items-center justify-between text-xs">
-      <span>Acumulado: <strong class="text-foreground">{{ dialogData.currentAmount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong></span>
-      <span>Alvo: <strong class="text-foreground">{{ dialogData.targetAmount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong></span>
+      <span>Acumulado: <strong class="text-foreground">{{ dialogData.currentAmount | moneyPipe }}</strong></span>
+      <span>Alvo: <strong class="text-foreground">{{ dialogData.targetAmount | moneyPipe }}</strong></span>
     </div>
   </div>
 

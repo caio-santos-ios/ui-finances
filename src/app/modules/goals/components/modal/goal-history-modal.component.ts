@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import { api } from 'src/app/shared/api/api';
 import Swal from 'sweetalert2';
@@ -10,7 +11,7 @@ import Swal from 'sweetalert2';
   selector: 'app-goal-history-modal',
   templateUrl: './goal-history-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule, ButtonComponent, MoneyPipe],
 })
 export class GoalHistoryModalComponent extends MyFinance implements OnInit {
   loading = true;

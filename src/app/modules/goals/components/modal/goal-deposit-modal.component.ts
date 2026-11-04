@@ -4,6 +4,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import { api } from 'src/app/shared/api/api';
 
@@ -11,7 +12,7 @@ import { api } from 'src/app/shared/api/api';
   selector: 'app-goal-deposit-modal',
   templateUrl: './goal-deposit-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxMaskDirective, ButtonComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NgxMaskDirective, ButtonComponent, MoneyPipe],
 })
 export class GoalDepositModalComponent extends MyFinance implements OnInit {
   isLoading = false;
