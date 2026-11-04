@@ -46,6 +46,8 @@ export class OperationModalComponent extends MyFinance implements OnInit {
       description: ['', [Validators.required]],
       repeat: [false],
       recurrence: [''],
+      payeeName: [''],
+      payeeDocument: [''],
     });
 
     await this.getBanks();
@@ -96,6 +98,8 @@ export class OperationModalComponent extends MyFinance implements OnInit {
           time: timePart,
           repeat: !!this.operation.repeat,
           recurrence: this.operation.recurrence || '',
+          payeeName: this.operation.payeeName || '',
+          payeeDocument: this.operation.payeeDocument || '',
         },
         { emitEvent: false }
       );

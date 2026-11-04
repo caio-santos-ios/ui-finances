@@ -33,6 +33,8 @@ export class CategoryModalComponent extends MyFinance implements OnInit {
       type: ['income', [Validators.required]],
       lifeCostClass: ['DISCRETIONARY'],
       lifeCostRecurrence: ['VARIABLE'],
+      irTreatment: ['NONE'],
+      irSubtype: [''],
     });
 
     if (this.dialogData?.id) {
@@ -49,6 +51,8 @@ export class CategoryModalComponent extends MyFinance implements OnInit {
         type: data.data.type?.toLowerCase(),
         lifeCostClass: data.data.lifeCostClass || 'DISCRETIONARY',
         lifeCostRecurrence: data.data.lifeCostRecurrence || 'VARIABLE',
+        irTreatment: data.data.irTreatment || 'NONE',
+        irSubtype: data.data.irSubtype || '',
       });
     } catch (error) {
       this.normalizeErr(error);

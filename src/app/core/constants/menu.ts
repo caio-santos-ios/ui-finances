@@ -52,6 +52,11 @@ export class Menu {
           route: '/goals',
         },
         {
+          icon: 'file-invoice-dollar',
+          label: 'Imposto de Renda',
+          route: '/tax',
+        },
+        {
           icon: 'sliders',
           label: 'Configuração Dashboard',
           route: '/setting-dashboard',

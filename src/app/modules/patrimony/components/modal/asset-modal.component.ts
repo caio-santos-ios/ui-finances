@@ -36,6 +36,9 @@ export class AssetModalComponent extends MyFinance implements OnInit {
       currentValue: [null, [Validators.required]],
       acquisitionDate: [''],
       description: [''],
+      includeInIr: [true],
+      irAssetCode: [''],
+      irDescription: [''],
     });
 
     if (this.dialogData?.id) {
@@ -51,6 +54,9 @@ export class AssetModalComponent extends MyFinance implements OnInit {
       this.form.patchValue({
         ...this.asset,
         acquisitionDate: formattedDate,
+        includeInIr: this.asset.includeInIr ?? true,
+        irAssetCode: this.asset.irAssetCode || '',
+        irDescription: this.asset.irDescription || '',
       });
     } catch (error) {
       this.normalizeErr(error);

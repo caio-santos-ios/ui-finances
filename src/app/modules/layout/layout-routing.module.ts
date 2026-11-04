@@ -59,6 +59,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'tax',
+    component: LayoutComponent,
+    loadChildren: () => import('../tax/tax.module').then((m) => m.TaxModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'setting-dashboard',
     component: LayoutComponent,
     loadChildren: () => import('../setting-dashboard/setting-dashboard.module').then((m) => m.SettingDashboardModule),

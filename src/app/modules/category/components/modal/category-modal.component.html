@@ -59,6 +59,37 @@
           </select>
         </div>
       }
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="irTreatment">Tratamento no Imposto de Renda</label>
+        <select
+          id="irTreatment"
+          formControlName="irTreatment"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="NONE">Não entra na declaração</option>
+          <option value="TAXABLE_INCOME">Rendimento Tributável (Salários, Aluguéis, etc.)</option>
+          <option value="EXEMPT_INCOME">Rendimento Isento (Bolsas, Doações, etc.)</option>
+          <option value="EXCLUSIVE_INCOME">Tributação Exclusiva (PLR, etc.)</option>
+          <option value="DEDUCTION">Dedução Legal (Saúde, Educação, Previdência)</option>
+        </select>
+      </div>
+
+      @if (form.get('irTreatment')?.value === 'DEDUCTION') {
+        <div class="col-span-12">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="irSubtype">Tipo de Dedução</label>
+          <select
+            id="irSubtype"
+            formControlName="irSubtype"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="health">Despesas Médicas / Saúde</option>
+            <option value="education">Instrução / Educação</option>
+            <option value="pension">Previdência Privada (PGBL)</option>
+            <option value="dependent">Dependentes</option>
+            <option value="alimony">Pensão Alimentícia</option>
+            <option value="other">Outra Dedução</option>
+          </select>
+        </div>
+      }
     </div>
 
     <div class="mt-6 flex justify-end gap-2">

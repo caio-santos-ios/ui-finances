@@ -105,6 +105,27 @@
           formControlName="description"
           class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
       </div>
+
+      @if (form.value.type === 'expense') {
+        <div class="col-span-12 sm:col-span-6">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="payeeName">Prestador / Favorecido (IR)</label>
+          <input
+            id="payeeName"
+            type="text"
+            placeholder="Ex: Dr. Silva, Escola Exemplo..."
+            formControlName="payeeName"
+            class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+        <div class="col-span-12 sm:col-span-6">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="payeeDocument">CPF / CNPJ do Prestador (IR)</label>
+          <input
+            id="payeeDocument"
+            type="text"
+            placeholder="000.000.000-00 ou CNPJ"
+            formControlName="payeeDocument"
+            class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+      }
       @if (form.value.type !== 'transfer') {
       <div class="col-span-12">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="repeat">Repetir operação</label>
