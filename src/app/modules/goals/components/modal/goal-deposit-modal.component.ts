@@ -16,12 +16,18 @@ import { api } from 'src/app/shared/api/api';
 })
 export class GoalDepositModalComponent extends MyFinance implements OnInit {
   isLoading = false;
+  investmentAssets: any[] = [];
+  banks: any[] = [];
 
   form: FormGroup = new FormGroup({
     type: new FormControl('deposit', [Validators.required]),
     value: new FormControl(null, [Validators.required]),
     date: new FormControl(new Date().toISOString().split('T')[0], [Validators.required]),
     note: new FormControl(''),
+    linkInvestment: new FormControl(false),
+    investmentAssetId: new FormControl(''),
+    brokerId: new FormControl(''),
+    createInvestmentTransaction: new FormControl(true),
   });
 
   constructor(
@@ -37,7 +43,32 @@ export class GoalDepositModalComponent extends MyFinance implements OnInit {
     super();
   }
 
-  ngOnInit(): void {}
+  async ngOnInit(): Promise<void> {
+    await this.loadDependencies();
+  }
+
+  async loadDependencies(): Promise<void> {
+    try {
+      const [assetsRes, banksRes] = await Promise.allSettled([
+        api.get('/investments/investment-assets'),
+        api.get('/banks/select?deleted=false'),
+      ]);
+
+      if (assetsRes.status === 'fulfilled') {
+        const raw = assetsRes.value.data;
+        this.investmentAssets = raw?.data ?? raw ?? [];
+      }
+
+      if (banksRes.status === 'fulfilled') {
+        const raw = banksRes.value.data;
+        this.banks = raw?.data ?? raw ?? [];
+      }
+    } catch (e) {
+      // Non-blocking
+    } finally {
+      this.cdr.markForCheck();
+    }
+  }
 
   close(result: boolean = false) {
     this.dialogRef.close(result);
@@ -68,13 +99,24 @@ export class GoalDepositModalComponent extends MyFinance implements OnInit {
         return;
       }
 
-      const payload = {
+      if (raw.type === 'deposit' && raw.linkInvestment && !raw.investmentAssetId) {
+        this.toastWarning('Selecione o ativo de investimento a ser vinculado.');
+        return;
+      }
+
+      const payload: any = {
         goalId: this.dialogData.goalId,
         type: raw.type,
         value,
         date: raw.date ? new Date(raw.date).toISOString() : new Date().toISOString(),
         note: raw.note?.trim() || null,
       };
+
+      if (raw.type === 'deposit' && raw.linkInvestment && raw.investmentAssetId) {
+        payload.investmentAssetId = raw.investmentAssetId;
+        payload.brokerId = raw.brokerId || null;
+        payload.createInvestmentTransaction = !!raw.createInvestmentTransaction;
+      }
 
       await api.post(`/goals/${this.dialogData.goalId}/transactions`, payload);
       this.toastSuccess(raw.type === 'withdraw' ? 'Resgate registrado com sucesso.' : 'Aporte realizado com sucesso!');

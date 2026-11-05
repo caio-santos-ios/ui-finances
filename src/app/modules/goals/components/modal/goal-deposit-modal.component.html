@@ -1,4 +1,4 @@
-<div class="border-muted/20 bg-card w-[480px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+<div class="border-muted/20 bg-card w-[520px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
   <div class="mb-5 flex items-center justify-between">
     <div class="flex items-center gap-2">
       <i class="fa-solid fa-piggy-bank text-primary text-base"></i>
@@ -7,7 +7,7 @@
     <button
       type="button"
       (click)="close()"
-      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors cursor-pointer">
       <i class="fa-solid fa-xmark"></i>
     </button>
   </div>
@@ -32,6 +32,13 @@
           <option value="withdraw">Resgate (-)</option>
         </select>
       </div>
+
+      @if (form.get('type')?.value === 'withdraw') {
+        <div class="col-span-12 flex items-start gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-200">
+          <i class="fa-solid fa-triangle-exclamation text-amber-400 mt-0.5 shrink-0"></i>
+          <span>Atenção: A retirada do valor da meta não realiza o resgate financeiro automático na sua corretora.</span>
+        </div>
+      }
 
       <div class="col-span-12 sm:col-span-6">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="value">Valor (R$)</label>
@@ -65,6 +72,70 @@
           formControlName="note"
           class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
       </div>
+
+      @if (form.get('type')?.value === 'deposit') {
+        <div class="col-span-12 border-t border-border/40 pt-3">
+          <div class="flex items-center justify-between">
+            <label for="linkInvestment" class="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer">
+              <i class="fa-solid fa-chart-line text-primary"></i>
+              Vincular a um investimento
+            </label>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input
+                id="linkInvestment"
+                type="checkbox"
+                formControlName="linkInvestment"
+                class="sr-only peer" />
+              <div class="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          @if (form.get('linkInvestment')?.value) {
+            <div class="mt-3 grid grid-cols-12 gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3.5">
+              <div class="col-span-12 sm:col-span-7">
+                <label class="text-foreground mb-1 block text-xs font-semibold" for="investmentAssetId">
+                  Ativo de Investimento <span class="text-primary">*</span>
+                </label>
+                <select
+                  id="investmentAssetId"
+                  formControlName="investmentAssetId"
+                  class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-xs outline-none transition">
+                  <option value="">Selecione um ativo...</option>
+                  @for (asset of investmentAssets; track asset.id) {
+                    <option [value]="asset.id">
+                      {{ asset.ticker ? (asset.ticker + ' - ' + asset.name) : asset.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-span-12 sm:col-span-5">
+                <label class="text-foreground mb-1 block text-xs font-semibold" for="brokerId">Corretora / Banco</label>
+                <select
+                  id="brokerId"
+                  formControlName="brokerId"
+                  class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-xs outline-none transition">
+                  <option value="">Selecione (opcional)</option>
+                  @for (b of banks; track b.id) {
+                    <option [value]="b.id">{{ b.name }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="col-span-12 flex items-center gap-2 pt-1">
+                <input
+                  id="createInvestmentTransaction"
+                  type="checkbox"
+                  formControlName="createInvestmentTransaction"
+                  class="rounded border-muted text-primary focus:ring-primary h-4 w-4 cursor-pointer" />
+                <label for="createInvestmentTransaction" class="text-xs text-foreground cursor-pointer select-none">
+                  Criar movimentação de compra no módulo de investimentos
+                </label>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
 
     <div class="mt-6 flex justify-end gap-2">

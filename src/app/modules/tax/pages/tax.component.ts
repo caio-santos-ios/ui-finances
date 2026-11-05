@@ -58,6 +58,11 @@ export class TaxComponent extends MyFinance implements OnInit {
     await this.loadData();
   }
 
+  async onYearChange(year: any): Promise<void> {
+    this.baseYear = Number(year);
+    await this.loadData();
+  }
+
   async loadData(): Promise<void> {
     this.isLoading = true;
     this.cdr.markForCheck();
