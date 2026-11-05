@@ -80,6 +80,7 @@
         <tr>
           <th class="py-3 px-4">Nome</th>
           <th class="py-3 px-4">Tipo</th>
+          <th class="py-3 px-4">Tratamento IR</th>
           <th class="py-3 px-4">Custo de Vida</th>
           <th class="py-3 px-4">Data de Criação</th>
           <th class="py-3 px-4 text-right">Ações</th>
@@ -98,6 +99,29 @@
             <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-600 dark:text-rose-400">
               <i class="fa-solid fa-arrow-trend-down text-[10px]"></i> Despesa
             </span>
+            }
+          </td>
+          <td class="py-3 px-4">
+            @if (item.irTreatment === 'TAXABLE_INCOME') {
+              <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
+                <i class="fa-solid fa-circle-dot text-[9px]"></i> Tributável
+              </span>
+            } @else if (item.irTreatment === 'EXEMPT_INCOME') {
+              <span class="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-500">
+                <i class="fa-solid fa-circle-dot text-[9px]"></i> Isento
+              </span>
+            } @else if (item.irTreatment === 'EXCLUSIVE_INCOME') {
+              <span class="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-400">
+                <i class="fa-solid fa-circle-dot text-[9px]"></i> Exclusivo
+              </span>
+            } @else if (item.irTreatment === 'DEDUCTION') {
+              <span class="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs font-medium text-indigo-400">
+                <i class="fa-solid fa-receipt text-[9px]"></i> Dedução
+              </span>
+            } @else {
+              <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-500" title="Sem tratamento de IR definido. Lançamentos nesta categoria gerarão pendência no IR.">
+                <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> Não definido
+              </span>
             }
           </td>
           <td class="py-3 px-4">

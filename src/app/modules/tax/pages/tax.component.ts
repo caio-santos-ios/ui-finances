@@ -45,6 +45,9 @@ export class TaxComponent extends MyFinance implements OnInit {
   snapshots: any[] = [];
   snapshotsLoading = false;
 
+  searchTerm: string = '';
+  selectedCategory: string = '';
+
   constructor() {
     super();
     const current = new Date().getFullYear();
@@ -83,10 +86,80 @@ export class TaxComponent extends MyFinance implements OnInit {
 
   setTab(tab: 'summary' | 'income' | 'deductions' | 'assets' | 'debts' | 'snapshots'): void {
     this.activeTab = tab;
+    this.searchTerm = '';
+    this.selectedCategory = '';
     if (tab === 'snapshots') {
       this.loadSnapshots();
     }
     this.cdr.markForCheck();
+  }
+
+  get uniqueIncomeCategories(): string[] {
+    const set = new Set<string>();
+    [
+      ...(this.preview?.taxableIncome || []),
+      ...(this.preview?.exemptIncome || []),
+      ...(this.preview?.exclusiveIncome || []),
+    ].forEach((i: any) => {
+      if (i.categoryName) set.add(i.categoryName);
+    });
+    return Array.from(set).sort();
+  }
+
+  get uniqueDeductionCategories(): string[] {
+    const set = new Set<string>();
+    (this.preview?.deductions || []).forEach((i: any) => {
+      if (i.categoryName) set.add(i.categoryName);
+    });
+    return Array.from(set).sort();
+  }
+
+  filterIncomeItems(items: any[]): any[] {
+    if (!items) return [];
+    return items.filter((item) => {
+      const matchCat = !this.selectedCategory || item.categoryName === this.selectedCategory;
+      const term = this.searchTerm.trim().toLowerCase();
+      const matchText =
+        !term ||
+        (item.categoryName || '').toLowerCase().includes(term) ||
+        (item.description || '').toLowerCase().includes(term) ||
+        (item.payerDocument || '').toLowerCase().includes(term);
+      return matchCat && matchText;
+    });
+  }
+
+  filterDeductionItems(items: any[]): any[] {
+    if (!items) return [];
+    return items.filter((item) => {
+      const matchCat = !this.selectedCategory || item.categoryName === this.selectedCategory;
+      const term = this.searchTerm.trim().toLowerCase();
+      const matchText =
+        !term ||
+        (item.categoryName || '').toLowerCase().includes(term) ||
+        (item.description || '').toLowerCase().includes(term) ||
+        (item.payeeName || '').toLowerCase().includes(term) ||
+        (item.payeeDocument || '').toLowerCase().includes(term);
+      return matchCat && matchText;
+    });
+  }
+
+  filterGenericItems(items: any[], fields: string[]): any[] {
+    if (!items) return [];
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return items;
+    return items.filter((item) =>
+      fields.some((field) => (item[field] || '').toString().toLowerCase().includes(term))
+    );
+  }
+
+  openOrigin(item: any, type: 'operation' | 'patrimony' | 'investment'): void {
+    if (type === 'investment' || item?.source === 'investment') {
+      this.router.navigate(['/investments']);
+    } else if (type === 'patrimony' || item?.source === 'patrimony') {
+      this.router.navigate(['/patrimony']);
+    } else {
+      this.router.navigate(['/operation']);
+    }
   }
 
   async loadSnapshots(): Promise<void> {
@@ -108,7 +181,7 @@ export class TaxComponent extends MyFinance implements OnInit {
     this.isExportingExcel = true;
     this.cdr.markForCheck();
     try {
-      const response = await api.get(`/tax/export?baseYear=${this.baseYear}&format=xlsx`, {
+      const response = await api.post(`/tax/export?baseYear=${this.baseYear}&format=xlsx`, {}, {
         responseType: 'blob',
       });
       const blob = new Blob([response.data], {
@@ -136,7 +209,7 @@ export class TaxComponent extends MyFinance implements OnInit {
     this.isExportingPdf = true;
     this.cdr.markForCheck();
     try {
-      const response = await api.get(`/tax/export?baseYear=${this.baseYear}&format=pdf`, {
+      const response = await api.post(`/tax/export?baseYear=${this.baseYear}&format=pdf`, {}, {
         responseType: 'blob',
       });
       const blob = new Blob([response.data], {

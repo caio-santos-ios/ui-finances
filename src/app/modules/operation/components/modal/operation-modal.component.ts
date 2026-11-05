@@ -30,6 +30,12 @@ export class OperationModalComponent extends MyFinance implements OnInit {
     return !!this.dialogData?.id;
   }
 
+  get isDeductibleCategory(): boolean {
+    if (this.form?.value?.type !== 'expense') return false;
+    const cat = this.categories.find((c) => c.id === this.form?.value?.categoryId);
+    return cat?.irTreatment === 'DEDUCTION';
+  }
+
   async ngOnInit(): Promise<void> {
     const now = new Date();
     const currentDate = now.toISOString().split('T')[0];
