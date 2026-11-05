@@ -67,7 +67,8 @@ export class TaxComponent extends MyFinance implements OnInit {
     this.isLoading = true;
     this.cdr.markForCheck();
     try {
-      const { data } = await api.get(`/tax/preview?baseYear=${this.baseYear}`);
+      const year = Number(this.baseYear);
+      const { data } = await api.get(`/tax/${year}/preview?baseYear=${year}`);
       const payload = data?.data ?? data;
       if (payload) {
         this.preview = {
@@ -186,7 +187,8 @@ export class TaxComponent extends MyFinance implements OnInit {
     this.isExportingExcel = true;
     this.cdr.markForCheck();
     try {
-      const response = await api.post(`/tax/export?baseYear=${this.baseYear}&format=xlsx`, {}, {
+      const year = Number(this.baseYear);
+      const response = await api.post(`/tax/${year}/export?baseYear=${year}&format=xlsx`, {}, {
         responseType: 'blob',
       });
       const blob = new Blob([response.data], {
@@ -195,7 +197,7 @@ export class TaxComponent extends MyFinance implements OnInit {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Informe_IRPF_${this.baseYear}.xlsx`;
+      a.download = `Informe_IRPF_${year}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -214,7 +216,8 @@ export class TaxComponent extends MyFinance implements OnInit {
     this.isExportingPdf = true;
     this.cdr.markForCheck();
     try {
-      const response = await api.post(`/tax/export?baseYear=${this.baseYear}&format=pdf`, {}, {
+      const year = Number(this.baseYear);
+      const response = await api.post(`/tax/${year}/export?baseYear=${year}&format=pdf`, {}, {
         responseType: 'blob',
       });
       const blob = new Blob([response.data], {
@@ -223,7 +226,7 @@ export class TaxComponent extends MyFinance implements OnInit {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Informe_IRPF_${this.baseYear}.pdf`;
+      a.download = `Informe_IRPF_${year}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
