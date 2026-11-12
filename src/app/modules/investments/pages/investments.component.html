@@ -2,9 +2,6 @@
   <app-button (buttonClick)="toggleFilters()" impact="bold" tone="light" shape="rounded" size="medium">
     <i class="fa-solid fa-filter mr-1.5"></i> Filtros
   </app-button>
-  <app-button (buttonClick)="openAssetModal()" impact="bold" tone="light" shape="rounded" size="medium">
-    <i class="fa-solid fa-plus mr-1.5"></i> Novo Ativo
-  </app-button>
   <app-button (buttonClick)="openTransactionModal()" impact="bold" tone="primary" shape="rounded" size="medium">
     <i class="fa-solid fa-plus mr-1.5"></i> Nova Movimentação
   </app-button>
@@ -267,15 +264,10 @@
         <i class="fa-solid fa-chart-pie text-xl"></i>
       </div>
       <h3 class="text-foreground text-base font-semibold">Nenhuma posição em aberto</h3>
-      <p class="text-muted-foreground text-sm mt-1 mb-4">Cadastre um ativo e lance suas compras de ações, FIIs ou renda fixa para visualizar sua carteira consolidada.</p>
-      <div class="flex gap-2">
-        <app-button (buttonClick)="openAssetModal()" impact="bold" tone="light" shape="rounded" size="medium">
-          <i class="fa-solid fa-plus mr-1.5"></i> Cadastrar Ativo
-        </app-button>
-        <app-button (buttonClick)="openTransactionModal()" impact="bold" tone="primary" shape="rounded" size="medium">
-          <i class="fa-solid fa-plus mr-1.5"></i> Nova Movimentação
-        </app-button>
-      </div>
+      <p class="text-muted-foreground text-sm mt-1 mb-4">Lance suas compras de ações, FIIs ou renda fixa para visualizar sua carteira consolidada.</p>
+      <app-button (buttonClick)="openTransactionModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-plus mr-1.5"></i> Nova Movimentação
+      </app-button>
     </div>
   }
 } @else if (activeTab === 'transactions') {
@@ -428,9 +420,9 @@
         <i class="fa-solid fa-cubes text-xl"></i>
       </div>
       <h3 class="text-foreground text-base font-semibold">Nenhum ativo cadastrado</h3>
-      <p class="text-muted-foreground text-sm mt-1 mb-4">Cadastre seu primeiro ativo de investimento para começar.</p>
-      <app-button (buttonClick)="openAssetModal()" impact="bold" tone="primary" shape="rounded" size="medium">
-        <i class="fa-solid fa-plus mr-1.5"></i> Cadastrar Ativo
+      <p class="text-muted-foreground text-sm mt-1 mb-4">Seus ativos serão cadastrados automaticamente conforme você registrar novas movimentações de compra.</p>
+      <app-button (buttonClick)="openTransactionModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-plus mr-1.5"></i> Nova Movimentação
       </app-button>
     </div>
   }

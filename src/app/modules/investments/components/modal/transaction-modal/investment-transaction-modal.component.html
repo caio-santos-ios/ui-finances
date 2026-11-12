@@ -24,15 +24,95 @@
         </select>
       </div>
 
-      <div class="col-span-12 sm:col-span-6">
-        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="investmentAssetId">Ativo</label>
-        <select id="investmentAssetId" formControlName="investmentAssetId"
-          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-          <option value="">Selecione o ativo...</option>
-          @for (a of assets; track a.id) {
-            <option [value]="a.id">{{ a.ticker ? (a.ticker + ' - ' + a.name) : a.name }}</option>
-          }
-        </select>
+      <!-- Campo Ativo com Autocomplete -->
+      <div class="col-span-12 sm:col-span-6 relative" #assetDropdownContainer>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="assetSearchInput">
+          Ativo <span class="text-rose-500">*</span>
+        </label>
+
+        <div class="relative">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          </div>
+
+          <input
+            id="assetSearchInput"
+            type="text"
+            [ngModel]="searchQuery"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onSearchInput($event)"
+            (focus)="onSearchFocus()"
+            placeholder="Buscar por ticker ou nome (ex: PETR4, MXRF11)..."
+            autocomplete="off"
+            [disabled]="isEdit"
+            class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border pl-9 pr-9 py-2 text-sm outline-none transition disabled:opacity-60 disabled:cursor-not-allowed" />
+
+          <div class="absolute inset-y-0 right-0 flex items-center pr-2.5">
+            @if (isSearching) {
+              <svg class="h-4 w-4 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            } @else if (selectedAsset && !isEdit) {
+              <button
+                type="button"
+                (click)="clearSelectedAsset()"
+                class="text-muted-foreground hover:text-foreground p-1 transition-colors"
+                title="Limpar seleção de ativo">
+                <i class="fa-solid fa-xmark text-xs"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+
+        <!-- Dropdown flutuante de resultados -->
+        @if (showDropdown) {
+          <div
+            class="border-muted/20 bg-card absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-lg border p-1 shadow-2xl backdrop-blur-md">
+            @if (isSearching && searchResults.length === 0) {
+              <div class="flex items-center justify-center gap-2 p-4 text-xs text-muted-foreground">
+                <svg class="h-4 w-4 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                Buscando ativos no mercado...
+              </div>
+            } @else if (!isSearching && searchResults.length === 0) {
+              <div class="p-3 text-center text-xs text-muted-foreground">
+                Nenhum ativo encontrado para "<strong>{{ searchQuery }}</strong>"
+              </div>
+            } @else {
+              @for (item of searchResults; track item.symbol) {
+                <div
+                  (click)="selectAsset(item)"
+                  class="hover:bg-primary/10 flex cursor-pointer items-center justify-between gap-2 rounded-md p-2 transition-colors">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-bold text-foreground text-sm">{{ item.symbol }}</span>
+                      <span class="inline-flex items-center rounded px-1.5 py-0.2 text-[10px] font-semibold text-primary bg-primary/10">
+                        {{ getAssetTypeLabel(item.type) }}
+                      </span>
+                      @if (item.alreadyRegistered) {
+                        <span class="rounded bg-muted px-1.5 py-0.2 text-[10px] font-medium text-muted-foreground">
+                          Na carteira
+                        </span>
+                      }
+                    </div>
+                    <p class="truncate text-xs text-muted-foreground">{{ item.name }}</p>
+                  </div>
+
+                  @if (item.close && item.close > 0) {
+                    <div class="text-right whitespace-nowrap">
+                      <div class="text-xs font-semibold text-foreground">{{ formatPrice(item.close) }}</div>
+                      <div class="text-[10px] text-muted-foreground">Cotação</div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+        }
       </div>
 
       <div class="col-span-12 sm:col-span-6">
