@@ -82,7 +82,7 @@ export class InvestmentService {
   }
 
   async updateTransaction(id: string, payload: CreateTransactionPayload): Promise<any> {
-    const response = await api.put(`/investments/transactions/${id}`, payload);
+    const response = await api.put(`/investments/transactions/${id}`, { ...payload, id });
     return response.data?.data || response.data;
   }
 
