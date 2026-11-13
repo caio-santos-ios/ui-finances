@@ -1,5 +1,10 @@
 <app-breadcrumb [module]="'Metas'" icon="fa-solid fa-bullseye">
   <div class="flex items-center gap-2">
+    <app-button (buttonClick)="toggleCards()" impact="bold" tone="light" shape="rounded" size="medium"
+      [title]="showCards ? 'Ocultar cards de resumo' : 'Mostrar cards de resumo'">
+      <i class="fa-solid {{ showCards ? 'fa-eye-slash' : 'fa-eye' }} mr-1.5"></i>
+      {{ showCards ? 'Ocultar Cards' : 'Mostrar Cards' }}
+    </app-button>
     <app-button (buttonClick)="toggleFilters()" impact="bold" tone="light" shape="rounded" size="medium">
       <i class="fa-solid fa-filter mr-1.5"></i> Filtros
     </app-button>
@@ -9,6 +14,7 @@
   </div>
 </app-breadcrumb>
 
+@if (showCards) {
 <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
   <div class="border-muted/20 bg-background rounded-xl border p-4 shadow-xs">
     <div class="flex items-center justify-between">
@@ -65,6 +71,7 @@
     </div>
   </div>
 </div>
+}
 
 <div class="mb-4 flex border-b border-border">
   <button type="button" (click)="setTab('all')"

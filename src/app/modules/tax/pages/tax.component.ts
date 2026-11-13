@@ -19,6 +19,7 @@ export class TaxComponent extends MyFinance implements OnInit {
   availableYears: number[] = [];
   activeTab: 'summary' | 'income' | 'deductions' | 'assets' | 'debts' | 'snapshots' = 'summary';
 
+  showCards = this.getStoredCardsVisibility('mf_show_cards_tax');
   isLoading = true;
   isExportingExcel = false;
   isExportingPdf = false;
@@ -56,6 +57,12 @@ export class TaxComponent extends MyFinance implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.loadData();
+  }
+
+  toggleCards(): void {
+    this.showCards = !this.showCards;
+    this.setStoredCardsVisibility('mf_show_cards_tax', this.showCards);
+    this.cdr.markForCheck();
   }
 
   async onYearChange(year: any): Promise<void> {

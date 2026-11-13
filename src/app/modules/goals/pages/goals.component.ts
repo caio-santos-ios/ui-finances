@@ -24,6 +24,7 @@ export class GoalsComponent extends MyFinance implements OnInit {
   totalPages: any[] = [];
   loading = true;
   showFilters = false;
+  showCards = this.getStoredCardsVisibility('mf_show_cards_goals');
   activeTab: 'all' | 'in_progress' | 'completed' = 'all';
 
   filters = {
@@ -50,8 +51,15 @@ export class GoalsComponent extends MyFinance implements OnInit {
     await Promise.all([this.loadSummary(), this.loadData(1)]);
   }
 
+  toggleCards(): void {
+    this.showCards = !this.showCards;
+    this.setStoredCardsVisibility('mf_show_cards_goals', this.showCards);
+    this.cdr.markForCheck();
+  }
+
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
+    this.cdr.markForCheck();
   }
 
   setTab(tab: 'all' | 'in_progress' | 'completed'): void {

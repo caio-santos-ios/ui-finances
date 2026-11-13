@@ -27,6 +27,7 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
     super();
   }
 
+  showCards = this.getStoredCardsVisibility('mf_show_cards_patrimony');
   activeTab: 'assets' | 'debts' | 'history' = 'assets';
   historySubTab: 'all' | 'assets' | 'debts' = 'all';
 
@@ -70,6 +71,12 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
       this.loadAssets(1),
       this.loadDebts(1),
     ]);
+  }
+
+  toggleCards(): void {
+    this.showCards = !this.showCards;
+    this.setStoredCardsVisibility('mf_show_cards_patrimony', this.showCards);
+    this.cdr.markForCheck();
   }
 
   async loadSummary() {

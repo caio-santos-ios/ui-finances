@@ -97,4 +97,28 @@ export class MyFinance {
       }
     }
   }
+
+  getStoredCardsVisibility(key: string, defaultValue = true): boolean {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem(key);
+        if (saved !== null) {
+          return saved === 'true';
+        }
+      }
+    } catch {
+      // fallback
+    }
+    return defaultValue;
+  }
+
+  setStoredCardsVisibility(key: string, value: boolean): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(key, String(value));
+      }
+    } catch {
+      // fallback
+    }
+  }
 }

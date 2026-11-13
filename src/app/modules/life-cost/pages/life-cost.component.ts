@@ -21,6 +21,7 @@ import { LifeCostOperationsModalComponent } from '../components/life-cost-operat
 export class LifeCostComponent extends MyFinance implements OnInit {
   activeTab: 'monthly' | 'breakdown' = 'monthly';
   isLoading = false;
+  showCards = this.getStoredCardsVisibility('mf_show_cards_life_cost');
 
   summary: any = {
     averageMonthlyCost: 0,
@@ -52,6 +53,12 @@ export class LifeCostComponent extends MyFinance implements OnInit {
 
   ngOnInit(): void {
     this.loadAll();
+  }
+
+  toggleCards(): void {
+    this.showCards = !this.showCards;
+    this.setStoredCardsVisibility('mf_show_cards_life_cost', this.showCards);
+    this.cdr.markForCheck();
   }
 
   async loadAll() {

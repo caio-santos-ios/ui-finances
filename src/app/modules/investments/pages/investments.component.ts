@@ -23,6 +23,7 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
   activeTab: 'positions' | 'transactions' | 'assets' = 'positions';
   isLoading = false;
   showFilters = false;
+  showCards = this.getStoredCardsVisibility('mf_show_cards_investments');
 
   portfolio: any = {
     totalInvested: 0,
@@ -53,6 +54,12 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
 
   ngOnInit(): void {
     this.loadAll();
+  }
+
+  toggleCards(): void {
+    this.showCards = !this.showCards;
+    this.setStoredCardsVisibility('mf_show_cards_investments', this.showCards);
+    this.cdr.markForCheck();
   }
 
   toggleFilters() {
