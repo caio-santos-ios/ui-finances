@@ -95,9 +95,14 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     try {
       this.isLoading = true;
       const { data } = await api.get(`/debts/${this.debt.id}/payments`);
-      this.payments = data?.data ?? (Array.isArray(data) ? data : []);
+      const rawList = data?.data ?? (Array.isArray(data) ? data : []);
+      this.payments = rawList.map((p: any) => ({
+        ...p,
+        paymentDate: p.paymentDate || p.date,
+        remainingAmountAfter: p.newRemainingAmount ?? p.remainingAmountAfter,
+      }));
       if (this.payments.length > 0) {
-        this.debt.remainingAmount = this.payments[0].newRemainingAmount;
+        this.debt.remainingAmount = this.payments[0].newRemainingAmount ?? this.payments[0].remainingAmountAfter;
       }
     } catch (error) {
       this.normalizeErr(error);

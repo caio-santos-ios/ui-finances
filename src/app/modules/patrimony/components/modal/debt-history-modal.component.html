@@ -109,7 +109,10 @@
                     <i class="fa-solid {{ item.type === 'amortization' ? 'fa-bolt' : 'fa-check' }} mr-1 text-[10px]"></i>
                     {{ item.type === 'amortization' ? 'Amortização' : 'Parcela' }}
                   </span>
-                  <span class="text-muted-foreground text-xs">{{ item.paymentDate | date:'dd/MM/yyyy':'UTC' }}</span>
+                  <span class="text-muted-foreground text-xs flex items-center gap-1 font-medium">
+                    <i class="fa-regular fa-calendar text-[11px]"></i>
+                    {{ (item.paymentDate || item.date) | date:'dd/MM/yyyy' }}
+                  </span>
                 </div>
 
                 <div class="flex items-center gap-1">
@@ -129,7 +132,7 @@
                     {{ item.amount | moneyPipe }}
                   </span>
                   <span class="text-muted-foreground ml-2 text-xs">
-                    (Saldo devedor: <span class="font-semibold text-rose-500">{{ item.remainingAmountAfter | moneyPipe }}</span>)
+                    (Saldo devedor: <span class="font-semibold text-rose-500">{{ (item.remainingAmountAfter ?? item.newRemainingAmount) | moneyPipe }}</span>)
                   </span>
                 </div>
               </div>
