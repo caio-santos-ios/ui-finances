@@ -47,6 +47,37 @@ export interface CreateTransactionPayload {
   createOperation?: boolean;
 }
 
+export interface B3ImportRow {
+  ticker: string;
+  name: string;
+  type: string;
+  kind: string;
+  date: string;
+  brokerName: string;
+  quantity: number;
+  unitPrice: number;
+  totalValue: number;
+  importHash: string;
+  isDuplicate: boolean;
+  hasWarning: boolean;
+  warningMessage?: string | null;
+  selected?: boolean;
+}
+
+export interface B3PreviewResponse {
+  totalRows: number;
+  newRows: number;
+  duplicateRows: number;
+  warningRows: number;
+  rows: B3ImportRow[];
+}
+
+export interface B3ConfirmResponse {
+  importedCount: number;
+  skippedCount: number;
+  createdAssetTickers: string[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -99,5 +130,21 @@ export class InvestmentService {
   async getTransactions(params?: any): Promise<any[]> {
     const response = await api.get('/investments/transactions', { params });
     return response.data?.data || response.data || [];
+  }
+
+  async previewB3Import(file: File): Promise<B3PreviewResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post('/investments/import/b3/preview', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data?.data || response.data;
+  }
+
+  async confirmB3Import(items: B3ImportRow[]): Promise<B3ConfirmResponse> {
+    const response = await api.post('/investments/import/b3/confirm', { items });
+    return response.data?.data || response.data;
   }
 }

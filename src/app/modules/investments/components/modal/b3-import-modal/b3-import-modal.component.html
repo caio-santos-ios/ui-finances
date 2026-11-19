@@ -1,0 +1,330 @@
+<div class="border-muted/20 bg-card {{ step === 'preview' ? 'w-[980px]' : 'w-[640px]' }} max-w-[95vw] rounded-xl border p-6 shadow-xl transition-all duration-200">
+  <!-- Cabeçalho -->
+  <div class="mb-5 flex items-center justify-between border-b border-border/50 pb-4">
+    <div class="flex items-center gap-2.5">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <i class="fa-solid fa-file-import text-base"></i>
+      </div>
+      <div>
+        <h2 class="text-foreground text-lg font-bold">Importação de Planilha B3</h2>
+        <p class="text-muted-foreground text-xs">
+          {{ step === 'upload' ? 'Envie o arquivo oficial exportado da Área do Investidor' : 'Revise e selecione as movimentações a serem importadas' }}
+        </p>
+      </div>
+    </div>
+    <button type="button" (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- ETAPA 1: UPLOAD -->
+  @if (step === 'upload') {
+    <div class="space-y-4">
+      <!-- Card informativo -->
+      <div class="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs text-muted-foreground">
+        <i class="fa-solid fa-circle-info text-primary mt-0.5 text-sm shrink-0"></i>
+        <div class="space-y-1">
+          <p class="font-semibold text-foreground">Como obter a planilha da B3?</p>
+          <p>
+            Acesse a <strong>Área do Investidor da B3</strong> (investidor.b3.com.br), vá na seção <strong>Extratos &bull; Movimentação</strong>, filtre pelo período desejado e clique em <strong>Exportar (CSV ou Excel)</strong>.
+          </p>
+          <p class="text-[11px] text-muted-foreground/80">
+            O sistema faz a identificação automática de ativos, corretoras e aplica regras de antiduplicação para não cadastrar operações repetidas.
+          </p>
+        </div>
+      </div>
+
+      <!-- Dropzone -->
+      <div
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+        class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 {{
+          isDragging
+            ? 'border-primary bg-primary/10 scale-[1.01]'
+            : selectedFile
+            ? 'border-emerald-500/50 bg-emerald-500/5'
+            : 'border-muted/30 hover:border-primary/50 hover:bg-muted/10'
+        }}">
+        <input
+          #fileInput
+          type="file"
+          (change)="onFileSelected($event)"
+          accept=".csv,.xlsx,.xls"
+          class="hidden" />
+
+        @if (!selectedFile) {
+          <div class="flex flex-col items-center justify-center gap-3">
+            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+            </div>
+            <div>
+              <p class="text-foreground text-sm font-semibold">Arraste a planilha aqui ou clique para selecionar</p>
+              <p class="text-muted-foreground mt-1 text-xs">Suporta arquivos <strong>.csv</strong> ou <strong>.xlsx</strong> da B3 (máx. 15MB)</p>
+            </div>
+          </div>
+        } @else {
+          <div class="flex items-center justify-between gap-4 p-2" (click)="$event.stopPropagation()">
+            <div class="flex items-center gap-3 text-left">
+              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 shrink-0">
+                <i class="fa-solid fa-file-excel text-2xl"></i>
+              </div>
+              <div class="overflow-hidden">
+                <p class="text-foreground text-sm font-bold truncate max-w-[360px]">{{ selectedFile.name }}</p>
+                <p class="text-muted-foreground text-xs">{{ formatFileSize(selectedFile.size) }} &bull; Pronto para validação</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" (click)="fileInput.click()"
+                class="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                Trocar Arquivo
+              </button>
+              <button type="button" (click)="removeFile()"
+                class="flex h-8 w-8 items-center justify-center rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors"
+                title="Remover arquivo">
+                <i class="fa-solid fa-trash text-xs"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Rodapé da etapa de upload -->
+      <div class="mt-6 flex items-center justify-end gap-2 border-t border-border/50 pt-4">
+        <app-button type="button" (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+          Cancelar
+        </app-button>
+        <app-button
+          type="button"
+          (buttonClick)="loadPreview()"
+          [disabled]="!selectedFile"
+          [isLoading]="isLoadingPreview"
+          impact="bold"
+          tone="primary"
+          shape="rounded"
+          size="medium">
+          <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Carregar Planilha
+        </app-button>
+      </div>
+    </div>
+  }
+
+  <!-- ETAPA 2: PREVIEW E VALIDAÇÃO -->
+  @if (step === 'preview' && previewData) {
+    <div class="space-y-4">
+      <!-- Indicadores de Resumo (Pills) -->
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="rounded-xl border border-border/60 bg-background/50 p-3">
+          <span class="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider block">Total no Arquivo</span>
+          <span class="text-foreground text-xl font-bold mt-1 block">{{ previewData.totalRows }}</span>
+        </div>
+        <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3">
+          <span class="text-emerald-500 text-[11px] font-semibold uppercase tracking-wider block">Novas (Disponíveis)</span>
+          <span class="text-emerald-500 text-xl font-bold mt-1 block">{{ previewData.newRows }}</span>
+        </div>
+        <div class="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3">
+          <span class="text-amber-500 text-[11px] font-semibold uppercase tracking-wider block">Já Importadas</span>
+          <span class="text-amber-500 text-xl font-bold mt-1 block">{{ previewData.duplicateRows }}</span>
+        </div>
+        <div class="rounded-xl border border-orange-500/30 bg-orange-500/5 p-3">
+          <span class="text-orange-400 text-[11px] font-semibold uppercase tracking-wider block">Com Aviso</span>
+          <span class="text-orange-400 text-xl font-bold mt-1 block">{{ previewData.warningRows }}</span>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros e Busca -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <!-- Filtros rápidos -->
+        <div class="flex items-center gap-1.5 rounded-lg border border-border bg-background/40 p-1">
+          <button type="button" (click)="setFilterTab('all')"
+            class="px-3 py-1 rounded-md text-xs font-semibold transition-colors {{ filterTab === 'all' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground' }}">
+            Todas ({{ previewData.totalRows }})
+          </button>
+          <button type="button" (click)="setFilterTab('new')"
+            class="px-3 py-1 rounded-md text-xs font-semibold transition-colors {{ filterTab === 'new' ? 'bg-emerald-500 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground' }}">
+            Novas ({{ previewData.newRows }})
+          </button>
+          <button type="button" (click)="setFilterTab('duplicate')"
+            class="px-3 py-1 rounded-md text-xs font-semibold transition-colors {{ filterTab === 'duplicate' ? 'bg-amber-500 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground' }}">
+            Duplicadas ({{ previewData.duplicateRows }})
+          </button>
+          @if (previewData.warningRows > 0) {
+            <button type="button" (click)="setFilterTab('warning')"
+              class="px-3 py-1 rounded-md text-xs font-semibold transition-colors {{ filterTab === 'warning' ? 'bg-orange-500 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground' }}">
+              Avisos ({{ previewData.warningRows }})
+            </button>
+          }
+        </div>
+
+        <!-- Campo de busca -->
+        <div class="relative sm:w-64">
+          <i class="fa-solid fa-magnifying-glass text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 text-xs"></i>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Buscar por ticker, ativo..."
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border py-1.5 pl-8 pr-3 text-xs outline-none transition" />
+        </div>
+      </div>
+
+      <!-- Tabela de Movimentações -->
+      <div class="border-muted/20 bg-background rounded-xl border overflow-hidden">
+        <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[380px] overflow-y-auto">
+          <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+            <thead class="border-muted/20 bg-card text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+              <tr>
+                <th class="py-3 px-3 w-10 text-center">
+                  <input
+                    type="checkbox"
+                    [checked]="isAllSelected"
+                    [indeterminate]="isIndeterminate"
+                    (change)="toggleSelectAll($any($event.target).checked)"
+                    class="rounded border-muted/30 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+                    title="Marcar / desmarcar todas as linhas elegíveis" />
+                </th>
+                <th class="py-3 px-3">Status</th>
+                <th class="py-3 px-3">Tipo</th>
+                <th class="py-3 px-3">Data</th>
+                <th class="py-3 px-3">Ticker / Ativo</th>
+                <th class="py-3 px-3">Corretora</th>
+                <th class="py-3 px-3 text-right">Qtd</th>
+                <th class="py-3 px-3 text-right">Preço Unit.</th>
+                <th class="py-3 px-3 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-muted/10 divide-y text-xs">
+              @for (row of filteredRows; track row.importHash) {
+                <tr
+                  (click)="toggleRow(row)"
+                  class="transition-colors cursor-pointer {{
+                    row.isDuplicate
+                      ? 'bg-muted/10 opacity-60 cursor-not-allowed'
+                      : row.selected
+                      ? 'bg-primary/5 hover:bg-primary/10'
+                      : 'hover:bg-card/50'
+                  }}">
+                  <!-- Checkbox -->
+                  <td class="py-2.5 px-3 text-center" (click)="$event.stopPropagation()">
+                    <input
+                      type="checkbox"
+                      [checked]="row.selected"
+                      [disabled]="row.isDuplicate"
+                      (change)="row.selected = $any($event.target).checked; cdr.markForCheck()"
+                      class="rounded border-muted/30 text-primary focus:ring-primary h-4 w-4 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer" />
+                  </td>
+
+                  <!-- Status -->
+                  <td class="py-2.5 px-3 whitespace-nowrap">
+                    @if (row.isDuplicate) {
+                      <span class="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-semibold text-amber-500" [title]="row.warningMessage || 'Já cadastrada'">
+                        <i class="fa-solid fa-clock-rotate-left mr-1 text-[10px]"></i> Já importada
+                      </span>
+                    } @else if (row.hasWarning) {
+                      <span class="inline-flex items-center rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-semibold text-orange-400" [title]="row.warningMessage || 'Aviso'">
+                        <i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i> Sem preço
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-500">
+                        <i class="fa-solid fa-circle-check mr-1 text-[10px]"></i> Nova
+                      </span>
+                    }
+                  </td>
+
+                  <!-- Tipo (BUY / SELL) -->
+                  <td class="py-2.5 px-3 whitespace-nowrap">
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold {{
+                      row.kind === 'BUY' ? 'bg-emerald-500/15 text-emerald-500' : 'bg-rose-500/15 text-rose-500'
+                    }}">
+                      <i class="fa-solid {{ row.kind === 'BUY' ? 'fa-arrow-down' : 'fa-arrow-up' }} mr-1 text-[10px]"></i>
+                      {{ row.kind === 'BUY' ? 'Compra' : 'Venda' }}
+                    </span>
+                  </td>
+
+                  <!-- Data -->
+                  <td class="py-2.5 px-3 text-foreground whitespace-nowrap font-medium">
+                    {{ row.date | date:'dd/MM/yyyy':'UTC' }}
+                  </td>
+
+                  <!-- Ticker / Ativo -->
+                  <td class="py-2.5 px-3">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-bold text-foreground">{{ row.ticker }}</span>
+                      <span class="rounded bg-muted/40 px-1 py-0.2 text-[9px] font-bold uppercase text-muted-foreground">{{ row.type }}</span>
+                    </div>
+                    <span class="text-muted-foreground block text-[11px] truncate max-w-[220px]" [title]="row.name">
+                      {{ row.name }}
+                    </span>
+                  </td>
+
+                  <!-- Corretora -->
+                  <td class="py-2.5 px-3 text-muted-foreground whitespace-nowrap">
+                    <span class="truncate block max-w-[140px]" [title]="row.brokerName">
+                      {{ row.brokerName }}
+                    </span>
+                  </td>
+
+                  <!-- Quantidade -->
+                  <td class="py-2.5 px-3 text-right font-semibold text-foreground whitespace-nowrap">
+                    {{ row.quantity }}
+                  </td>
+
+                  <!-- Preço Unitário -->
+                  <td class="py-2.5 px-3 text-right text-foreground whitespace-nowrap">
+                    @if (row.unitPrice === 0) {
+                      <span class="text-orange-400 font-semibold" title="Preço unitário zerado ou ausente">R$ 0,00</span>
+                    } @else {
+                      <span class="font-medium">{{ row.unitPrice | moneyPipe }}</span>
+                    }
+                  </td>
+
+                  <!-- Total -->
+                  <td class="py-2.5 px-3 text-right font-bold text-foreground whitespace-nowrap">
+                    {{ row.totalValue | moneyPipe }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="9" class="py-8 text-center text-muted-foreground">
+                    Nenhuma movimentação encontrada com o filtro selecionado.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Rodapé da etapa de preview -->
+      <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-border/50 pt-4">
+        <div class="flex items-center gap-2 text-xs text-muted-foreground">
+          <span class="font-semibold text-foreground">
+            {{ selectedCount }} de {{ totalSelectableCount }}
+          </span>
+          movimentações selecionadas para importação.
+          @if (previewData.duplicateRows > 0) {
+            <span class="text-amber-500 font-medium">({{ previewData.duplicateRows }} já existiam e foram desmarcadas)</span>
+          }
+        </div>
+
+        <div class="flex items-center gap-2 self-end sm:self-auto">
+          <app-button type="button" (buttonClick)="backToUpload()" impact="bold" tone="light" shape="rounded" size="medium">
+            <i class="fa-solid fa-arrow-left mr-1.5"></i> Trocar Planilha
+          </app-button>
+          <app-button
+            type="button"
+            (buttonClick)="confirmImport()"
+            [disabled]="selectedCount === 0"
+            [isLoading]="isConfirming"
+            impact="bold"
+            tone="primary"
+            shape="rounded"
+            size="medium">
+            <i class="fa-solid fa-check mr-1.5"></i> Confirmar Importação ({{ selectedCount }})
+          </app-button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

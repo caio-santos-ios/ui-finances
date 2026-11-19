@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { InvestmentAssetModalComponent } from '../components/modal/asset-modal/investment-asset-modal.component';
 import { InvestmentTransactionModalComponent } from '../components/modal/transaction-modal/investment-transaction-modal.component';
 import { InvestmentAssetHistoryModalComponent } from '../components/modal/asset-history-modal/investment-asset-history-modal.component';
+import { B3ImportModalComponent } from '../components/modal/b3-import-modal/b3-import-modal.component';
 
 @Component({
   selector: 'app-investments',
@@ -182,6 +183,15 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
   openAssetModal(asset?: any) {
     const ref = this.dialog.open(InvestmentAssetModalComponent, {
       data: { asset },
+    });
+    ref.closed.subscribe(async (res) => {
+      if (res) await this.loadAll();
+    });
+  }
+
+  openB3ImportModal() {
+    const ref = this.dialog.open(B3ImportModalComponent, {
+      disableClose: true,
     });
     ref.closed.subscribe(async (res) => {
       if (res) await this.loadAll();
