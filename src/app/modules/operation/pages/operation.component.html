@@ -116,7 +116,17 @@
         @for (item of pagination.data; track $index) {
         <tr class="hover:bg-card/50 transition-colors">
           <td class="py-3 px-4 font-medium text-foreground">{{item.categoryName || "-"}}</td>
-          <td class="py-3 px-4 font-medium text-foreground">{{item.bankName || "-"}}</td>
+          <td class="py-3 px-4 font-medium text-foreground">
+            @if (item.type === 'transfer') {
+            <span class="inline-flex items-center gap-1.5 whitespace-nowrap" [title]="'Origem: ' + (item.bankName || '-') + ' | Destino: ' + (item.destinationBankName || '-')">
+              <span>{{ item.bankName || "-" }}</span>
+              <i class="fa-solid fa-arrow-right text-[10px] text-blue-400"></i>
+              <span>{{ item.destinationBankName || "-" }}</span>
+            </span>
+            } @else {
+            {{ item.bankName || "-" }}
+            }
+          </td>
           <td class="py-3 px-4 font-medium text-foreground">{{item.value | moneyPipe }}</td>
           <td class="py-3 px-4 font-medium text-foreground">{{normalizeMaxText(item.description, 35) || "-"}}</td>
           <td class="py-3 px-4">

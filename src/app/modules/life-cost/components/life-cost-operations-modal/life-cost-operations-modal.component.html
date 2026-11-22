@@ -36,7 +36,17 @@
             @for (item of operations; track item.id) {
               <tr class="hover:bg-card/50 transition-colors">
                 <td class="py-2.5 px-3 font-medium text-foreground text-xs">{{ item.categoryName || '-' }}</td>
-                <td class="py-2.5 px-3 font-medium text-foreground text-xs">{{ item.bankName || '-' }}</td>
+                <td class="py-2.5 px-3 font-medium text-foreground text-xs">
+                  @if (item.type === 'transfer') {
+                    <span class="inline-flex items-center gap-1.5 whitespace-nowrap" [title]="'Origem: ' + (item.bankName || '-') + ' | Destino: ' + (item.destinationBankName || '-')">
+                      <span>{{ item.bankName || '-' }}</span>
+                      <i class="fa-solid fa-arrow-right text-[10px] text-blue-400"></i>
+                      <span>{{ item.destinationBankName || '-' }}</span>
+                    </span>
+                  } @else {
+                    {{ item.bankName || '-' }}
+                  }
+                </td>
                 <td class="py-2.5 px-3 font-semibold text-foreground text-xs">{{ item.value | moneyPipe }}</td>
                 <td class="py-2.5 px-3 font-medium text-foreground text-xs max-w-[200px] truncate" [title]="item.description">
                   {{ item.description || '-' }}
