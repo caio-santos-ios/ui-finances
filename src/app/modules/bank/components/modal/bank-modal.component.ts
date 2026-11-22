@@ -93,6 +93,8 @@ export class BankModalComponent extends MyFinance implements OnInit {
         const typeBank = this.typeBanks.find((x: any) => x.code == body.code);
         if (typeBank) {
           body.name = typeBank.name;
+        } else if (this.bank?.name) {
+          body.name = this.bank.name;
         }
       }
       await api.put('/banks', { ...body, id: this.dialogData.id });
