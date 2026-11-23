@@ -2,12 +2,7 @@
   <div class="mb-5 flex items-center justify-between">
     <div class="flex items-center gap-2">
       <i class="fa-solid fa-clock-rotate-left text-primary text-base"></i>
-      <div>
-        <h2 class="text-foreground text-lg font-semibold">Histórico de Ciclos • {{ dialogData.budgetName }}</h2>
-        @if (dialogData.categoryName) {
-          <p class="text-muted-foreground text-xs">Categoria: {{ dialogData.categoryName }}</p>
-        }
-      </div>
+      <h2 class="text-foreground text-lg font-semibold">Histórico de Ciclos • {{ dialogData.budgetName }}</h2>
     </div>
     <button
       type="button"
@@ -55,7 +50,7 @@
 
           <div class="text-muted-foreground mb-3 text-xs flex items-center gap-1.5">
             <i class="fa-regular fa-calendar text-[11px]"></i>
-            <span>{{ cycle.startDate | date:'dd/MM/yyyy' }} a {{ cycle.endDate | date:'dd/MM/yyyy' }}</span>
+            <span>{{ cycle.startDate | date:'dd/MM/yyyy':'UTC' }} a {{ cycle.endDate | date:'dd/MM/yyyy':'UTC' }}</span>
           </div>
 
           <!-- Valores e Progresso -->
