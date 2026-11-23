@@ -1,0 +1,143 @@
+@if (aiService.isOpen()) {
+  <!-- Backdrop -->
+  <div
+    (click)="close()"
+    class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300">
+  </div>
+
+  <!-- Slide-over Drawer -->
+  <aside
+    class="fixed inset-y-0 right-0 z-50 flex w-full max-w-[440px] flex-col border-l border-border bg-card shadow-2xl transition-transform duration-300 ease-in-out">
+
+    <!-- Drawer Header -->
+    <div class="flex items-center justify-between border-b border-border/60 px-5 py-4 bg-muted/20">
+      <div class="flex items-center gap-3">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-400 shadow-xs">
+          <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-bold text-foreground">Assistente IA</h2>
+            <span class="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold text-violet-400 border border-violet-500/20">Gemini</span>
+          </div>
+          <p class="text-[11px] text-muted-foreground">Consultor Financeiro Pessoal</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1">
+        @if (aiService.messages().length > 0) {
+          <button
+            type="button"
+            (click)="clear()"
+            title="Limpar Conversa"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer">
+            <i class="fa-solid fa-rotate-left text-xs"></i>
+          </button>
+        }
+        <button
+          type="button"
+          (click)="close()"
+          title="Fechar"
+          class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div #messagesContainer class="scrollbar-thumb-rounded scrollbar-track-rounded grow overflow-y-auto px-4 py-4 space-y-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted">
+      @if (aiService.messages().length === 0) {
+        <!-- Estado Vazio / Boas-vindas -->
+        <div class="flex flex-col items-center justify-center py-6 text-center">
+          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-600/20 to-purple-500/20 border border-violet-500/30 text-violet-400 shadow-lg">
+            <i class="fa-solid fa-brain text-2xl"></i>
+          </div>
+          <h3 class="text-base font-bold text-foreground">Como posso te ajudar hoje?</h3>
+          <p class="mt-1.5 max-w-[340px] text-xs text-muted-foreground leading-relaxed">
+            Tenho acesso consolidado às suas contas, gastos do mês, orçamentos, metas e investimentos para responder suas dúvidas financeiras.
+          </p>
+
+          <!-- Chips de Sugestões -->
+          <div class="mt-6 w-full space-y-2 text-left">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80 px-1">Perguntas Sugeridas:</p>
+            @for (question of suggestedQuestions; track question) {
+              <button
+                type="button"
+                (click)="sendSuggestion(question)"
+                class="w-full text-left rounded-xl border border-border/60 bg-muted/20 hover:bg-violet-500/10 hover:border-violet-500/30 px-3.5 py-2.5 text-xs text-foreground/90 transition-all flex items-center justify-between group cursor-pointer shadow-2xs">
+                <span>{{ question }}</span>
+                <i class="fa-solid fa-arrow-right text-[11px] text-muted-foreground/50 group-hover:text-violet-400 transition-colors"></i>
+              </button>
+            }
+          </div>
+        </div>
+      } @else {
+        <!-- Histórico de Mensagens -->
+        @for (msg of aiService.messages(); track $index) {
+          @if (msg.role === 'user') {
+            <!-- Mensagem do Usuário -->
+            <div class="flex justify-end">
+              <div class="max-w-[85%] rounded-2xl rounded-tr-xs bg-primary px-4 py-2.5 text-xs sm:text-sm text-primary-foreground shadow-xs leading-relaxed">
+                {{ msg.content }}
+              </div>
+            </div>
+          } @else {
+            <!-- Resposta da IA -->
+            <div class="flex items-start gap-2.5">
+              <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 text-xs shadow-xs mt-0.5">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <div
+                class="max-w-[88%] rounded-2xl rounded-tl-xs border border-border/50 bg-muted/40 px-4 py-3 text-xs sm:text-sm text-foreground shadow-2xs leading-relaxed prose-sm"
+                [innerHTML]="formatMarkdown(msg.content)">
+              </div>
+            </div>
+          }
+        }
+
+        <!-- Indicador de Carregamento / Digitando -->
+        @if (aiService.isLoading()) {
+          <div class="flex items-start gap-2.5 animate-in fade-in duration-300">
+            <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 text-xs shadow-xs mt-0.5">
+              <i class="fa-solid fa-wand-magic-sparkles animate-spin"></i>
+            </div>
+            <div class="rounded-2xl rounded-tl-xs border border-border/50 bg-muted/40 px-4 py-3 text-xs text-muted-foreground flex items-center gap-2">
+              <div class="flex gap-1">
+                <span class="h-1.5 w-1.5 rounded-full bg-violet-400 animate-bounce"></span>
+                <span class="h-1.5 w-1.5 rounded-full bg-violet-400 animate-bounce [animation-delay:0.2s]"></span>
+                <span class="h-1.5 w-1.5 rounded-full bg-violet-400 animate-bounce [animation-delay:0.4s]"></span>
+              </div>
+              <span>Analisando suas finanças...</span>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Input Footer -->
+    <div class="border-t border-border/60 bg-muted/10 p-3.5">
+      <form (submit)="send(); $event.preventDefault()" class="relative flex items-center">
+        <textarea
+          #inputField
+          rows="1"
+          [(ngModel)]="inputText"
+          name="message"
+          (keydown)="onKeyDown($event)"
+          [disabled]="aiService.isLoading()"
+          placeholder="Faça uma pergunta sobre suas finanças..."
+          class="w-full resize-none rounded-xl border border-border/80 bg-background px-3.5 py-2.5 pr-12 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:border-violet-500 focus:outline-hidden focus:ring-1 focus:ring-violet-500 disabled:opacity-60 transition max-h-32 min-h-[42px]"></textarea>
+
+        <button
+          type="submit"
+          [disabled]="!inputText.trim() || aiService.isLoading()"
+          class="absolute right-2 flex h-8 w-8 items-center justify-center rounded-lg bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-30 disabled:pointer-events-none transition shadow-xs cursor-pointer"
+          title="Enviar Mensagem">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+        </button>
+      </form>
+      <p class="mt-2 text-center text-[10px] text-muted-foreground/70">
+        Pressione <kbd class="rounded border border-border/60 bg-muted/30 px-1 py-0.5 font-mono text-[9px]">Enter</kbd> para enviar • Shift + Enter para quebra de linha
+      </p>
+    </div>
+  </aside>
+}

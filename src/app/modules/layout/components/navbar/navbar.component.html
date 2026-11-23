@@ -29,6 +29,12 @@
 
       <!-- Profile menu -->
       <div class="items-center justify-end sm:order-4 md:flex md:flex-1 lg:w-0">
+        <!-- Botão Assistente IA -->
+        <button type="button" (click)="toggleAiChat()"
+          class="mr-3 flex h-9 w-9 items-center justify-center rounded-lg border border-violet-500/30 bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 hover:text-violet-300 transition-all shadow-xs cursor-pointer"
+          title="Assistente IA">
+          <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+        </button>
         <app-profile-menu></app-profile-menu>
       </div>
     </div>

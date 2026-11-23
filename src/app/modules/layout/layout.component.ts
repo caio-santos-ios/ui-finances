@@ -2,13 +2,14 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Event, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { AiChatDrawerComponent } from './components/ai-chat-drawer/ai-chat-drawer.component';
 
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [SidebarComponent, NavbarComponent, RouterOutlet],
+  imports: [SidebarComponent, NavbarComponent, RouterOutlet, AiChatDrawerComponent],
 })
 export class LayoutComponent implements OnInit {
   private mainContent: HTMLElement | null = null;
