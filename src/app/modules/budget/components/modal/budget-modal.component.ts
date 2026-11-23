@@ -35,6 +35,7 @@ export class BudgetModalComponent extends MyFinance implements OnInit {
       name: ['', [Validators.required]],
       categoryId: ['', [Validators.required]],
       limit: ['', [Validators.required]],
+      period: ['monthly', [Validators.required]],
       alertPercentage: ['', [Validators.required]],
       type: ['income', [Validators.required]],
       receiveAlert: [false, [Validators.required]],
@@ -50,7 +51,10 @@ export class BudgetModalComponent extends MyFinance implements OnInit {
     try {
       const { data } = await api.get(`/budgets/${id}`);
       this.budget = data.data;
-      this.form.patchValue({ ...this.budget });
+      this.form.patchValue({
+        ...this.budget,
+        period: this.budget.period || 'monthly'
+      });
     } catch (error) {
       this.normalizeErr(error);
     } finally {

@@ -1,0 +1,98 @@
+<div class="border-muted/20 bg-card w-[680px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-clock-rotate-left text-primary text-base"></i>
+      <div>
+        <h2 class="text-foreground text-lg font-semibold">Histórico de Ciclos • {{ dialogData.budgetName }}</h2>
+        @if (dialogData.categoryName) {
+          <p class="text-muted-foreground text-xs">Categoria: {{ dialogData.categoryName }}</p>
+        }
+      </div>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="flex items-center justify-center py-12">
+      <i class="fa-solid fa-spinner text-primary animate-spin text-2xl"></i>
+    </div>
+  } @else if (cycles.length === 0) {
+    <div class="flex flex-col items-center justify-center py-10 text-center">
+      <div class="bg-muted/40 mb-3 flex h-12 w-12 items-center justify-center rounded-full">
+        <i class="fa-solid fa-calendar-xmark text-muted-foreground text-xl"></i>
+      </div>
+      <p class="text-foreground font-semibold">Nenhum ciclo encontrado</p>
+      <p class="text-muted-foreground mt-1 text-xs">O histórico de ciclos aparecerá aqui conforme o tempo passar.</p>
+    </div>
+  } @else {
+    <div class="max-h-[440px] space-y-3 overflow-y-auto pr-1">
+      @for (cycle of cycles; track cycle.cycleKey) {
+        <div class="border-muted/20 bg-background/60 hover:border-muted/40 rounded-xl border p-4 transition-all">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="text-foreground font-semibold text-sm">{{ cycle.label }}</span>
+              @if (cycle.isCurrent) {
+                <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                  <span class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
+                  Ciclo Atual
+                </span>
+              }
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span
+                [class]="getStatusBadgeClass(cycle.status)"
+                class="rounded-md border px-2 py-0.5 text-[11px] font-semibold">
+                {{ getStatusLabel(cycle.status) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="text-muted-foreground mb-3 text-xs flex items-center gap-1.5">
+            <i class="fa-regular fa-calendar text-[11px]"></i>
+            <span>{{ cycle.startDate | date:'dd/MM/yyyy' }} a {{ cycle.endDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <!-- Valores e Progresso -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-muted-foreground">
+                Gasto: <strong class="text-foreground font-semibold">{{ cycle.spent | moneyPipe }}</strong> de {{ cycle.limit | moneyPipe }}
+              </span>
+              <span class="font-semibold text-xs" [class.text-rose-400]="cycle.status === 'exceeded'" [class.text-amber-400]="cycle.status === 'warning'" [class.text-emerald-400]="cycle.status === 'normal'">
+                {{ cycle.percentage }}%
+              </span>
+            </div>
+
+            <div class="h-2 w-full rounded-full bg-muted/60 overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all duration-300 {{ getProgressBarColorClass(cycle.status) }}"
+                [style.width.%]="getClampedPercentage(cycle.percentage)"></div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] pt-1">
+              <span class="text-muted-foreground">Saldo Restante:</span>
+              <span
+                class="font-semibold"
+                [class.text-emerald-400]="cycle.remaining >= 0"
+                [class.text-rose-400]="cycle.remaining < 0">
+                {{ cycle.remaining | moneyPipe }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="mt-6 flex justify-end">
+    <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-xmark mr-1.5"></i> Fechar
+    </app-button>
+  </div>
+</div>

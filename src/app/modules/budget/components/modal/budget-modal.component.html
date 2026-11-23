@@ -24,6 +24,16 @@
           class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
       </div>
       <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="period">Período de Renovação</label>
+        <select id="period" formControlName="period"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="monthly">Mensal (Padrão)</option>
+          <option value="weekly">Semanal</option>
+          <option value="yearly">Anual</option>
+          <option value="daily">Diário</option>
+        </select>
+      </div>
+      <div class="col-span-12">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="category">Categoria</label>
         <select id="category" formControlName="categoryId"
           class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">

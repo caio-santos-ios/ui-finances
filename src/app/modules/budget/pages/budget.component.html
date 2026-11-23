@@ -121,13 +121,25 @@
       <tbody class="divide-muted/10 divide-y text-sm">
         @for (item of pagination.data; track $index) {
         <tr class="hover:bg-card/50 transition-colors">
-          <td class="py-3 px-4 font-medium text-foreground">{{item.name}}</td>
+          <td class="py-3 px-4 font-medium text-foreground">
+            <div class="flex items-center gap-2">
+              <span>{{item.name}}</span>
+              <span class="inline-flex items-center rounded-md bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                {{ getPeriodLabel(item.period) }}
+              </span>
+            </div>
+          </td>
           <td class="py-3 px-4 font-medium text-foreground">{{item.categoryName}}</td>
           <td class="py-3 px-4 font-medium text-foreground">{{item.limit | moneyPipe }}</td>
           <td class="py-3 px-4 font-medium text-foreground">{{item.spent | moneyPipe }}</td>
           <td class="py-3 px-4 font-medium text-foreground">{{item.remaining | moneyPipe }}</td>
           <td class="py-3 px-4 text-xs text-muted-foreground">{{item.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>
           <td class="py-3 px-4 text-right">
+            <button type="button" (click)="openHistoryModal(item)"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              title="Histórico de Ciclos">
+              <i class="fa-solid fa-clock-rotate-left text-sm"></i>
+            </button>
             <button type="button" (click)="openModal(item.id)"
               class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               title="Editar Orçamento">

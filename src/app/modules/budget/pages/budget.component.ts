@@ -5,6 +5,7 @@ import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadc
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { Dialog } from '@angular/cdk/dialog';
 import { BudgetModalComponent } from '../components/modal/budget-modal.component';
+import { BudgetHistoryModalComponent } from '../components/modal/budget-history-modal.component';
 import { ResetPagination, TPagination } from 'src/app/shared/models/pagination';
 import { api } from 'src/app/shared/api/api';
 import Swal from 'sweetalert2';
@@ -177,6 +178,28 @@ export class BudgetComponent extends MyFinance implements OnInit {
       await this.loadData(targetPage);
     } catch (error) {
       this.normalizeErr(error);
+    }
+  }
+
+  openHistoryModal(item: any) {
+    this.dialog.open(BudgetHistoryModalComponent, {
+      data: {
+        budgetId: item.id,
+        budgetName: item.name,
+        categoryName: item.categoryName,
+        period: item.period
+      }
+    });
+  }
+
+  getPeriodLabel(period: string): string {
+    switch (period?.toLowerCase()) {
+      case 'daily': return 'Diário';
+      case 'weekly': return 'Semanal';
+      case 'yearly': return 'Anual';
+      case 'monthly':
+      default:
+        return 'Mensal';
     }
   }
 
