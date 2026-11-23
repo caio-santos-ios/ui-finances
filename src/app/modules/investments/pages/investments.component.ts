@@ -83,6 +83,13 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
   }
 
+  positionsSortColumn: string = '';
+  positionsSortDirection: 'asc' | 'desc' | '' = '';
+  transactionsSortColumn: string = '';
+  transactionsSortDirection: 'asc' | 'desc' | '' = '';
+  assetsSortColumn: string = '';
+  assetsSortDirection: 'asc' | 'desc' | '' = '';
+
   get filteredPositions(): any[] {
     let list = this.portfolio?.positions || [];
     if (this.filters.positionsSearch) {
@@ -95,7 +102,32 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     if (this.filters.positionsType) {
       list = list.filter((p: any) => p.type === this.filters.positionsType);
     }
+    if (this.positionsSortColumn) {
+      return this.sortData(list, this.positionsSortColumn, this.positionsSortColumn, this.positionsSortDirection).list;
+    }
     return list;
+  }
+
+  onPositionsSort(column: string) {
+    this.positionsSortDirection =
+      this.positionsSortColumn === column && this.positionsSortDirection === 'asc' ? 'desc' : 'asc';
+    this.positionsSortColumn = column;
+    this.cdr.markForCheck();
+  }
+
+  get sortedTransactions(): any[] {
+    let list = this.transactions || [];
+    if (this.transactionsSortColumn) {
+      return this.sortData(list, this.transactionsSortColumn, this.transactionsSortColumn, this.transactionsSortDirection).list;
+    }
+    return list;
+  }
+
+  onTransactionsSort(column: string) {
+    this.transactionsSortDirection =
+      this.transactionsSortColumn === column && this.transactionsSortDirection === 'asc' ? 'desc' : 'asc';
+    this.transactionsSortColumn = column;
+    this.cdr.markForCheck();
   }
 
   get filteredAssets(): any[] {
@@ -110,7 +142,17 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     if (this.filters.assetsType) {
       list = list.filter((a: any) => a.type === this.filters.assetsType);
     }
+    if (this.assetsSortColumn) {
+      return this.sortData(list, this.assetsSortColumn, this.assetsSortColumn, this.assetsSortDirection).list;
+    }
     return list;
+  }
+
+  onAssetsSort(column: string) {
+    this.assetsSortDirection =
+      this.assetsSortColumn === column && this.assetsSortDirection === 'asc' ? 'desc' : 'asc';
+    this.assetsSortColumn = column;
+    this.cdr.markForCheck();
   }
 
   setTab(tab: 'positions' | 'transactions' | 'assets') {

@@ -147,12 +147,42 @@
       <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
         <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
           <tr>
-            <th class="py-3 px-4">Meta</th>
-            <th class="py-3 px-4">Valor Alvo</th>
-            <th class="py-3 px-4">Valor Acumulado</th>
-            <th class="py-3 px-4">Progresso</th>
-            <th class="py-3 px-4">Prazo</th>
-            <th class="py-3 px-4">Status</th>
+            <th (click)="onSort('name')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Meta</span>
+                <i class="fa-solid {{ sortColumn === 'name' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('targetAmount')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Valor Alvo</span>
+                <i class="fa-solid {{ sortColumn === 'targetAmount' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('currentAmount')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Valor Acumulado</span>
+                <i class="fa-solid {{ sortColumn === 'currentAmount' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('percent')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Progresso</span>
+                <i class="fa-solid {{ sortColumn === 'percent' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('deadline')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Prazo</span>
+                <i class="fa-solid {{ sortColumn === 'deadline' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('status')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Status</span>
+                <i class="fa-solid {{ sortColumn === 'status' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
             <th class="py-3 px-4 text-right">Ações</th>
           </tr>
         </thead>

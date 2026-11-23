@@ -16,6 +16,23 @@ import Swal from 'sweetalert2';
 export class GoalHistoryModalComponent extends MyFinance implements OnInit {
   loading = true;
   transactions: any[] = [];
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
+
+  get sortedTransactions(): any[] {
+    let list = this.transactions || [];
+    if (this.sortColumn) {
+      return this.sortData(list, this.sortColumn, this.sortColumn, this.sortDirection).list;
+    }
+    return list;
+  }
+
+  onSort(column: string): void {
+    this.sortDirection =
+      this.sortColumn === column && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortColumn = column;
+    this.cdr.markForCheck();
+  }
 
   constructor(
     private dialogRef: DialogRef<boolean>,

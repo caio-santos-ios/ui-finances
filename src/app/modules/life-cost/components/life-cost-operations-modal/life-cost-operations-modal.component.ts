@@ -24,6 +24,23 @@ export interface LifeCostOperationsModalData {
 export class LifeCostOperationsModalComponent extends MyFinance implements OnInit {
   operations: any[] = [];
   isLoading = false;
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
+
+  get sortedOperations(): any[] {
+    let list = this.operations || [];
+    if (this.sortColumn) {
+      return this.sortData(list, this.sortColumn, this.sortColumn, this.sortDirection).list;
+    }
+    return list;
+  }
+
+  onSort(column: string): void {
+    this.sortDirection =
+      this.sortColumn === column && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortColumn = column;
+    this.cdr.markForCheck();
+  }
 
   constructor(
     private dialogRef: DialogRef,

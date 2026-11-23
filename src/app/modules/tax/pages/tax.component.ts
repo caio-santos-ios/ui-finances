@@ -48,6 +48,8 @@ export class TaxComponent extends MyFinance implements OnInit {
 
   searchTerm: string = '';
   selectedCategory: string = '';
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
 
   constructor() {
     super();
@@ -101,9 +103,18 @@ export class TaxComponent extends MyFinance implements OnInit {
     this.activeTab = tab;
     this.searchTerm = '';
     this.selectedCategory = '';
+    this.sortColumn = '';
+    this.sortDirection = '';
     if (tab === 'snapshots') {
       this.loadSnapshots();
     }
+    this.cdr.markForCheck();
+  }
+
+  onSort(column: string): void {
+    this.sortDirection =
+      this.sortColumn === column && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortColumn = column;
     this.cdr.markForCheck();
   }
 
@@ -129,7 +140,7 @@ export class TaxComponent extends MyFinance implements OnInit {
 
   filterIncomeItems(items: any[]): any[] {
     if (!items) return [];
-    return items.filter((item) => {
+    let filtered = items.filter((item) => {
       const matchCat = !this.selectedCategory || item.categoryName === this.selectedCategory;
       const term = this.searchTerm.trim().toLowerCase();
       const matchText =
@@ -139,11 +150,15 @@ export class TaxComponent extends MyFinance implements OnInit {
         (item.payerDocument || '').toLowerCase().includes(term);
       return matchCat && matchText;
     });
+    if (this.sortColumn) {
+      filtered = this.sortData(filtered, this.sortColumn, this.sortColumn, this.sortDirection).list;
+    }
+    return filtered;
   }
 
   filterDeductionItems(items: any[]): any[] {
     if (!items) return [];
-    return items.filter((item) => {
+    let filtered = items.filter((item) => {
       const matchCat = !this.selectedCategory || item.categoryName === this.selectedCategory;
       const term = this.searchTerm.trim().toLowerCase();
       const matchText =
@@ -154,15 +169,32 @@ export class TaxComponent extends MyFinance implements OnInit {
         (item.payeeDocument || '').toLowerCase().includes(term);
       return matchCat && matchText;
     });
+    if (this.sortColumn) {
+      filtered = this.sortData(filtered, this.sortColumn, this.sortColumn, this.sortDirection).list;
+    }
+    return filtered;
   }
 
   filterGenericItems(items: any[], fields: string[]): any[] {
     if (!items) return [];
     const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return items;
-    return items.filter((item) =>
-      fields.some((field) => (item[field] || '').toString().toLowerCase().includes(term))
-    );
+    let filtered = !term
+      ? items
+      : items.filter((item) =>
+          fields.some((field) => (item[field] || '').toString().toLowerCase().includes(term))
+        );
+    if (this.sortColumn) {
+      filtered = this.sortData(filtered, this.sortColumn, this.sortColumn, this.sortDirection).list;
+    }
+    return filtered;
+  }
+
+  get sortedSnapshots(): any[] {
+    let list = this.snapshots || [];
+    if (this.sortColumn) {
+      return this.sortData(list, this.sortColumn, this.sortColumn, this.sortDirection).list;
+    }
+    return list;
   }
 
   openOrigin(item: any, type: 'operation' | 'patrimony' | 'investment'): void {

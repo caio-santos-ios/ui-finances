@@ -28,6 +28,8 @@ export class B3ImportModalComponent extends MyFinance implements OnInit {
   previewData: B3PreviewResponse | null = null;
   filterTab: 'all' | 'new' | 'duplicate' | 'warning' = 'all';
   searchTerm: string = '';
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
 
   constructor(
     private dialogRef: DialogRef<boolean>,
@@ -153,7 +155,18 @@ export class B3ImportModalComponent extends MyFinance implements OnInit {
       );
     }
 
+    if (this.sortColumn) {
+      list = this.sortData(list, this.sortColumn, this.sortColumn, this.sortDirection).list;
+    }
+
     return list;
+  }
+
+  onSort(column: string): void {
+    this.sortDirection =
+      this.sortColumn === column && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.sortColumn = column;
+    this.cdr.markForCheck();
   }
 
   get selectedCount(): number {

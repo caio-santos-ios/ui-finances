@@ -29,18 +29,53 @@
         <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
           <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
             <tr>
-              <th class="py-3 px-3">Data</th>
-              <th class="py-3 px-3">Tipo</th>
-              <th class="py-3 px-3">Corretora</th>
-              <th class="py-3 px-3">Qtd</th>
-              <th class="py-3 px-3">Preço Unit.</th>
-              <th class="py-3 px-3">Taxas</th>
-              <th class="py-3 px-3 font-bold">Total</th>
+              <th (click)="onSort('date')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Data</span>
+                  <i class="fa-solid {{ sortColumn === 'date' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('kind')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Tipo</span>
+                  <i class="fa-solid {{ sortColumn === 'kind' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('brokerName')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Corretora</span>
+                  <i class="fa-solid {{ sortColumn === 'brokerName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('quantity')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Qtd</span>
+                  <i class="fa-solid {{ sortColumn === 'quantity' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('unitPrice')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Preço Unit.</span>
+                  <i class="fa-solid {{ sortColumn === 'unitPrice' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('fees')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Taxas</span>
+                  <i class="fa-solid {{ sortColumn === 'fees' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('amount')" class="py-3 px-3 font-bold cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Total</span>
+                  <i class="fa-solid {{ sortColumn === 'amount' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
               <th class="py-3 px-3 text-right">Ações</th>
             </tr>
           </thead>
           <tbody class="divide-muted/10 divide-y text-sm">
-            @for (item of transactions; track item.id) {
+            @for (item of sortedTransactions; track item.id) {
               <tr class="hover:bg-card/50 transition-colors">
                 <td class="py-2.5 px-3 text-xs text-muted-foreground">
                   {{ item.date | date:'dd/MM/yyyy':'UTC' }}

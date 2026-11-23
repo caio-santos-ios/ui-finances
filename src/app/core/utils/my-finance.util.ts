@@ -121,4 +121,79 @@ export class MyFinance {
       // fallback
     }
   }
+
+  sortData<T>(
+    list: T[],
+    column: string,
+    currentColumn: string,
+    currentDirection: 'asc' | 'desc' | ''
+  ): { list: T[]; column: string; direction: 'asc' | 'desc' } {
+    const direction: 'asc' | 'desc' =
+      currentColumn === column && currentDirection === 'asc' ? 'desc' : 'asc';
+
+    const sorted = [...(list || [])].sort((a: any, b: any) => {
+      let valA = this.getNestedValue(a, column);
+      let valB = this.getNestedValue(b, column);
+
+      if (valA === null || valA === undefined || valA === '') return 1;
+      if (valB === null || valB === undefined || valB === '') return -1;
+
+      if (typeof valA === 'boolean' && typeof valB === 'boolean') {
+        const numA = valA ? 1 : 0;
+        const numB = valB ? 1 : 0;
+        return direction === 'asc' ? numA - numB : numB - numA;
+      }
+
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return direction === 'asc' ? valA - valB : valB - valA;
+      }
+
+      const numA =
+        typeof valA === 'string' && valA.trim() !== '' && !isNaN(Number(valA))
+          ? Number(valA)
+          : NaN;
+      const numB =
+        typeof valB === 'string' && valB.trim() !== '' && !isNaN(Number(valB))
+          ? Number(valB)
+          : NaN;
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return direction === 'asc' ? numA - numB : numB - numA;
+      }
+
+      const dateA =
+        typeof valA === 'string' &&
+        valA.length >= 10 &&
+        (valA.includes('-') || valA.includes('/'))
+          ? Date.parse(valA)
+          : NaN;
+      const dateB =
+        typeof valB === 'string' &&
+        valB.length >= 10 &&
+        (valB.includes('-') || valB.includes('/'))
+          ? Date.parse(valB)
+          : NaN;
+      if (!isNaN(dateA) && !isNaN(dateB)) {
+        return direction === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+
+      const strA = String(valA).trim();
+      const strB = String(valB).trim();
+      return direction === 'asc'
+        ? strA.localeCompare(strB, 'pt-BR', { sensitivity: 'base', numeric: true })
+        : strB.localeCompare(strA, 'pt-BR', { sensitivity: 'base', numeric: true });
+    });
+
+    return { list: sorted, column, direction };
+  }
+
+  getNestedValue(obj: any, path: string): any {
+    if (!obj || !path) return null;
+    const val = path
+      .split('.')
+      .reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
+    if (Array.isArray(val)) {
+      return val.join(', ');
+    }
+    return val;
+  }
 }

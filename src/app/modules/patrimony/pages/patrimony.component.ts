@@ -65,6 +65,15 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
   historyAssetsLoading = false;
   historyDebtsLoading = false;
 
+  assetsSortColumn: string = '';
+  assetsSortDirection: 'asc' | 'desc' | '' = '';
+  debtsSortColumn: string = '';
+  debtsSortDirection: 'asc' | 'desc' | '' = '';
+  historyAssetsSortColumn: string = '';
+  historyAssetsSortDirection: 'asc' | 'desc' | '' = '';
+  historyDebtsSortColumn: string = '';
+  historyDebtsSortDirection: 'asc' | 'desc' | '' = '';
+
   async ngOnInit(): Promise<void> {
     await Promise.all([
       this.loadSummary(),
@@ -122,6 +131,10 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
 
       const { data } = await api.get(`/assets?${params.toString()}`);
       this.assetsPagination = data.data;
+      if (this.assetsSortColumn && this.assetsPagination?.data?.length) {
+        const res = this.sortData(this.assetsPagination.data, this.assetsSortColumn, '', this.assetsSortDirection);
+        this.assetsPagination.data = res.list;
+      }
 
       if (this.summary.totalAssets === 0 && this.assetsPagination?.data?.length > 0) {
         const activeItems = this.assetsPagination.data.filter((item: any) => !item.disposed);
@@ -164,6 +177,11 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
         data: activeItems,
         totalCount: activeItems.length,
       };
+
+      if (this.debtsSortColumn && this.debtsPagination?.data?.length) {
+        const res = this.sortData(this.debtsPagination.data, this.debtsSortColumn, '', this.debtsSortDirection);
+        this.debtsPagination.data = res.list;
+      }
 
       if (this.summary.totalDebts === 0 && this.debtsPagination?.data?.length > 0) {
         const sum = this.debtsPagination.data.reduce((acc: number, item: any) => acc + (Number(item.remainingAmount) || 0), 0);
@@ -235,6 +253,42 @@ export class PatrimonyComponent extends MyFinance implements OnInit {
       this.loadHistoryAssets(1);
       this.loadHistoryDebts(1);
     }
+  }
+
+  onAssetsSort(column: string) {
+    if (!this.assetsPagination.data?.length) return;
+    const res = this.sortData(this.assetsPagination.data, column, this.assetsSortColumn, this.assetsSortDirection);
+    this.assetsPagination.data = res.list;
+    this.assetsSortColumn = res.column;
+    this.assetsSortDirection = res.direction;
+    this.cdr.markForCheck();
+  }
+
+  onDebtsSort(column: string) {
+    if (!this.debtsPagination.data?.length) return;
+    const res = this.sortData(this.debtsPagination.data, column, this.debtsSortColumn, this.debtsSortDirection);
+    this.debtsPagination.data = res.list;
+    this.debtsSortColumn = res.column;
+    this.debtsSortDirection = res.direction;
+    this.cdr.markForCheck();
+  }
+
+  onHistoryAssetsSort(column: string) {
+    if (!this.historyAssetsPagination.data?.length) return;
+    const res = this.sortData(this.historyAssetsPagination.data, column, this.historyAssetsSortColumn, this.historyAssetsSortDirection);
+    this.historyAssetsPagination.data = res.list;
+    this.historyAssetsSortColumn = res.column;
+    this.historyAssetsSortDirection = res.direction;
+    this.cdr.markForCheck();
+  }
+
+  onHistoryDebtsSort(column: string) {
+    if (!this.historyDebtsPagination.data?.length) return;
+    const res = this.sortData(this.historyDebtsPagination.data, column, this.historyDebtsSortColumn, this.historyDebtsSortDirection);
+    this.historyDebtsPagination.data = res.list;
+    this.historyDebtsSortColumn = res.column;
+    this.historyDebtsSortDirection = res.direction;
+    this.cdr.markForCheck();
   }
 
   setHistorySubTab(subTab: 'all' | 'assets' | 'debts') {

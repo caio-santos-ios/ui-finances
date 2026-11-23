@@ -29,16 +29,41 @@
       <table class="w-full text-left text-xs">
         <thead class="text-muted-foreground border-muted/20 border-b font-semibold uppercase">
           <tr>
-            <th class="py-2.5 pr-2">Data</th>
-            <th class="py-2.5 px-2">Tipo</th>
-            <th class="py-2.5 px-2">Valor</th>
-            <th class="py-2.5 px-2">Investimento</th>
-            <th class="py-2.5 px-2">Observação</th>
+            <th (click)="onSort('date')" class="py-2.5 pr-2 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Data</span>
+                <i class="fa-solid {{ sortColumn === 'date' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('type')" class="py-2.5 px-2 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Tipo</span>
+                <i class="fa-solid {{ sortColumn === 'type' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('value')" class="py-2.5 px-2 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Valor</span>
+                <i class="fa-solid {{ sortColumn === 'value' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('investmentAssetName')" class="py-2.5 px-2 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Investimento</span>
+                <i class="fa-solid {{ sortColumn === 'investmentAssetName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
+            <th (click)="onSort('note')" class="py-2.5 px-2 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <div class="inline-flex items-center gap-1.5">
+                <span>Observação</span>
+                <i class="fa-solid {{ sortColumn === 'note' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+              </div>
+            </th>
             <th class="py-2.5 pl-2 text-right">Ações</th>
           </tr>
         </thead>
         <tbody class="divide-muted/10 divide-y">
-          @for (tx of transactions; track tx.id) {
+          @for (tx of sortedTransactions; track tx.id) {
             <tr class="hover:bg-muted/30 transition-colors">
               <td class="text-foreground py-2.5 pr-2">{{ tx.date | date:'dd/MM/yyyy' }}</td>
               <td class="py-2.5 px-2">

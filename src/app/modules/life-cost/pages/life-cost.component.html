@@ -137,12 +137,42 @@
         <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
           <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
             <tr>
-              <th class="py-3 px-4">Mês / Ano</th>
-              <th class="py-3 px-4">Essencial</th>
-              <th class="py-3 px-4">Discricionário</th>
-              <th class="py-3 px-4">Ajustes Abatidos</th>
-              <th class="py-3 px-4">Excluído</th>
-              <th class="py-3 px-4 font-bold">Custo Líquido</th>
+              <th (click)="onMonthlySort('label')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Mês / Ano</span>
+                  <i class="fa-solid {{ monthlySortColumn === 'label' ? (monthlySortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onMonthlySort('essentialExpense')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Essencial</span>
+                  <i class="fa-solid {{ monthlySortColumn === 'essentialExpense' ? (monthlySortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onMonthlySort('discretionaryExpense')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Discricionário</span>
+                  <i class="fa-solid {{ monthlySortColumn === 'discretionaryExpense' ? (monthlySortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onMonthlySort('reimbursementAdjustment')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Ajustes Abatidos</span>
+                  <i class="fa-solid {{ monthlySortColumn === 'reimbursementAdjustment' ? (monthlySortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onMonthlySort('excludedExpense')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Excluído</span>
+                  <i class="fa-solid {{ monthlySortColumn === 'excludedExpense' ? (monthlySortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onMonthlySort('netCost')" class="py-3 px-4 font-bold cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Custo Líquido</span>
+                  <i class="fa-solid {{ monthlySortColumn === 'netCost' ? (monthlySortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody class="divide-muted/10 divide-y text-sm">
@@ -240,12 +270,42 @@
         <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
           <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
             <tr>
-              <th class="py-3 px-4">Categoria</th>
-              <th class="py-3 px-4">Classificação</th>
-              <th class="py-3 px-4">Recorrência</th>
-              <th class="py-3 px-4">Lançamentos</th>
-              <th class="py-3 px-4">% do Custo</th>
-              <th class="py-3 px-4 font-bold">Total Gasto</th>
+              <th (click)="onBreakdownSort('categoryName')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Categoria</span>
+                  <i class="fa-solid {{ breakdownSortColumn === 'categoryName' ? (breakdownSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onBreakdownSort('lifeCostClass')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Classificação</span>
+                  <i class="fa-solid {{ breakdownSortColumn === 'lifeCostClass' ? (breakdownSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onBreakdownSort('lifeCostRecurrence')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Recorrência</span>
+                  <i class="fa-solid {{ breakdownSortColumn === 'lifeCostRecurrence' ? (breakdownSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onBreakdownSort('operationCount')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Lançamentos</span>
+                  <i class="fa-solid {{ breakdownSortColumn === 'operationCount' ? (breakdownSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onBreakdownSort('percentageOfCost')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>% do Custo</span>
+                  <i class="fa-solid {{ breakdownSortColumn === 'percentageOfCost' ? (breakdownSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onBreakdownSort('totalSpent')" class="py-3 px-4 font-bold cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Total Gasto</span>
+                  <i class="fa-solid {{ breakdownSortColumn === 'totalSpent' ? (breakdownSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
               <th class="py-3 px-4 text-right">Ações</th>
             </tr>
           </thead>

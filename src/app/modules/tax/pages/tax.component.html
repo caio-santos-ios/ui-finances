@@ -285,10 +285,30 @@
         <table class="text-muted-foreground table w-full table-auto border-collapse text-left text-xs">
           <thead class="border-muted/20 bg-background sticky top-0 z-10 border-b font-semibold uppercase">
             <tr>
-              <th class="py-2.5 px-4">Fonte / Categoria</th>
-              <th class="py-2.5 px-4">Descrição</th>
-              <th class="py-2.5 px-4">CNPJ / CPF</th>
-              <th class="py-2.5 px-4 text-right">Total Recebido</th>
+              <th (click)="onSort('categoryName')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Fonte / Categoria</span>
+                  <i class="fa-solid {{ sortColumn === 'categoryName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('description')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Descrição</span>
+                  <i class="fa-solid {{ sortColumn === 'description' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('payerDocument')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>CNPJ / CPF</span>
+                  <i class="fa-solid {{ sortColumn === 'payerDocument' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('totalValue')" class="py-2.5 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5 justify-end">
+                  <span>Total Recebido</span>
+                  <i class="fa-solid {{ sortColumn === 'totalValue' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
               <th class="py-2.5 px-3 text-right">Ação</th>
             </tr>
           </thead>
@@ -327,10 +347,30 @@
         <table class="text-muted-foreground table w-full table-auto border-collapse text-left text-xs">
           <thead class="border-muted/20 bg-background sticky top-0 z-10 border-b font-semibold uppercase">
             <tr>
-              <th class="py-2.5 px-4">Fonte / Categoria</th>
-              <th class="py-2.5 px-4">Descrição</th>
-              <th class="py-2.5 px-4">CNPJ / CPF</th>
-              <th class="py-2.5 px-4 text-right">Total Recebido</th>
+              <th (click)="onSort('categoryName')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Fonte / Categoria</span>
+                  <i class="fa-solid {{ sortColumn === 'categoryName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('description')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Descrição</span>
+                  <i class="fa-solid {{ sortColumn === 'description' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('payerDocument')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>CNPJ / CPF</span>
+                  <i class="fa-solid {{ sortColumn === 'payerDocument' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('totalValue')" class="py-2.5 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5 justify-end">
+                  <span>Total Recebido</span>
+                  <i class="fa-solid {{ sortColumn === 'totalValue' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
               <th class="py-2.5 px-3 text-right">Ação</th>
             </tr>
           </thead>
@@ -369,10 +409,30 @@
         <table class="text-muted-foreground table w-full table-auto border-collapse text-left text-xs">
           <thead class="border-muted/20 bg-background sticky top-0 z-10 border-b font-semibold uppercase">
             <tr>
-              <th class="py-2.5 px-4">Fonte / Categoria</th>
-              <th class="py-2.5 px-4">Descrição</th>
-              <th class="py-2.5 px-4">CNPJ / CPF</th>
-              <th class="py-2.5 px-4 text-right">Total Recebido</th>
+              <th (click)="onSort('categoryName')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Fonte / Categoria</span>
+                  <i class="fa-solid {{ sortColumn === 'categoryName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('description')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Descrição</span>
+                  <i class="fa-solid {{ sortColumn === 'description' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('payerDocument')" class="py-2.5 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>CNPJ / CPF</span>
+                  <i class="fa-solid {{ sortColumn === 'payerDocument' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('totalValue')" class="py-2.5 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5 justify-end">
+                  <span>Total Recebido</span>
+                  <i class="fa-solid {{ sortColumn === 'totalValue' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
               <th class="py-2.5 px-3 text-right">Ação</th>
             </tr>
           </thead>
@@ -433,11 +493,36 @@
           <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
             <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
               <tr>
-                <th class="py-3 px-4">Tipo de Dedução</th>
-                <th class="py-3 px-4">Prestador / Beneficiário</th>
-                <th class="py-3 px-4">CPF / CNPJ</th>
-                <th class="py-3 px-4">Comprovante</th>
-                <th class="py-3 px-4 text-right">Valor Dedutível</th>
+                <th (click)="onSort('subtype')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Tipo de Dedução</span>
+                    <i class="fa-solid {{ sortColumn === 'subtype' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('payeeName')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Prestador / Beneficiário</span>
+                    <i class="fa-solid {{ sortColumn === 'payeeName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('payeeDocument')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>CPF / CNPJ</span>
+                    <i class="fa-solid {{ sortColumn === 'payeeDocument' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('hasReceipt')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Comprovante</span>
+                    <i class="fa-solid {{ sortColumn === 'hasReceipt' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('totalValue')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Valor Dedutível</span>
+                    <i class="fa-solid {{ sortColumn === 'totalValue' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
                 <th class="py-3 px-3 text-right">Ação</th>
               </tr>
             </thead>
@@ -511,10 +596,30 @@
           <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
             <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
               <tr>
-                <th class="py-3 px-4">Código IR</th>
-                <th class="py-3 px-4">Bem / Discriminação Receita Federal</th>
-                <th class="py-3 px-4 text-right">Situação em 31/12/{{ baseYear - 1 }}</th>
-                <th class="py-3 px-4 text-right">Situação em 31/12/{{ baseYear }}</th>
+                <th (click)="onSort('code')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Código IR</span>
+                    <i class="fa-solid {{ sortColumn === 'code' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('name')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Bem / Discriminação Receita Federal</span>
+                    <i class="fa-solid {{ sortColumn === 'name' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('situationPreviousYear')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Situação em 31/12/{{ baseYear - 1 }}</span>
+                    <i class="fa-solid {{ sortColumn === 'situationPreviousYear' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('situationBaseYear')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Situação em 31/12/{{ baseYear }}</span>
+                    <i class="fa-solid {{ sortColumn === 'situationBaseYear' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
                 <th class="py-3 px-3 text-right">Ação</th>
               </tr>
             </thead>
@@ -578,10 +683,30 @@
           <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
             <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
               <tr>
-                <th class="py-3 px-4">Código</th>
-                <th class="py-3 px-4">Dívida / Credor / Discriminação</th>
-                <th class="py-3 px-4 text-right">Situação em 31/12/{{ baseYear - 1 }}</th>
-                <th class="py-3 px-4 text-right">Situação em 31/12/{{ baseYear }}</th>
+                <th (click)="onSort('code')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Código</span>
+                    <i class="fa-solid {{ sortColumn === 'code' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('name')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Dívida / Credor / Discriminação</span>
+                    <i class="fa-solid {{ sortColumn === 'name' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('situationPreviousYear')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Situação em 31/12/{{ baseYear - 1 }}</span>
+                    <i class="fa-solid {{ sortColumn === 'situationPreviousYear' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('situationBaseYear')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Situação em 31/12/{{ baseYear }}</span>
+                    <i class="fa-solid {{ sortColumn === 'situationBaseYear' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
                 <th class="py-3 px-3 text-right">Ação</th>
               </tr>
             </thead>
@@ -637,15 +762,40 @@
         <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
           <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
             <tr>
-              <th class="py-3 px-4">Data do Snapshot</th>
-              <th class="py-3 px-4">Ano-Base</th>
-              <th class="py-3 px-4">Hash de Integridade (SHA-256)</th>
-              <th class="py-3 px-4 text-right">Rend. Tributáveis</th>
-              <th class="py-3 px-4 text-right">Bens e Direitos</th>
+              <th (click)="onSort('createdAt')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Data do Snapshot</span>
+                  <i class="fa-solid {{ sortColumn === 'createdAt' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('baseYear')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Ano-Base</span>
+                  <i class="fa-solid {{ sortColumn === 'baseYear' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('hashSha256')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Hash de Integridade (SHA-256)</span>
+                  <i class="fa-solid {{ sortColumn === 'hashSha256' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('totalTaxableIncome')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5 justify-end">
+                  <span>Rend. Tributáveis</span>
+                  <i class="fa-solid {{ sortColumn === 'totalTaxableIncome' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('totalAssetsCost')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5 justify-end">
+                  <span>Bens e Direitos</span>
+                  <i class="fa-solid {{ sortColumn === 'totalAssetsCost' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody class="divide-muted/10 divide-y text-sm">
-            @for (s of snapshots; track s.id) {
+            @for (s of sortedSnapshots; track s.id) {
               <tr class="hover:bg-card/50 transition-colors">
                 <td class="py-3 px-4 text-xs font-semibold text-foreground">{{ s.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
                 <td class="py-3 px-4 text-xs text-muted-foreground">{{ s.baseYear }}</td>

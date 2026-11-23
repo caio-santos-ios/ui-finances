@@ -184,14 +184,54 @@
                     class="rounded border-muted/30 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
                     title="Marcar / desmarcar todas as linhas elegíveis" />
                 </th>
-                <th class="py-3 px-3">Status</th>
-                <th class="py-3 px-3">Tipo</th>
-                <th class="py-3 px-3">Data</th>
-                <th class="py-3 px-3">Ticker / Ativo</th>
-                <th class="py-3 px-3">Corretora</th>
-                <th class="py-3 px-3 text-right">Qtd</th>
-                <th class="py-3 px-3 text-right">Preço Unit.</th>
-                <th class="py-3 px-3 text-right">Total</th>
+                <th (click)="onSort('isDuplicate')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Status</span>
+                    <i class="fa-solid {{ sortColumn === 'isDuplicate' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('kind')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Tipo</span>
+                    <i class="fa-solid {{ sortColumn === 'kind' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('date')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Data</span>
+                    <i class="fa-solid {{ sortColumn === 'date' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('ticker')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Ticker / Ativo</span>
+                    <i class="fa-solid {{ sortColumn === 'ticker' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('brokerName')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5">
+                    <span>Corretora</span>
+                    <i class="fa-solid {{ sortColumn === 'brokerName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('quantity')" class="py-3 px-3 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Qtd</span>
+                    <i class="fa-solid {{ sortColumn === 'quantity' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('unitPrice')" class="py-3 px-3 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Preço Unit.</span>
+                    <i class="fa-solid {{ sortColumn === 'unitPrice' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
+                <th (click)="onSort('totalValue')" class="py-3 px-3 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <span>Total</span>
+                    <i class="fa-solid {{ sortColumn === 'totalValue' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody class="divide-muted/10 divide-y text-xs">

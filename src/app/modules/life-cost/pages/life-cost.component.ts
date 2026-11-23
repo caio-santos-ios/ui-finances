@@ -47,6 +47,29 @@ export class LifeCostComponent extends MyFinance implements OnInit {
   monthlySeries: any[] = [];
   breakdown: any[] = [];
 
+  monthlySortColumn: string = '';
+  monthlySortDirection: 'asc' | 'desc' | '' = '';
+  breakdownSortColumn: string = '';
+  breakdownSortDirection: 'asc' | 'desc' | '' = '';
+
+  onMonthlySort(column: string) {
+    if (!this.monthlySeries?.length) return;
+    const res = this.sortData(this.monthlySeries, column, this.monthlySortColumn, this.monthlySortDirection);
+    this.monthlySeries = res.list;
+    this.monthlySortColumn = res.column;
+    this.monthlySortDirection = res.direction;
+    this.cdr.markForCheck();
+  }
+
+  onBreakdownSort(column: string) {
+    if (!this.breakdown?.length) return;
+    const res = this.sortData(this.breakdown, column, this.breakdownSortColumn, this.breakdownSortDirection);
+    this.breakdown = res.list;
+    this.breakdownSortColumn = res.column;
+    this.breakdownSortDirection = res.direction;
+    this.cdr.markForCheck();
+  }
+
   constructor(private dialog: Dialog) {
     super();
   }

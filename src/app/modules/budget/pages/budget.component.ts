@@ -35,6 +35,8 @@ export class BudgetComponent extends MyFinance implements OnInit {
     startDate: '',
     endDate: '',
   };
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
 
   async ngOnInit(): Promise<void> {
     await Promise.all([
@@ -89,6 +91,10 @@ export class BudgetComponent extends MyFinance implements OnInit {
 
       const { data } = await api.get(`/budgets?${params.toString()}`);
       this.pagination = data.data;
+      if (this.sortColumn && this.pagination.data?.length) {
+        const res = this.sortData(this.pagination.data, this.sortColumn, '', this.sortDirection);
+        this.pagination.data = res.list;
+      }
       const count = Number(this.pagination.totalPages) || 0;
       this.totalPages = Array.from({ length: count }, (_, i) => i + 1);
     } catch (error) {
@@ -102,6 +108,15 @@ export class BudgetComponent extends MyFinance implements OnInit {
   onPageChange(page: number) {
     if (page < 1 || page > this.pagination.totalPages || page === this.pagination.currentPage) return;
     this.loadData(page);
+  }
+
+  onSort(column: string) {
+    if (!this.pagination.data?.length) return;
+    const res = this.sortData(this.pagination.data, column, this.sortColumn, this.sortDirection);
+    this.pagination.data = res.list;
+    this.sortColumn = res.column;
+    this.sortDirection = res.direction;
+    this.cdr.markForCheck();
   }
 
   get pages(): (number | '...')[] {

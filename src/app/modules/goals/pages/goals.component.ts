@@ -42,6 +42,8 @@ export class GoalsComponent extends MyFinance implements OnInit {
   };
 
   goals: any[] = [];
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' | '' = '';
 
   constructor(private dialog: Dialog) {
     super();
@@ -135,6 +137,11 @@ export class GoalsComponent extends MyFinance implements OnInit {
         };
       });
 
+      if (this.sortColumn && this.goals?.length) {
+        const res = this.sortData(this.goals, this.sortColumn, '', this.sortDirection);
+        this.goals = res.list;
+      }
+
       const count = Number(this.pagination.totalPages) || 0;
       this.totalPages = Array.from({ length: count }, (_, i) => i + 1);
     } catch (error) {
@@ -148,6 +155,15 @@ export class GoalsComponent extends MyFinance implements OnInit {
   onPageChange(page: number): void {
     if (page < 1 || page > this.pagination.totalPages || page === this.pagination.currentPage) return;
     this.loadData(page);
+  }
+
+  onSort(column: string): void {
+    if (!this.goals?.length) return;
+    const res = this.sortData(this.goals, column, this.sortColumn, this.sortDirection);
+    this.goals = res.list;
+    this.sortColumn = res.column;
+    this.sortDirection = res.direction;
+    this.cdr.markForCheck();
   }
 
   get pages(): (number | '...')[] {
