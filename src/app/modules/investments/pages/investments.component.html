@@ -410,6 +410,28 @@
               </tr>
             }
           </tbody>
+          <tfoot class="border-muted/30 bg-card/90 text-foreground sticky bottom-0 z-10 border-t-2 text-xs font-bold">
+            @let pt = positionsTotals;
+            <tr>
+              <td class="py-3 px-4 uppercase tracking-wider" colspan="3">Total ({{ pt.count }} {{ pt.count === 1 ? 'ativo' : 'ativos' }})</td>
+              <td class="py-3 px-4">{{ pt.quantity }}</td>
+              <td class="py-3 px-4 text-muted-foreground">-</td>
+              <td class="py-3 px-4 text-muted-foreground">-</td>
+              <td class="py-3 px-4 text-sm">{{ pt.currentValue | moneyPipe }}</td>
+              <td class="py-3 px-4">
+                <div class="{{ pt.unrealizedProfit >= 0 ? 'text-emerald-500' : 'text-rose-500' }}">
+                  {{ pt.unrealizedProfit >= 0 ? '+' : '' }}{{ pt.unrealizedProfit | moneyPipe }}
+                  <span class="text-[11px]">({{ pt.unrealizedProfit >= 0 ? '+' : '' }}{{ pt.profitPercent }}%)</span>
+                </div>
+                @if (pt.incomeReceived > 0) {
+                  <div class="text-[11px] text-blue-500 font-semibold">
+                    +{{ pt.incomeReceived | moneyPipe }} proventos
+                  </div>
+                }
+              </td>
+              <td class="py-3 px-4"></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
@@ -500,6 +522,16 @@
               </tr>
             }
           </tbody>
+          <tfoot class="border-muted/30 bg-card/90 text-foreground sticky bottom-0 z-10 border-t-2 text-xs font-bold">
+            @let ct = closedTotals;
+            <tr>
+              <td class="py-3 px-4 uppercase tracking-wider" colspan="3">Total ({{ ct.count }} {{ ct.count === 1 ? 'ativo' : 'ativos' }})</td>
+              <td class="py-3 px-4 text-sm {{ ct.incomeReceived > 0 ? 'text-blue-400' : 'text-muted-foreground' }}">
+                {{ ct.incomeReceived > 0 ? ('+' + (ct.incomeReceived | moneyPipe)) : 'R$ 0,00' }}
+              </td>
+              <td class="py-3 px-4" colspan="2"></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
@@ -561,10 +593,10 @@
                   <i class="fa-solid {{ transactionsSortColumn === 'fees' ? (transactionsSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
                 </div>
               </th>
-              <th (click)="onTransactionsSort('totalValue')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+              <th (click)="onTransactionsSort('amount')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
                 <div class="inline-flex items-center gap-1.5">
                   <span>Valor Total</span>
-                  <i class="fa-solid {{ transactionsSortColumn === 'totalValue' ? (transactionsSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                  <i class="fa-solid {{ transactionsSortColumn === 'amount' ? (transactionsSortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
                 </div>
               </th>
               <th class="py-3 px-4 text-right">Ações</th>
@@ -629,6 +661,17 @@
               </tr>
             }
           </tbody>
+          <tfoot class="border-muted/30 bg-card/90 text-foreground sticky bottom-0 z-10 border-t-2 text-xs font-bold">
+            @let tt = transactionsTotals;
+            <tr>
+              <td class="py-3 px-4 uppercase tracking-wider" colspan="4">Total ({{ tt.count }} {{ tt.count === 1 ? 'movimentação' : 'movimentações' }})</td>
+              <td class="py-3 px-4">{{ tt.quantity > 0 ? tt.quantity : '-' }}</td>
+              <td class="py-3 px-4 text-muted-foreground">-</td>
+              <td class="py-3 px-4">{{ tt.fees > 0 ? (tt.fees | moneyPipe) : '-' }}</td>
+              <td class="py-3 px-4 text-sm">{{ tt.amount | moneyPipe }}</td>
+              <td class="py-3 px-4"></td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
@@ -730,6 +773,11 @@
               </tr>
             }
           </tbody>
+          <tfoot class="border-muted/30 bg-card/90 text-foreground sticky bottom-0 z-10 border-t-2 text-xs font-bold">
+            <tr>
+              <td class="py-3 px-4 uppercase tracking-wider" colspan="6">Total ({{ filteredAssets.length }} {{ filteredAssets.length === 1 ? 'ativo cadastrado' : 'ativos cadastrados' }})</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

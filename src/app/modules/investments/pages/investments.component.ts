@@ -323,6 +323,47 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     return list;
   }
 
+  get positionsTotals() {
+    const list = this.filteredPositions;
+    const totalInvested = list.reduce((acc, item) => acc + (Number(item.totalInvested) || 0), 0);
+    const currentValue = list.reduce((acc, item) => acc + (Number(item.currentValue) || 0), 0);
+    const unrealizedProfit = list.reduce((acc, item) => acc + (Number(item.unrealizedProfit) || 0), 0);
+    const incomeReceived = list.reduce((acc, item) => acc + (Number(item.incomeReceived) || 0), 0);
+    const quantity = list.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
+    const profitPercent = totalInvested > 0 ? Math.round((unrealizedProfit / totalInvested) * 10000) / 100 : 0;
+    return {
+      count: list.length,
+      quantity: Math.round(quantity * 10000) / 10000,
+      totalInvested,
+      currentValue,
+      unrealizedProfit,
+      incomeReceived,
+      profitPercent,
+    };
+  }
+
+  get closedTotals() {
+    const list = this.filteredClosedPositions;
+    const incomeReceived = list.reduce((acc, item) => acc + (Number(item.incomeReceived) || 0), 0);
+    return {
+      count: list.length,
+      incomeReceived,
+    };
+  }
+
+  get transactionsTotals() {
+    const list = this.sortedTransactions;
+    const quantity = list.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0);
+    const fees = list.reduce((acc, item) => acc + (Number(item.fees) || 0), 0);
+    const amount = list.reduce((acc, item) => acc + (Number(item.amount) || 0), 0);
+    return {
+      count: list.length,
+      quantity: Math.round(quantity * 10000) / 10000,
+      fees,
+      amount,
+    };
+  }
+
   onAssetsSort(column: string) {
     this.assetsSortDirection =
       this.assetsSortColumn === column && this.assetsSortDirection === 'asc' ? 'desc' : 'asc';
