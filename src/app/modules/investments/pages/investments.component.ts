@@ -21,7 +21,7 @@ import { B3ImportModalComponent } from '../components/modal/b3-import-modal/b3-i
   imports: [CommonModule, FormsModule, ButtonComponent, BreadcrumbComponent, MoneyPipe],
 })
 export class InvestmentsComponent extends MyFinance implements OnInit {
-  activeTab: 'positions' | 'transactions' | 'assets' = 'positions';
+  activeTab: 'positions' | 'closed' | 'transactions' | 'assets' = 'positions';
   isLoading = false;
   showFilters = false;
   showCards = this.getStoredCardsVisibility('mf_show_cards_investments');
@@ -69,7 +69,7 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
   }
 
   clearFilters() {
-    if (this.activeTab === 'positions') {
+    if (this.activeTab === 'positions' || this.activeTab === 'closed') {
       this.filters.positionsSearch = '';
       this.filters.positionsType = '';
     } else if (this.activeTab === 'transactions') {
@@ -85,13 +85,23 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
 
   positionsSortColumn: string = '';
   positionsSortDirection: 'asc' | 'desc' | '' = '';
+  closedSortColumn: string = '';
+  closedSortDirection: 'asc' | 'desc' | '' = '';
   transactionsSortColumn: string = '';
   transactionsSortDirection: 'asc' | 'desc' | '' = '';
   assetsSortColumn: string = '';
   assetsSortDirection: 'asc' | 'desc' | '' = '';
 
+  get activePositions(): any[] {
+    return (this.portfolio?.positions || []).filter((p: any) => (p.quantity || 0) > 0);
+  }
+
+  get closedPositions(): any[] {
+    return (this.portfolio?.positions || []).filter((p: any) => (p.quantity || 0) <= 0);
+  }
+
   get filteredPositions(): any[] {
-    let list = this.portfolio?.positions || [];
+    let list = this.activePositions;
     if (this.filters.positionsSearch) {
       const q = this.filters.positionsSearch.toLowerCase();
       list = list.filter((p: any) =>
@@ -112,6 +122,31 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     this.positionsSortDirection =
       this.positionsSortColumn === column && this.positionsSortDirection === 'asc' ? 'desc' : 'asc';
     this.positionsSortColumn = column;
+    this.cdr.markForCheck();
+  }
+
+  get filteredClosedPositions(): any[] {
+    let list = this.closedPositions;
+    if (this.filters.positionsSearch) {
+      const q = this.filters.positionsSearch.toLowerCase();
+      list = list.filter((p: any) =>
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.ticker && p.ticker.toLowerCase().includes(q))
+      );
+    }
+    if (this.filters.positionsType) {
+      list = list.filter((p: any) => p.type === this.filters.positionsType);
+    }
+    if (this.closedSortColumn) {
+      return this.sortData(list, this.closedSortColumn, this.closedSortColumn, this.closedSortDirection).list;
+    }
+    return list;
+  }
+
+  onClosedSort(column: string) {
+    this.closedSortDirection =
+      this.closedSortColumn === column && this.closedSortDirection === 'asc' ? 'desc' : 'asc';
+    this.closedSortColumn = column;
     this.cdr.markForCheck();
   }
 
@@ -155,7 +190,7 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
   }
 
-  setTab(tab: 'positions' | 'transactions' | 'assets') {
+  setTab(tab: 'positions' | 'closed' | 'transactions' | 'assets') {
     this.activeTab = tab;
     this.cdr.markForCheck();
   }
@@ -164,7 +199,9 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     const map: Record<string, string> = {
       STOCK: 'Ação',
       REIT: 'FII',
+      FII: 'FII',
       ETF: 'ETF',
+      BDR: 'BDR',
       FIXED_INCOME: 'Renda Fixa',
       CRYPTO: 'Cripto',
       OTHER: 'Outro',
