@@ -39,14 +39,30 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
 
   transactions: any[] = [];
   assets: any[] = [];
+  brokers: any[] = [];
 
   filters = {
     positionsSearch: '',
     positionsType: '',
+    positionsBroker: '',
+    positionsProfit: '', // '' | 'profit' | 'loss' | 'neutral'
+    positionsIncome: '', // '' | 'with' | 'without'
+    positionsMinValue: null as number | null,
+    positionsMaxValue: null as number | null,
+
+    transactionsSearch: '',
     transactionsKind: '',
     transactionsAssetId: '',
+    transactionsBrokerId: '',
+    transactionsStartDate: '',
+    transactionsEndDate: '',
+    transactionsMinAmount: null as number | null,
+    transactionsMaxAmount: null as number | null,
+
     assetsSearch: '',
     assetsType: '',
+    assetsSource: '', // '' | 'MARKET_API' | 'MANUAL'
+    assetsPriceStatus: '', // '' | 'with' | 'without'
   };
 
   constructor(private dialog: Dialog) {
@@ -68,17 +84,83 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
   }
 
+  get activeFiltersCount(): number {
+    if (this.activeTab === 'positions') {
+      return [
+        this.filters.positionsSearch,
+        this.filters.positionsType,
+        this.filters.positionsBroker,
+        this.filters.positionsProfit,
+        this.filters.positionsIncome,
+        this.filters.positionsMinValue !== null && this.filters.positionsMinValue !== undefined && String(this.filters.positionsMinValue) !== '',
+        this.filters.positionsMaxValue !== null && this.filters.positionsMaxValue !== undefined && String(this.filters.positionsMaxValue) !== '',
+      ].filter(Boolean).length;
+    }
+    if (this.activeTab === 'closed') {
+      return [
+        this.filters.positionsSearch,
+        this.filters.positionsType,
+        this.filters.positionsBroker,
+        this.filters.positionsIncome,
+      ].filter(Boolean).length;
+    }
+    if (this.activeTab === 'transactions') {
+      return [
+        this.filters.transactionsSearch,
+        this.filters.transactionsKind,
+        this.filters.transactionsAssetId,
+        this.filters.transactionsBrokerId,
+        this.filters.transactionsStartDate,
+        this.filters.transactionsEndDate,
+        this.filters.transactionsMinAmount !== null && this.filters.transactionsMinAmount !== undefined && String(this.filters.transactionsMinAmount) !== '',
+        this.filters.transactionsMaxAmount !== null && this.filters.transactionsMaxAmount !== undefined && String(this.filters.transactionsMaxAmount) !== '',
+      ].filter(Boolean).length;
+    }
+    if (this.activeTab === 'assets') {
+      return [
+        this.filters.assetsSearch,
+        this.filters.assetsType,
+        this.filters.assetsSource,
+        this.filters.assetsPriceStatus,
+      ].filter(Boolean).length;
+    }
+    return 0;
+  }
+
+  get availablePositionBrokers(): string[] {
+    const set = new Set<string>();
+    for (const p of (this.portfolio?.positions || [])) {
+      for (const b of (p.brokerNames || [])) {
+        if (b) set.add(b);
+      }
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }
+
   clearFilters() {
     if (this.activeTab === 'positions' || this.activeTab === 'closed') {
       this.filters.positionsSearch = '';
       this.filters.positionsType = '';
+      this.filters.positionsBroker = '';
+      this.filters.positionsProfit = '';
+      this.filters.positionsIncome = '';
+      this.filters.positionsMinValue = null;
+      this.filters.positionsMaxValue = null;
     } else if (this.activeTab === 'transactions') {
+      this.filters.transactionsSearch = '';
       this.filters.transactionsKind = '';
       this.filters.transactionsAssetId = '';
+      this.filters.transactionsBrokerId = '';
+      this.filters.transactionsStartDate = '';
+      this.filters.transactionsEndDate = '';
+      this.filters.transactionsMinAmount = null;
+      this.filters.transactionsMaxAmount = null;
       this.loadTransactions();
     } else if (this.activeTab === 'assets') {
       this.filters.assetsSearch = '';
       this.filters.assetsType = '';
+      this.filters.assetsSource = '';
+      this.filters.assetsPriceStatus = '';
     }
     this.cdr.markForCheck();
   }
@@ -100,6 +182,12 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
     return (this.portfolio?.positions || []).filter((p: any) => (p.quantity || 0) <= 0);
   }
 
+  private matchesAssetType(itemType: string, filterType: string): boolean {
+    if (!filterType) return true;
+    if (filterType === 'FII') return itemType === 'FII' || itemType === 'REIT';
+    return itemType === filterType;
+  }
+
   get filteredPositions(): any[] {
     let list = this.activePositions;
     if (this.filters.positionsSearch) {
@@ -110,7 +198,28 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
       );
     }
     if (this.filters.positionsType) {
-      list = list.filter((p: any) => p.type === this.filters.positionsType);
+      list = list.filter((p: any) => this.matchesAssetType(p.type, this.filters.positionsType));
+    }
+    if (this.filters.positionsBroker) {
+      list = list.filter((p: any) => (p.brokerNames || []).includes(this.filters.positionsBroker));
+    }
+    if (this.filters.positionsProfit === 'profit') {
+      list = list.filter((p: any) => (p.unrealizedProfit || 0) > 0);
+    } else if (this.filters.positionsProfit === 'loss') {
+      list = list.filter((p: any) => (p.unrealizedProfit || 0) < 0);
+    } else if (this.filters.positionsProfit === 'neutral') {
+      list = list.filter((p: any) => (p.unrealizedProfit || 0) === 0);
+    }
+    if (this.filters.positionsIncome === 'with') {
+      list = list.filter((p: any) => (p.incomeReceived || 0) > 0);
+    } else if (this.filters.positionsIncome === 'without') {
+      list = list.filter((p: any) => (p.incomeReceived || 0) <= 0);
+    }
+    if (this.filters.positionsMinValue !== null && this.filters.positionsMinValue !== undefined && String(this.filters.positionsMinValue) !== '') {
+      list = list.filter((p: any) => (p.currentValue || 0) >= Number(this.filters.positionsMinValue));
+    }
+    if (this.filters.positionsMaxValue !== null && this.filters.positionsMaxValue !== undefined && String(this.filters.positionsMaxValue) !== '') {
+      list = list.filter((p: any) => (p.currentValue || 0) <= Number(this.filters.positionsMaxValue));
     }
     if (this.positionsSortColumn) {
       return this.sortData(list, this.positionsSortColumn, this.positionsSortColumn, this.positionsSortDirection).list;
@@ -135,7 +244,15 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
       );
     }
     if (this.filters.positionsType) {
-      list = list.filter((p: any) => p.type === this.filters.positionsType);
+      list = list.filter((p: any) => this.matchesAssetType(p.type, this.filters.positionsType));
+    }
+    if (this.filters.positionsBroker) {
+      list = list.filter((p: any) => (p.brokerNames || []).includes(this.filters.positionsBroker));
+    }
+    if (this.filters.positionsIncome === 'with') {
+      list = list.filter((p: any) => (p.incomeReceived || 0) > 0);
+    } else if (this.filters.positionsIncome === 'without') {
+      list = list.filter((p: any) => (p.incomeReceived || 0) <= 0);
     }
     if (this.closedSortColumn) {
       return this.sortData(list, this.closedSortColumn, this.closedSortColumn, this.closedSortDirection).list;
@@ -152,6 +269,21 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
 
   get sortedTransactions(): any[] {
     let list = this.transactions || [];
+    if (this.filters.transactionsSearch) {
+      const q = this.filters.transactionsSearch.toLowerCase();
+      list = list.filter((t: any) =>
+        (t.assetTicker && t.assetTicker.toLowerCase().includes(q)) ||
+        (t.assetName && t.assetName.toLowerCase().includes(q)) ||
+        (t.brokerName && t.brokerName.toLowerCase().includes(q)) ||
+        (t.notes && t.notes.toLowerCase().includes(q))
+      );
+    }
+    if (this.filters.transactionsMinAmount !== null && this.filters.transactionsMinAmount !== undefined && String(this.filters.transactionsMinAmount) !== '') {
+      list = list.filter((t: any) => (t.amount || 0) >= Number(this.filters.transactionsMinAmount));
+    }
+    if (this.filters.transactionsMaxAmount !== null && this.filters.transactionsMaxAmount !== undefined && String(this.filters.transactionsMaxAmount) !== '') {
+      list = list.filter((t: any) => (t.amount || 0) <= Number(this.filters.transactionsMaxAmount));
+    }
     if (this.transactionsSortColumn) {
       return this.sortData(list, this.transactionsSortColumn, this.transactionsSortColumn, this.transactionsSortDirection).list;
     }
@@ -175,7 +307,15 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
       );
     }
     if (this.filters.assetsType) {
-      list = list.filter((a: any) => a.type === this.filters.assetsType);
+      list = list.filter((a: any) => this.matchesAssetType(a.type, this.filters.assetsType));
+    }
+    if (this.filters.assetsSource) {
+      list = list.filter((a: any) => (a.source || 'MANUAL').toUpperCase() === this.filters.assetsSource);
+    }
+    if (this.filters.assetsPriceStatus === 'with') {
+      list = list.filter((a: any) => (a.manualPrice || 0) > 0);
+    } else if (this.filters.assetsPriceStatus === 'without') {
+      list = list.filter((a: any) => (a.manualPrice || 0) <= 0);
     }
     if (this.assetsSortColumn) {
       return this.sortData(list, this.assetsSortColumn, this.assetsSortColumn, this.assetsSortDirection).list;
@@ -217,10 +357,21 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
         this.loadPortfolio(),
         this.loadTransactions(),
         this.loadAssets(),
+        this.loadBrokers(),
       ]);
     } finally {
       this.isLoading = false;
       this.cdr.markForCheck();
+    }
+  }
+
+  async loadBrokers() {
+    try {
+      const { data } = await api.get('/banks/select?deleted=false');
+      this.brokers = data?.data || [];
+      this.cdr.markForCheck();
+    } catch (error) {
+      this.normalizeErr(error);
     }
   }
 
@@ -237,11 +388,15 @@ export class InvestmentsComponent extends MyFinance implements OnInit {
 
   async loadTransactions() {
     try {
-      let query = '';
-      if (this.filters.transactionsKind) query += `&kind=${this.filters.transactionsKind}`;
-      if (this.filters.transactionsAssetId) query += `&assetId=${this.filters.transactionsAssetId}`;
+      const params = new URLSearchParams();
+      if (this.filters.transactionsKind) params.set('kind', this.filters.transactionsKind);
+      if (this.filters.transactionsAssetId) params.set('assetId', this.filters.transactionsAssetId);
+      if (this.filters.transactionsBrokerId) params.set('brokerId', this.filters.transactionsBrokerId);
+      if (this.filters.transactionsStartDate) params.set('start', `${this.filters.transactionsStartDate}T00:00:00Z`);
+      if (this.filters.transactionsEndDate) params.set('end', `${this.filters.transactionsEndDate}T23:59:59Z`);
 
-      const { data } = await api.get(`/investments/transactions?${query}`);
+      const qs = params.toString();
+      const { data } = await api.get(`/investments/transactions${qs ? '?' + qs : ''}`);
       this.transactions = data?.data || [];
       this.cdr.markForCheck();
     } catch (error) {

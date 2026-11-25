@@ -6,6 +6,9 @@
   </app-button>
   <app-button (buttonClick)="toggleFilters()" impact="bold" tone="light" shape="rounded" size="medium">
     <i class="fa-solid fa-filter mr-1.5"></i> Filtros
+    @if (activeFiltersCount > 0) {
+      <span class="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">{{ activeFiltersCount }}</span>
+    }
   </app-button>
   <app-button (buttonClick)="openB3ImportModal()" impact="bold" tone="light" shape="rounded" size="medium">
     <i class="fa-solid fa-file-import mr-1.5 text-emerald-500"></i> Importar B3
@@ -110,7 +113,7 @@
 @if (showFilters) {
   <div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
     @if (activeTab === 'positions' || activeTab === 'closed') {
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <label class="text-foreground mb-1.5 block text-xs font-semibold">Ativo / Código</label>
           <input type="text" [(ngModel)]="filters.positionsSearch" placeholder="Buscar por ticker ou nome..."
@@ -130,9 +133,55 @@
             <option value="OTHER">Outro</option>
           </select>
         </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Corretora</label>
+          <select [(ngModel)]="filters.positionsBroker"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todas as corretoras</option>
+            @for (b of availablePositionBrokers; track b) {
+              <option [value]="b">{{ b }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Proventos</label>
+          <select [(ngModel)]="filters.positionsIncome"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todos</option>
+            <option value="with">Com proventos recebidos</option>
+            <option value="without">Sem proventos</option>
+          </select>
+        </div>
+        @if (activeTab === 'positions') {
+          <div>
+            <label class="text-foreground mb-1.5 block text-xs font-semibold">Rentabilidade</label>
+            <select [(ngModel)]="filters.positionsProfit"
+              class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+              <option value="">Todas</option>
+              <option value="profit">No lucro (+)</option>
+              <option value="loss">No prejuízo (-)</option>
+              <option value="neutral">Neutro (0%)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-foreground mb-1.5 block text-xs font-semibold">Valor Atual Mínimo (R$)</label>
+            <input type="number" min="0" step="0.01" [(ngModel)]="filters.positionsMinValue" placeholder="0,00"
+              class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+          </div>
+          <div>
+            <label class="text-foreground mb-1.5 block text-xs font-semibold">Valor Atual Máximo (R$)</label>
+            <input type="number" min="0" step="0.01" [(ngModel)]="filters.positionsMaxValue" placeholder="Sem limite"
+              class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+          </div>
+        }
       </div>
     } @else if (activeTab === 'transactions') {
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Buscar</label>
+          <input type="text" [(ngModel)]="filters.transactionsSearch" placeholder="Ticker, ativo, corretora, obs..."
+            class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
         <div>
           <label class="text-foreground mb-1.5 block text-xs font-semibold">Operação</label>
           <select [(ngModel)]="filters.transactionsKind" (change)="loadTransactions()"
@@ -155,9 +204,39 @@
             }
           </select>
         </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Corretora</label>
+          <select [(ngModel)]="filters.transactionsBrokerId" (change)="loadTransactions()"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todas as corretoras</option>
+            @for (b of brokers; track b.id) {
+              <option [value]="b.id">{{ b.name }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Inicial</label>
+          <input type="date" [(ngModel)]="filters.transactionsStartDate" (change)="loadTransactions()"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Final</label>
+          <input type="date" [(ngModel)]="filters.transactionsEndDate" (change)="loadTransactions()"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Valor Mínimo (R$)</label>
+          <input type="number" min="0" step="0.01" [(ngModel)]="filters.transactionsMinAmount" placeholder="0,00"
+            class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Valor Máximo (R$)</label>
+          <input type="number" min="0" step="0.01" [(ngModel)]="filters.transactionsMaxAmount" placeholder="Sem limite"
+            class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+        </div>
       </div>
     } @else if (activeTab === 'assets') {
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome ou Ticker</label>
           <input type="text" [(ngModel)]="filters.assetsSearch" placeholder="Buscar por ticker ou nome..."
@@ -169,11 +248,30 @@
             class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
             <option value="">Todos os tipos</option>
             <option value="STOCK">Ação</option>
-            <option value="REIT">Fundo Imobiliário (FII)</option>
+            <option value="FII">Fundo Imobiliário (FII)</option>
             <option value="ETF">ETF</option>
+            <option value="BDR">BDR</option>
             <option value="FIXED_INCOME">Renda Fixa</option>
             <option value="CRYPTO">Criptomoeda</option>
             <option value="OTHER">Outro</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Origem da Cotação</label>
+          <select [(ngModel)]="filters.assetsSource"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todas</option>
+            <option value="MARKET_API">Cotação Automática (API)</option>
+            <option value="MANUAL">Manual</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-foreground mb-1.5 block text-xs font-semibold">Preço Manual</label>
+          <select [(ngModel)]="filters.assetsPriceStatus"
+            class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            <option value="">Todos</option>
+            <option value="with">Com preço manual</option>
+            <option value="without">Sem preço manual</option>
           </select>
         </div>
       </div>
