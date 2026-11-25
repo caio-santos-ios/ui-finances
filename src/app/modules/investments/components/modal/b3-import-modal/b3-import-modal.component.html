@@ -302,13 +302,12 @@
                     }
                   </td>
 
-                  <!-- Tipo (BUY / SELL) -->
+                  <!-- Tipo (BUY / SELL / DIVIDEND / JCP / INCOME) -->
                   <td class="py-2.5 px-3 whitespace-nowrap">
-                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold {{
-                      row.kind === 'BUY' ? 'bg-emerald-500/15 text-emerald-500' : 'bg-rose-500/15 text-rose-500'
-                    }}">
-                      <i class="fa-solid {{ row.kind === 'BUY' ? 'fa-arrow-down' : 'fa-arrow-up' }} mr-1 text-[10px]"></i>
-                      {{ row.kind === 'BUY' ? 'Compra' : 'Venda' }}
+                    @let kindMeta = getKindMeta(row.kind);
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold {{ kindMeta.badgeClass }}">
+                      <i class="fa-solid {{ kindMeta.icon }} mr-1 text-[10px]"></i>
+                      {{ kindMeta.label }}
                     </span>
                   </td>
 

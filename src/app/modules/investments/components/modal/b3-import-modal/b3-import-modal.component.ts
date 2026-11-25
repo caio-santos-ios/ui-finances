@@ -302,6 +302,23 @@ export class B3ImportModalComponent extends MyFinance implements OnInit {
     this.dialogRef.close(this.hasChanges);
   }
 
+  getKindMeta(kind: string): { label: string; badgeClass: string; icon: string } {
+    switch (kind?.toUpperCase()) {
+      case 'BUY':
+        return { label: 'Compra', badgeClass: 'bg-emerald-500/15 text-emerald-500', icon: 'fa-arrow-down' };
+      case 'SELL':
+        return { label: 'Venda', badgeClass: 'bg-rose-500/15 text-rose-500', icon: 'fa-arrow-up' };
+      case 'DIVIDEND':
+        return { label: 'Dividendo', badgeClass: 'bg-blue-500/15 text-blue-400', icon: 'fa-coins' };
+      case 'JCP':
+        return { label: 'JCP', badgeClass: 'bg-indigo-500/15 text-indigo-400', icon: 'fa-coins' };
+      case 'INCOME':
+        return { label: 'Rendimento', badgeClass: 'bg-cyan-500/15 text-cyan-400', icon: 'fa-hand-holding-dollar' };
+      default:
+        return { label: kind || 'Outro', badgeClass: 'bg-muted/30 text-muted-foreground', icon: 'fa-circle-dot' };
+    }
+  }
+
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 B';
     const k = 1024;
