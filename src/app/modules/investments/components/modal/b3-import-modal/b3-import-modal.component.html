@@ -5,12 +5,7 @@
       <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
         <i class="fa-solid fa-file-import text-base"></i>
       </div>
-      <div>
-        <h2 class="text-foreground text-lg font-bold">Importação de Planilha B3</h2>
-        <p class="text-muted-foreground text-xs">
-          {{ step === 'upload' ? 'Envie o arquivo oficial exportado da Área do Investidor' : 'Revise e selecione as movimentações a serem importadas' }}
-        </p>
-      </div>
+      <h2 class="text-foreground text-lg font-bold">Importação de Planilha B3</h2>
     </div>
     <button type="button" (click)="close()"
       class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
@@ -90,6 +85,41 @@
           </div>
         }
       </div>
+
+      <!-- Importações anteriores (reverter) -->
+      @if (isLoadingBatches) {
+        <div class="flex items-center gap-2 text-xs text-muted-foreground">
+          <i class="fa-solid fa-spinner animate-spin"></i> Carregando importações anteriores...
+        </div>
+      } @else if (batches.length > 0) {
+        <div class="rounded-xl border border-border/60">
+          <div class="flex items-center gap-2 border-b border-border/50 px-4 py-2.5 text-xs font-semibold text-foreground">
+            <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+            Importações anteriores
+          </div>
+          <div class="max-h-[200px] divide-y divide-border/40 overflow-y-auto">
+            @for (batch of batches; track batch.batchId) {
+              <div class="flex items-center justify-between gap-3 px-4 py-2.5 text-xs">
+                <div>
+                  <p class="font-semibold text-foreground">
+                    {{ batch.importedAt | date: 'dd/MM/yyyy HH:mm' }}
+                    <span class="ml-1 font-normal text-muted-foreground">&bull; {{ batch.transactionCount }} movimentação(ões)</span>
+                  </p>
+                  <p class="text-muted-foreground">
+                    Período: {{ batch.firstDate | date: 'dd/MM/yyyy':'UTC' }} a {{ batch.lastDate | date: 'dd/MM/yyyy':'UTC' }}
+                    @if (batch.assetCount > 0) { &bull; {{ batch.assetCount }} ativo(s) criado(s) }
+                  </p>
+                </div>
+                <button type="button" (click)="revertBatch(batch)" [disabled]="revertingBatchId !== null"
+                  class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-rose-500/30 px-3 py-1.5 font-semibold text-rose-500 transition-colors hover:bg-rose-500/10 disabled:opacity-50">
+                  <i class="fa-solid {{ revertingBatchId === batch.batchId ? 'fa-spinner animate-spin' : 'fa-rotate-left' }}"></i>
+                  Reverter
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <!-- Rodapé da etapa de upload -->
       <div class="mt-6 flex items-center justify-end gap-2 border-t border-border/50 pt-4">

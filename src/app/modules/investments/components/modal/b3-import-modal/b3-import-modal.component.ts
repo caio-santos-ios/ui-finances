@@ -6,10 +6,12 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
 import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import {
+  B3ImportBatch,
   B3ImportRow,
   B3PreviewResponse,
   InvestmentService,
 } from '../../../services/investment.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-b3-import-modal',
@@ -25,6 +27,11 @@ export class B3ImportModalComponent extends MyFinance implements OnInit {
   isLoadingPreview = false;
   isConfirming = false;
 
+  batches: B3ImportBatch[] = [];
+  isLoadingBatches = false;
+  revertingBatchId: string | null = null;
+  private hasChanges = false;
+
   previewData: B3PreviewResponse | null = null;
   filterTab: 'all' | 'new' | 'duplicate' | 'warning' = 'all';
   searchTerm: string = '';
@@ -38,7 +45,57 @@ export class B3ImportModalComponent extends MyFinance implements OnInit {
     super();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadBatches();
+  }
+
+  async loadBatches(): Promise<void> {
+    try {
+      this.isLoadingBatches = true;
+      this.cdr.markForCheck();
+      this.batches = await this.investmentService.getB3ImportBatches();
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.isLoadingBatches = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  async revertBatch(batch: B3ImportBatch): Promise<void> {
+    const result = await Swal.fire({
+      title: 'Reverter importação?',
+      text: `${batch.transactionCount} movimentação(ões) desta importação serão removidas, assim como os ativos criados por ela que ficarem sem movimentações.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Reverter',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        popup: 'bg-card text-foreground border border-border rounded-xl shadow-2xl',
+        title: 'text-foreground font-semibold',
+        htmlContainer: 'text-muted-foreground',
+        confirmButton: 'bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-lg transition-opacity hover:opacity-90',
+        cancelButton: 'bg-muted text-muted-foreground font-semibold px-4 py-2 rounded-lg transition-opacity hover:opacity-90',
+        actions: 'gap-2',
+      },
+      buttonsStyling: false,
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      this.revertingBatchId = batch.batchId;
+      this.cdr.markForCheck();
+      const res = await this.investmentService.revertB3Import(batch.batchId);
+      this.hasChanges = true;
+      this.toastSuccess(`Importação revertida: ${res?.revertedTransactions ?? batch.transactionCount} movimentação(ões) removida(s).`);
+      await this.loadBatches();
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.revertingBatchId = null;
+      this.cdr.markForCheck();
+    }
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -242,7 +299,7 @@ export class B3ImportModalComponent extends MyFinance implements OnInit {
   }
 
   close(): void {
-    this.dialogRef.close(false);
+    this.dialogRef.close(this.hasChanges);
   }
 
   formatFileSize(bytes: number): string {

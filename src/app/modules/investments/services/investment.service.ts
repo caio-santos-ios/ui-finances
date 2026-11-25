@@ -73,9 +73,19 @@ export interface B3PreviewResponse {
 }
 
 export interface B3ConfirmResponse {
+  batchId?: string;
   importedCount: number;
   skippedCount: number;
   createdAssetTickers: string[];
+}
+
+export interface B3ImportBatch {
+  batchId: string;
+  importedAt: string;
+  transactionCount: number;
+  assetCount: number;
+  firstDate?: string;
+  lastDate?: string;
 }
 
 @Injectable({
@@ -145,6 +155,16 @@ export class InvestmentService {
 
   async confirmB3Import(items: B3ImportRow[]): Promise<B3ConfirmResponse> {
     const response = await api.post('/investments/import/b3/confirm', { items });
+    return response.data?.data || response.data;
+  }
+
+  async getB3ImportBatches(): Promise<B3ImportBatch[]> {
+    const response = await api.get('/investments/import/b3/batches');
+    return response.data?.data || [];
+  }
+
+  async revertB3Import(batchId: string): Promise<{ revertedTransactions: number; removedAssets: number }> {
+    const response = await api.delete(`/investments/import/b3/batches/${batchId}`);
     return response.data?.data || response.data;
   }
 }
