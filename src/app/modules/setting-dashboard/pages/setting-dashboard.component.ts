@@ -158,7 +158,8 @@ export class SettingDashboardComponent extends MyFinance implements OnInit {
       });
       if (!result.isConfirmed) return;
 
-      await api.delete(`/dashboard/${id}`);
+      const { data } = await api.delete(`/dashboard/${id}`);
+      this.toastSuccess(data?.message || 'Configuração do dashboard excluída com sucesso.');
       const isLastItemOnPage = this.pagination.data?.length === 1;
       const targetPage = isLastItemOnPage && this.pagination.currentPage > 1
         ? this.pagination.currentPage - 1
