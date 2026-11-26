@@ -42,7 +42,8 @@ export class CreditCardPaymentModalComponent extends MyFinance implements OnInit
   }
 
   async ngOnInit(): Promise<void> {
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
     this.form = this.formBuilder.group({
       paymentBankId: [this.card.bankId || ''],
@@ -99,7 +100,9 @@ export class CreditCardPaymentModalComponent extends MyFinance implements OnInit
       this.isLoading = true;
       this.cdr.markForCheck();
 
-      const paidAtIso = raw.paidAt.includes('T') ? raw.paidAt : `${raw.paidAt}T12:00:00.000Z`;
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 8);
+      const paidAtIso = raw.paidAt.includes('T') ? raw.paidAt : `${raw.paidAt}T${currentTime}Z`;
 
       await this.creditCardService.payInvoice(this.card.id, this.invoice.id, {
         paymentBankId: raw.paymentBankId || null,
