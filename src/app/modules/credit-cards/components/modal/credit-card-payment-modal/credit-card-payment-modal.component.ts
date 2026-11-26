@@ -80,14 +80,24 @@ export class CreditCardPaymentModalComponent extends MyFinance implements OnInit
     }
 
     try {
-      this.isLoading = true;
-      this.cdr.markForCheck();
-
       const raw = this.form.value;
       const valStr = String(raw.value ?? '').replace(/R\$\s?/g, '').trim();
       const val = typeof raw.value === 'number'
         ? raw.value
         : Number(valStr.includes(',') ? valStr.replace(/\./g, '').replace(',', '.') : valStr);
+
+      if (isNaN(val) || val <= 0) {
+        this.toastWarning('O valor pago deve ser maior que zero.');
+        return;
+      }
+
+      if (raw.createExpenseOperation && !raw.paymentBankId) {
+        this.toastWarning('Selecione a conta bancária de débito para lançar a despesa.');
+        return;
+      }
+
+      this.isLoading = true;
+      this.cdr.markForCheck();
 
       const paidAtIso = raw.paidAt.includes('T') ? raw.paidAt : `${raw.paidAt}T12:00:00.000Z`;
 

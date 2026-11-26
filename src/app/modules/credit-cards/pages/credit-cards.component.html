@@ -173,7 +173,7 @@
 
           <div class="flex items-center gap-2">
             @if (selectedInvoice.status !== 'paid') {
-              <app-button (buttonClick)="openPaymentModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+              <app-button (buttonClick)="openPaymentModal()" [disabled]="selectedInvoice.totalAmount <= 0" impact="bold" tone="primary" shape="rounded" size="medium">
                 <i class="fa-solid fa-credit-card mr-1.5"></i> Pagar Fatura
               </app-button>
             }
