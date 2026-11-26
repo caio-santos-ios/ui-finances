@@ -24,10 +24,10 @@
   <form [formGroup]="form">
     <div class="grid grid-cols-12 gap-4">
       <div class="col-span-12">
-        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="pay-bank">Conta Bancária de Débito *</label>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="pay-bank">Conta Bancária de Débito</label>
         <select id="pay-bank" formControlName="paymentBankId"
           class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-          <option value="">Selecione a conta</option>
+          <option value="">Nenhum banco (apenas marcar fatura como paga)</option>
           @for (bank of banks; track bank.id) {
             <option [value]="bank.id">{{ bank.name }}</option>
           }
@@ -46,11 +46,13 @@
         <input id="pay-date" type="date" formControlName="paidAt"
           class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
       </div>
-    </div>
 
-    <div class="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-[11px] text-muted-foreground">
-      <i class="fa-solid fa-circle-info text-emerald-500 mr-1"></i>
-      Ao confirmar, a fatura será marcada como <strong>Paga</strong>, o limite será liberado no cartão e uma despesa será lançada na conta escolhida.
+      <div class="col-span-12">
+        <label class="flex items-center gap-2 cursor-pointer text-xs text-foreground font-medium select-none">
+          <input type="checkbox" formControlName="createExpenseOperation" class="rounded border-muted/30 text-primary focus:ring-primary h-4 w-4" />
+          <span>Registrar automaticamente como despesa em lançamentos</span>
+        </label>
+      </div>
     </div>
 
     <div class="mt-6 flex justify-end gap-2">

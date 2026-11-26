@@ -45,9 +45,10 @@ export class CreditCardPaymentModalComponent extends MyFinance implements OnInit
     const today = new Date().toISOString().split('T')[0];
 
     this.form = this.formBuilder.group({
-      paymentBankId: [this.card.bankId || '', [Validators.required]],
+      paymentBankId: [this.card.bankId || ''],
       value: [this.invoice.totalAmount || 0, [Validators.required]],
       paidAt: [today, [Validators.required]],
+      createExpenseOperation: [true],
     });
 
     await this.loadBanks();
@@ -90,12 +91,17 @@ export class CreditCardPaymentModalComponent extends MyFinance implements OnInit
       const paidAtIso = raw.paidAt.includes('T') ? raw.paidAt : `${raw.paidAt}T12:00:00.000Z`;
 
       await this.creditCardService.payInvoice(this.card.id, this.invoice.id, {
-        paymentBankId: raw.paymentBankId,
+        paymentBankId: raw.paymentBankId || null,
         paidAt: paidAtIso,
         value: val,
+        createExpenseOperation: !!raw.createExpenseOperation,
       });
 
-      this.toastSuccess('Fatura paga com sucesso! O limite foi liberado e a despesa registrada.');
+      this.toastSuccess(
+        raw.createExpenseOperation
+          ? 'Fatura paga com sucesso! O limite foi liberado e a despesa registrada.'
+          : 'Fatura marcada como paga e limite liberado com sucesso!'
+      );
       this.close(true);
     } catch (error) {
       this.normalizeErr(error);
