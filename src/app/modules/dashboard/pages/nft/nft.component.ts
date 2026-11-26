@@ -3,7 +3,6 @@ import { Nft } from '../../models/nft';
 import { api } from 'src/app/shared/api/api';
 import { FormsModule } from '@angular/forms';
 import { DashboardCardComponent } from '../../components/dashboard-card/dashboard-card.component';
-import { ProjectedBalanceCardComponent } from '../../components/projected-balance-card/projected-balance-card.component';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 
 @Component({
@@ -12,8 +11,7 @@ import { MyFinance } from 'src/app/core/utils/my-finance.util';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormsModule,
-    DashboardCardComponent,
-    ProjectedBalanceCardComponent,
+    DashboardCardComponent
   ],
 })
 export class NftComponent extends MyFinance implements OnInit {
