@@ -38,12 +38,28 @@ export class PayInstallmentModalComponent extends MyFinance implements OnInit {
 
     this.form = this.formBuilder.group({
       amount: [defaultAmount, [Validators.required]],
+      interest: [0],
       bankId: [this.debt.bankId || ''],
       createExpenseOperation: [true],
       paymentDate: [today, [Validators.required]],
     });
 
     await this.loadBanks();
+  }
+
+  private toNumber(val: any): number {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    const cleaned = String(val).replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.').trim();
+    const num = Number(cleaned);
+    return isNaN(num) ? 0 : num;
+  }
+
+  get totalAmount(): number {
+    if (!this.form) return 0;
+    const amount = this.toNumber(this.form.get('amount')?.value);
+    const interest = this.toNumber(this.form.get('interest')?.value);
+    return Math.round((amount + interest) * 100) / 100;
   }
 
   async loadBanks() {
@@ -79,9 +95,11 @@ export class PayInstallmentModalComponent extends MyFinance implements OnInit {
     try {
       this.isLoading = true;
       const raw = this.form.value;
-      const amount = Number(String(raw.amount).replace(',', '.'));
+      const amount = this.toNumber(raw.amount);
+      const interest = this.toNumber(raw.interest);
       const payload = {
         amount,
+        interest,
         bankId: raw.bankId,
         createExpenseOperation: !!raw.createExpenseOperation,
         paymentDate: this.parseDate(raw.paymentDate),

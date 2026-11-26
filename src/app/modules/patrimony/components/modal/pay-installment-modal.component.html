@@ -23,11 +23,24 @@
 
   <form [formGroup]="form">
     <div class="grid grid-cols-12 gap-4">
-      <div class="col-span-12">
+      <div class="col-span-12 sm:col-span-6">
         <label class="text-foreground mb-1.5 block text-xs font-semibold" for="amount">Valor do Pagamento *</label>
         <input id="amount" type="text" placeholder="R$ 0,00" formControlName="amount"
           mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
           class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition font-semibold" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="interest">Juros</label>
+        <input id="interest" type="text" placeholder="R$ 0,00" formControlName="interest"
+          mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition font-semibold" />
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="total">Total</label>
+        <input id="total" type="text" [value]="totalAmount | moneyPipe" disabled
+          class="border-muted/20 bg-muted/30 text-foreground w-full rounded-lg border px-3 py-2 text-sm font-bold cursor-not-allowed opacity-85" />
       </div>
 
       <div class="col-span-12">
