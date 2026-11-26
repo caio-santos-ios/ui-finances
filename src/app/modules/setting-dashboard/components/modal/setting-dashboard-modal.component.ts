@@ -59,6 +59,28 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
 
     if (this.dialogData?.id) {
       this.getById(this.dialogData.id);
+    } else {
+      this.loadNextSequence();
+    }
+  }
+
+  async loadNextSequence() {
+    try {
+      const { data } = await api.get('/dashboard?deleted=false&pageNumber=1&pageSize=500');
+      const items: any[] = data?.data?.data ?? [];
+      const maxSeq = items.reduce((max, item) => {
+        const num = Number(item?.sequence);
+        return !isNaN(num) && num > max ? num : max;
+      }, 0);
+      if (!this.form.get('sequence')?.value) {
+        this.form.patchValue({ sequence: String(maxSeq + 1) });
+      }
+    } catch {
+      if (!this.form.get('sequence')?.value) {
+        this.form.patchValue({ sequence: '1' });
+      }
+    } finally {
+      this.cdr.markForCheck();
     }
   }
 
