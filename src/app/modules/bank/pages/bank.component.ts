@@ -132,12 +132,18 @@ export class BankComponent extends MyFinance implements OnInit {
   }
 
   openOperationsModal(item: any): void {
-    this.dialog.open(BankOperationsModalComponent, {
+    const ref = this.dialog.open<boolean>(BankOperationsModalComponent, {
       data: {
         bankId: item.id,
         bankName: item.name,
         balance: item.balance,
       },
+    });
+
+    ref.closed.subscribe(async (changed) => {
+      if (changed) {
+        await this.loadData(this.pagination.currentPage || 1);
+      }
     });
   }
 

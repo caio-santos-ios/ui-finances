@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
+import { DIALOG_DATA, Dialog, DialogRef } from '@angular/cdk/dialog';
+import Swal from 'sweetalert2';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { MoneyPipe } from 'src/app/shared/pipes/money.pipe';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 import { api } from 'src/app/shared/api/api';
+import { OperationModalComponent } from 'src/app/modules/operation/components/modal/operation-modal.component';
 
 export interface BankOperationsModalData {
   bankId: string;
@@ -23,6 +25,7 @@ export interface BankOperationsModalData {
 export class BankOperationsModalComponent extends MyFinance implements OnInit {
   operations: any[] = [];
   isLoading = false;
+  hasChanged = false;
   startDate = '';
   endDate = '';
 
@@ -30,7 +33,8 @@ export class BankOperationsModalComponent extends MyFinance implements OnInit {
   sortDirection: 'asc' | 'desc' | '' = 'desc';
 
   constructor(
-    private dialogRef: DialogRef,
+    private dialogRef: DialogRef<boolean>,
+    private dialog: Dialog,
     @Inject(DIALOG_DATA) public data: BankOperationsModalData,
   ) {
     super();
@@ -135,7 +139,47 @@ export class BankOperationsModalComponent extends MyFinance implements OnInit {
     }
   }
 
+  editOperation(id: string): void {
+    const ref = this.dialog.open(OperationModalComponent, { data: { id } });
+    ref.closed.subscribe(async (result) => {
+      if (result) {
+        this.hasChanged = true;
+        await this.loadOperations();
+      }
+    });
+  }
+
+  async deleteOperation(id: string): Promise<void> {
+    try {
+      const result = await Swal.fire({
+        title: 'Excluir operação?',
+        text: 'Deseja realmente excluir a operação?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Excluir',
+        cancelButtonText: 'Cancelar',
+        customClass: {
+          popup: 'bg-card text-foreground border border-border rounded-xl shadow-2xl',
+          title: 'text-foreground font-semibold',
+          htmlContainer: 'text-muted-foreground',
+          confirmButton: 'bg-primary text-primary-foreground font-semibold px-4 py-2 rounded-lg transition-opacity hover:opacity-90',
+          cancelButton: 'bg-muted text-muted-foreground font-semibold px-4 py-2 rounded-lg transition-opacity hover:opacity-90',
+          actions: 'gap-2',
+        },
+        buttonsStyling: false,
+      });
+      if (!result.isConfirmed) return;
+
+      await api.delete(`/operations/${id}`);
+      this.hasChanged = true;
+      this.toastSuccess('Operação excluída com sucesso.');
+      await this.loadOperations();
+    } catch (error) {
+      this.normalizeErr(error);
+    }
+  }
+
   close(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(this.hasChanged);
   }
 }

@@ -108,6 +108,7 @@
                   <i class="fa-solid {{ sortColumn === 'createdAt' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
                 </div>
               </th>
+              <th class="py-3 px-3 text-right">Ações</th>
             </tr>
           </thead>
           <tbody class="divide-muted/10 divide-y text-sm">
@@ -152,6 +153,22 @@
                 <td class="py-2.5 px-3 text-xs text-muted-foreground whitespace-nowrap">
                   {{ item.createdAt | date: 'dd/MM/yyyy HH:mm':'UTC' }}
                 </td>
+                <td class="py-2.5 px-3 text-right whitespace-nowrap">
+                  <button
+                    type="button"
+                    (click)="editOperation(item.id)"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Editar Operação">
+                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="deleteOperation(item.id)"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-rose-500 transition-colors"
+                    title="Excluir Operação">
+                    <i class="fa-solid fa-trash text-xs"></i>
+                  </button>
+                </td>
               </tr>
             }
           </tbody>
@@ -163,7 +180,7 @@
               <td class="py-2.5 px-3 text-right whitespace-nowrap" [ngClass]="periodNet >= 0 ? 'text-emerald-500' : 'text-rose-500'">
                 {{ periodNet | moneyPipe }}
               </td>
-              <td class="py-2.5 px-3"></td>
+              <td colspan="2" class="py-2.5 px-3"></td>
             </tr>
           </tfoot>
         </table>
