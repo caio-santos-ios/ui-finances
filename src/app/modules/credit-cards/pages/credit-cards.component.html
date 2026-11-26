@@ -1,0 +1,293 @@
+<app-breadcrumb [module]="'Cartões de Crédito'" icon="fa-solid fa-credit-card">
+  <app-button (buttonClick)="openCardModal()" impact="bold" tone="light" shape="rounded" size="medium">
+    <i class="fa-solid fa-plus mr-1.5"></i> Novo Cartão
+  </app-button>
+  <app-button (buttonClick)="openTransactionModal()" [disabled]="cards.length === 0" impact="bold" tone="primary" shape="rounded" size="medium">
+    <i class="fa-solid fa-bag-shopping mr-1.5"></i> Nova Compra
+  </app-button>
+</app-breadcrumb>
+
+@if (isLoadingCards) {
+  <div class="border-muted/20 bg-background flex min-h-[300px] flex-col items-center justify-center rounded-xl border p-12 text-center">
+    <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+      <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+    </div>
+    <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando cartões de crédito...</p>
+  </div>
+} @else if (cards.length === 0) {
+  <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+    <div class="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full text-muted-foreground">
+      <i class="fa-solid fa-credit-card text-2xl"></i>
+    </div>
+    <h3 class="text-foreground text-base font-semibold">Nenhum cartão de crédito cadastrado</h3>
+    <p class="text-muted-foreground mt-1 mb-5 max-w-md text-sm">
+      Cadastre seus cartões para controlar faturas mensais, compras parceladas, melhor dia de compra e limite disponível.
+    </p>
+    <app-button (buttonClick)="openCardModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+      <i class="fa-solid fa-plus mr-1.5"></i> Cadastrar Primeiro Cartão
+    </app-button>
+  </div>
+} @else {
+  <!-- Grid / Carrossel de Cartões -->
+  <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+    @for (card of cards; track card.id) {
+      <div
+        (click)="selectCard(card)"
+        [style.background]="getCardGradient(card.color)"
+        class="relative flex cursor-pointer flex-col justify-between rounded-2xl p-5 text-white shadow-lg transition-all duration-200 {{
+          selectedCard?.id === card.id
+            ? 'ring-2 ring-primary ring-offset-2 ring-offset-card scale-[1.01]'
+            : 'opacity-85 hover:opacity-100'
+        }}">
+
+        <!-- Topo do cartão -->
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold tracking-tight">{{ card.name }}</span>
+            </div>
+            <div class="mt-0.5 flex items-center gap-2 text-xs text-white/75">
+              <span class="font-semibold uppercase tracking-wider">{{ card.brand }}</span>
+              @if (card.lastDigits) {
+                <span>&bull; &bull;&bull;&bull;&bull; {{ card.lastDigits }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button type="button" (click)="openCardModal(card, $event)"
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white/80 hover:bg-white/20 hover:text-white transition-colors"
+              title="Editar cartão">
+              <i class="fa-solid fa-pen text-[11px]"></i>
+            </button>
+            <button type="button" (click)="deleteCard(card, $event)"
+              class="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white/80 hover:bg-rose-500/70 hover:text-white transition-colors"
+              title="Excluir cartão">
+              <i class="fa-solid fa-trash text-[11px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Selo Melhor dia de compra + Fechamento/Vencimento -->
+        <div class="my-4 flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold backdrop-blur-xs">
+            <i class="fa-solid fa-star text-amber-300 text-[10px]"></i>
+            Melhor dia de compra: dia {{ card.bestPurchaseDay }}
+          </span>
+          <span class="text-[11px] text-white/75">
+            Fecha dia {{ card.closingDay }} &bull; Vence dia {{ card.dueDay }}
+          </span>
+        </div>
+
+        <!-- Barra de Limite -->
+        <div>
+          <div class="mb-1.5 flex items-center justify-between text-xs">
+            <span class="text-white/80">
+              Utilizado: <strong class="text-white">{{ card.usedLimit | moneyPipe }}</strong>
+            </span>
+            <span class="font-semibold text-white/90">{{ card.usagePercent }}%</span>
+          </div>
+          <div class="h-2 w-full overflow-hidden rounded-full bg-white/20">
+            <div
+              class="h-full rounded-full transition-all duration-300 {{ card.usagePercent >= 90 ? 'bg-rose-400' : card.usagePercent >= 70 ? 'bg-amber-300' : 'bg-emerald-400' }}"
+              [style.width.%]="getClampedPercent(card.usagePercent)"></div>
+          </div>
+          <div class="mt-2 flex items-center justify-between text-[11px] text-white/80">
+            <span>Disponível: <strong class="text-emerald-300">{{ card.availableLimit | moneyPipe }}</strong></span>
+            <span>Limite: {{ card.limit | moneyPipe }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Área da Fatura do Cartão Selecionado -->
+  @if (selectedCard) {
+    <div class="border-muted/20 bg-background rounded-xl border p-5">
+      <!-- Navegador de Faturas (Abas de Meses) -->
+      <div class="mb-4 flex items-center gap-2 overflow-x-auto pb-2 border-b border-border/60">
+        @if (isLoadingInvoices) {
+          <span class="text-xs text-muted-foreground"><i class="fa-solid fa-spinner animate-spin mr-1.5"></i> Carregando faturas...</span>
+        } @else {
+          @for (inv of invoices; track inv.id) {
+            <button
+              type="button"
+              (click)="selectInvoice(inv)"
+              class="flex shrink-0 items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer {{
+                selectedInvoice?.id === inv.id
+                  ? 'border-primary bg-primary/10 text-primary shadow-xs'
+                  : 'border-muted/20 bg-card/50 text-muted-foreground hover:text-foreground hover:border-muted/40'
+              }}">
+              <span>{{ inv.label }}</span>
+              <span class="rounded-full border px-1.5 py-0.2 text-[10px] font-bold {{ getInvoiceStatusClass(inv) }}">
+                {{ getInvoiceStatusLabel(inv) }}
+              </span>
+            </button>
+          }
+        }
+      </div>
+
+      <!-- Cabeçalho da Fatura Selecionada -->
+      @if (selectedInvoice) {
+        <div class="mb-5 flex flex-col gap-4 rounded-xl border border-muted/20 bg-card/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex flex-wrap items-center gap-6">
+            <div>
+              <span class="text-muted-foreground block text-[11px] font-semibold uppercase tracking-wider">Total da Fatura</span>
+              <span class="text-foreground text-2xl font-extrabold">{{ selectedInvoice.totalAmount | moneyPipe }}</span>
+            </div>
+
+            <div class="h-8 w-px bg-border/60 hidden sm:block"></div>
+
+            <div>
+              <span class="text-muted-foreground block text-[11px]">Fechamento</span>
+              <span class="text-foreground text-xs font-semibold">{{ selectedInvoice.closingDate | date:'dd/MM/yyyy':'UTC' }}</span>
+            </div>
+
+            <div>
+              <span class="text-muted-foreground block text-[11px]">Vencimento</span>
+              <span class="text-foreground text-xs font-semibold">{{ selectedInvoice.dueDate | date:'dd/MM/yyyy':'UTC' }}</span>
+            </div>
+
+            <div>
+              <span class="text-muted-foreground block text-[11px]">Status</span>
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold {{ getInvoiceStatusClass(selectedInvoice) }}">
+                {{ getInvoiceStatusLabel(selectedInvoice) }}
+              </span>
+            </div>
+
+            @if (selectedInvoice.status === 'paid' && selectedInvoice.paidAt) {
+              <div>
+                <span class="text-muted-foreground block text-[11px]">Pago em</span>
+                <span class="text-emerald-500 text-xs font-semibold">
+                  {{ selectedInvoice.paidAt | date:'dd/MM/yyyy':'UTC' }}
+                  @if (selectedInvoice.paymentBankName) {
+                    ({{ selectedInvoice.paymentBankName }})
+                  }
+                </span>
+              </div>
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            @if (selectedInvoice.status !== 'paid') {
+              <app-button (buttonClick)="openPaymentModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+                <i class="fa-solid fa-credit-card mr-1.5"></i> Pagar Fatura
+              </app-button>
+            }
+          </div>
+        </div>
+
+        <!-- Tabela de Lançamentos da Fatura -->
+        @if (isLoadingTransactions) {
+          <div class="flex items-center justify-center py-10">
+            <i class="fa-solid fa-spinner text-primary animate-spin text-2xl"></i>
+          </div>
+        } @else if (sortedTransactions.length > 0) {
+          <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[420px] overflow-auto">
+            <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+              <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+                <tr>
+                  <th (click)="onSort('date')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                    <div class="inline-flex items-center gap-1.5">
+                      <span>Data</span>
+                      <i class="fa-solid {{ sortColumn === 'date' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                    </div>
+                  </th>
+                  <th (click)="onSort('description')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                    <div class="inline-flex items-center gap-1.5">
+                      <span>Descrição</span>
+                      <i class="fa-solid {{ sortColumn === 'description' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                    </div>
+                  </th>
+                  <th (click)="onSort('categoryName')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                    <div class="inline-flex items-center gap-1.5">
+                      <span>Categoria</span>
+                      <i class="fa-solid {{ sortColumn === 'categoryName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                    </div>
+                  </th>
+                  <th (click)="onSort('installmentNumber')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
+                    <div class="inline-flex items-center gap-1.5">
+                      <span>Parcela</span>
+                      <i class="fa-solid {{ sortColumn === 'installmentNumber' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                    </div>
+                  </th>
+                  <th (click)="onSort('value')" class="py-3 px-4 text-right cursor-pointer select-none hover:text-foreground transition-colors group">
+                    <div class="inline-flex items-center gap-1.5 justify-end">
+                      <span>Valor</span>
+                      <i class="fa-solid {{ sortColumn === 'value' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                    </div>
+                  </th>
+                  <th class="py-3 px-4 text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody class="divide-muted/10 divide-y text-sm">
+                @for (tx of sortedTransactions; track tx.id) {
+                  <tr class="hover:bg-card/50 transition-colors">
+                    <td class="py-3 px-4 text-xs text-muted-foreground whitespace-nowrap">
+                      {{ tx.date | date:'dd/MM/yyyy':'UTC' }}
+                    </td>
+                    <td class="py-3 px-4 font-medium text-foreground">
+                      {{ tx.description }}
+                    </td>
+                    <td class="py-3 px-4">
+                      <span class="inline-flex items-center rounded-full bg-muted/40 px-2.5 py-0.5 text-xs font-medium text-foreground/80">
+                        {{ tx.categoryName }}
+                      </span>
+                    </td>
+                    <td class="py-3 px-4">
+                      @if (tx.totalInstallments > 1) {
+                        <span class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+                          {{ tx.installmentNumber }}/{{ tx.totalInstallments }}
+                        </span>
+                      } @else {
+                        <span class="text-xs text-muted-foreground">À vista</span>
+                      }
+                    </td>
+                    <td class="py-3 px-4 text-right font-semibold text-foreground whitespace-nowrap">
+                      {{ tx.value | moneyPipe }}
+                    </td>
+                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                      <button type="button" (click)="openTransactionModal(tx)"
+                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                        title="Editar lançamento">
+                        <i class="fa-solid fa-pen-to-square text-sm"></i>
+                      </button>
+                      <button type="button" (click)="deleteTransaction(tx)"
+                        class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-rose-500 transition-colors"
+                        title="Excluir lançamento">
+                        <i class="fa-solid fa-trash text-sm"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot class="border-muted/30 bg-card/90 text-foreground sticky bottom-0 z-10 border-t-2 text-xs font-bold">
+                <tr>
+                  <td class="py-3 px-4 uppercase tracking-wider" colspan="4">
+                    Total ({{ sortedTransactions.length }} {{ sortedTransactions.length === 1 ? 'lançamento' : 'lançamentos' }})
+                  </td>
+                  <td class="py-3 px-4 text-right text-sm">{{ selectedInvoice.totalAmount | moneyPipe }}</td>
+                  <td class="py-3 px-4"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        } @else {
+          <div class="flex flex-col items-center justify-center py-10 text-center">
+            <div class="bg-muted/40 mb-3 flex h-12 w-12 items-center justify-center rounded-full text-muted-foreground">
+              <i class="fa-solid fa-receipt text-xl"></i>
+            </div>
+            <p class="text-foreground text-sm font-semibold">Nenhum lançamento nesta fatura</p>
+            <p class="text-muted-foreground mt-1 mb-4 text-xs">Clique em "Nova Compra" para lançar compras à vista ou parceladas.</p>
+            <app-button (buttonClick)="openTransactionModal()" impact="bold" tone="primary" shape="rounded" size="small">
+              <i class="fa-solid fa-plus mr-1.5"></i> Nova Compra
+            </app-button>
+          </div>
+        }
+      }
+    </div>
+  }
+}

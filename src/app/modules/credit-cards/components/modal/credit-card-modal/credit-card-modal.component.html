@@ -1,0 +1,92 @@
+<div class="border-muted/20 bg-card w-[520px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-credit-card text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">{{ isEdit ? 'Editar Cartão de Crédito' : 'Novo Cartão de Crédito' }}</h2>
+    </div>
+    <button type="button" (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 sm:col-span-8">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cc-name">Nome do Cartão *</label>
+        <input id="cc-name" type="text" placeholder="Ex: Nubank Ultravioleta" formControlName="name"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-4">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cc-digits">Últimos 4 dígitos</label>
+        <input id="cc-digits" type="text" maxlength="4" placeholder="4821" formControlName="lastDigits"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cc-bank">Banco Emissor</label>
+        <select id="cc-bank" formControlName="bankId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Nenhum vinculado</option>
+          @for (bank of banks; track bank.id) {
+            <option [value]="bank.id">{{ bank.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cc-brand">Bandeira *</label>
+        <select id="cc-brand" formControlName="brand"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          @for (b of brands; track b) {
+            <option [value]="b">{{ b }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cc-limit">Limite Total *</label>
+        <input id="cc-limit" type="text" placeholder="R$ 0,00" formControlName="limit"
+          mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition font-semibold" />
+      </div>
+
+      <div class="col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cc-closing">Dia de Fechamento *</label>
+        <input id="cc-closing" type="number" min="1" max="31" formControlName="closingDay"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="cc-due">Dia de Vencimento *</label>
+        <input id="cc-due" type="number" min="1" max="31" formControlName="dueDay"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold">Cor do Cartão</label>
+        <div class="flex flex-wrap items-center gap-2">
+          @for (color of presetColors; track color) {
+            <button type="button" (click)="selectColor(color)"
+              [style.background-color]="color"
+              class="h-7 w-7 rounded-full border-2 transition-transform cursor-pointer {{ form.get('color')?.value === color ? 'border-white scale-110 ring-2 ring-primary' : 'border-transparent hover:scale-105' }}">
+            </button>
+          }
+          <input type="color" formControlName="color"
+            class="h-7 w-9 cursor-pointer rounded border border-muted/30 bg-transparent p-0.5"
+            title="Cor personalizada" />
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button type="button" (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+      <app-button (buttonClick)="save()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> {{ isEdit ? 'Salvar Alterações' : 'Cadastrar Cartão' }}
+      </app-button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,86 @@
+<div class="border-muted/20 bg-card w-[520px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-bag-shopping text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">{{ isEdit ? 'Editar Compra no Cartão' : 'Nova Compra no Cartão' }}</h2>
+    </div>
+    <button type="button" (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="grid grid-cols-12 gap-4">
+      @if (!isEdit) {
+        <div class="col-span-12">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="tx-card">Cartão de Crédito *</label>
+          <select id="tx-card" formControlName="creditCardId"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            @for (c of cards; track c.id) {
+              <option [value]="c.id">{{ c.name }} {{ c.lastDigits ? ('•••• ' + c.lastDigits) : '' }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="col-span-12">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="tx-desc">Descrição *</label>
+        <input id="tx-desc" type="text" placeholder="Ex: Supermercado, Notebook, Assinatura..." formControlName="description"
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="tx-val">{{ isEdit ? 'Valor da Parcela *' : 'Valor Total *' }}</label>
+        <input id="tx-val" type="text" placeholder="R$ 0,00" formControlName="value"
+          mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ "
+          class="border-muted/20 bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition font-semibold" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="tx-date">Data da Compra *</label>
+        <input id="tx-date" type="date" formControlName="date"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div class="col-span-12 sm:col-span-6">
+        <label class="text-foreground mb-1.5 block text-xs font-semibold" for="tx-cat">Categoria</label>
+        <select id="tx-cat" formControlName="categoryId"
+          class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Sem categoria</option>
+          @for (cat of categories; track cat.id) {
+            <option [value]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+      </div>
+
+      @if (!isEdit) {
+        <div class="col-span-12 sm:col-span-6">
+          <label class="text-foreground mb-1.5 block text-xs font-semibold" for="tx-inst">Parcelas *</label>
+          <select id="tx-inst" formControlName="installments"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+            @for (n of installmentOptions; track n) {
+              <option [ngValue]="n">{{ n === 1 ? '1x (À vista)' : (n + 'x') }}</option>
+            }
+          </select>
+        </div>
+
+        @if (installmentCount > 1 && installmentPreviewValue > 0) {
+          <div class="col-span-12 rounded-lg border border-primary/20 bg-primary/5 px-3.5 py-2.5 text-xs text-primary font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-calculator"></i>
+            <span>{{ installmentCount }}x de {{ installmentPreviewValue | moneyPipe }} (distribuído automaticamente nas próximas faturas)</span>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="mt-6 flex justify-end gap-2">
+      <app-button type="button" (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+      </app-button>
+      <app-button (buttonClick)="save()" [isLoading]="isLoading" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-check mr-1.5"></i> {{ isEdit ? 'Salvar Alterações' : 'Lançar Compra' }}
+      </app-button>
+    </div>
+  </form>
+</div>

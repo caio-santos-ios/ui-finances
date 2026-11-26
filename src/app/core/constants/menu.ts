@@ -17,6 +17,11 @@ export class Menu {
           route: '/banks',
         },
         {
+          icon: 'credit-card',
+          label: 'Cartões de Crédito',
+          route: '/credit-cards',
+        },
+        {
           icon: 'layer-group',
           label: 'Categorias',
           route: '/categories',

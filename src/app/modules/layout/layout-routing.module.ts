@@ -35,6 +35,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'credit-cards',
+    component: LayoutComponent,
+    loadChildren: () => import('../credit-cards/credit-cards.module').then((m) => m.CreditCardsModule),
+    canActivate: [AuthGuard],
+  },
+  {
     path: 'patrimony',
     component: LayoutComponent,
     loadChildren: () => import('../patrimony/patrimony.module').then((m) => m.PatrimonyModule),
