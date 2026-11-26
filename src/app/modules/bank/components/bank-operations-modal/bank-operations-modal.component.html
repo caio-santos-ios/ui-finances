@@ -1,0 +1,187 @@
+<div class="border-muted/20 bg-card w-[960px] max-w-[95vw] rounded-xl border p-6 shadow-xl">
+  <div class="mb-5 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-building-columns text-primary text-base"></i>
+      <h2 class="text-foreground text-lg font-semibold">Operações &bull; {{ data.bankName }}</h2>
+    </div>
+    <button
+      type="button"
+      (click)="close()"
+      class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- Filtro por data -->
+  <div class="border-muted/20 bg-background mb-4 rounded-xl border p-3.5">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <div class="flex-1">
+        <label class="text-foreground mb-1 block text-xs font-semibold">Data Inicial</label>
+        <input
+          type="date"
+          [(ngModel)]="startDate"
+          (keyup.enter)="applyFilters()"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-1.5 text-sm outline-none transition" />
+      </div>
+
+      <div class="flex-1">
+        <label class="text-foreground mb-1 block text-xs font-semibold">Data Final</label>
+        <input
+          type="date"
+          [(ngModel)]="endDate"
+          (keyup.enter)="applyFilters()"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-1.5 text-sm outline-none transition" />
+      </div>
+
+      <div class="flex items-center gap-2">
+        <app-button (buttonClick)="clearFilters()" impact="bold" tone="light" shape="rounded" size="small">
+          <i class="fa-solid fa-rotate-left mr-1.5"></i> Limpar
+        </app-button>
+        <app-button (buttonClick)="applyFilters()" impact="bold" tone="primary" shape="rounded" size="small">
+          <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Filtrar
+        </app-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumo do período -->
+  @if (!isLoading && operations.length > 0) {
+    <div class="mb-4 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+      <div class="border-muted/20 bg-background rounded-lg border px-3.5 py-2.5">
+        <span class="text-muted-foreground block text-[11px] font-semibold uppercase">Entradas</span>
+        <span class="text-sm font-bold text-emerald-500">{{ totalInflow | moneyPipe }}</span>
+      </div>
+      <div class="border-muted/20 bg-background rounded-lg border px-3.5 py-2.5">
+        <span class="text-muted-foreground block text-[11px] font-semibold uppercase">Saídas</span>
+        <span class="text-sm font-bold text-rose-500">{{ totalOutflow | moneyPipe }}</span>
+      </div>
+      <div class="border-muted/20 bg-background rounded-lg border px-3.5 py-2.5">
+        <span class="text-muted-foreground block text-[11px] font-semibold uppercase">Resultado do Período</span>
+        <span class="text-sm font-bold" [ngClass]="periodNet >= 0 ? 'text-emerald-500' : 'text-rose-500'">
+          {{ periodNet | moneyPipe }}
+        </span>
+      </div>
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="flex min-h-[240px] flex-col items-center justify-center text-center">
+      <svg class="h-8 w-8 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+      <p class="text-muted-foreground mt-3 text-xs">Carregando operações...</p>
+    </div>
+  } @else if (operations.length > 0) {
+    <div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+      <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[380px] grow overflow-auto px-4">
+        <table class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
+          <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
+            <tr>
+              <th (click)="onSort('categoryName')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Categoria</span>
+                  <i class="fa-solid {{ sortColumn === 'categoryName' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('description')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Descrição</span>
+                  <i class="fa-solid {{ sortColumn === 'description' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('type')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Tipo</span>
+                  <i class="fa-solid {{ sortColumn === 'type' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('value')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group text-right">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Valor</span>
+                  <i class="fa-solid {{ sortColumn === 'value' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+              <th (click)="onSort('createdAt')" class="py-3 px-3 cursor-pointer select-none hover:text-foreground transition-colors group">
+                <div class="inline-flex items-center gap-1.5">
+                  <span>Data</span>
+                  <i class="fa-solid {{ sortColumn === 'createdAt' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-muted/10 divide-y text-sm">
+            @for (item of sortedOperations; track item.id) {
+              <tr class="hover:bg-card/50 transition-colors">
+                <td class="py-2.5 px-3 font-medium text-foreground text-xs">
+                  {{ item.categoryName || '-' }}
+                </td>
+                <td class="py-2.5 px-3 font-medium text-foreground text-xs max-w-[260px] truncate" [title]="item.description">
+                  @if (item.type === 'transfer') {
+                    <span>{{ item.description || 'Transferência' }}</span>
+                    <span class="text-muted-foreground block text-[11px]">
+                      {{ item.bankName || '-' }} <i class="fa-solid fa-arrow-right text-[9px] text-blue-400 mx-0.5"></i> {{ item.destinationBankName || '-' }}
+                    </span>
+                  } @else {
+                    {{ item.description || '-' }}
+                  }
+                </td>
+                <td class="py-2.5 px-3">
+                  @if (item.type === 'income') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                      <i class="fa-solid fa-arrow-trend-up text-[10px]"></i> Receita
+                    </span>
+                  } @else if (item.type === 'transfer') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+                      <i class="fa-solid fa-arrow-right-arrow-left text-[10px]"></i>
+                      {{ item.destinationBankId === data.bankId ? 'Transf. Entrada' : 'Transf. Saída' }}
+                    </span>
+                  } @else if (item.type === 'adjustment') {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 px-2.5 py-0.5 text-xs font-medium text-purple-600 dark:text-purple-400">
+                      <i class="fa-solid fa-sliders text-[10px]"></i> Ajuste
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-medium text-rose-600 dark:text-rose-400">
+                      <i class="fa-solid fa-arrow-trend-down text-[10px]"></i> Despesa
+                    </span>
+                  }
+                </td>
+                <td class="py-2.5 px-3 font-semibold text-xs text-right whitespace-nowrap" [ngClass]="isInflow(item) ? 'text-emerald-500' : 'text-rose-500'">
+                  {{ isInflow(item) ? '+' : '-' }} {{ item.value | moneyPipe }}
+                </td>
+                <td class="py-2.5 px-3 text-xs text-muted-foreground whitespace-nowrap">
+                  {{ item.createdAt | date: 'dd/MM/yyyy HH:mm':'UTC' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+          <tfoot class="border-muted/20 border-t bg-card/40 text-xs font-bold text-foreground">
+            <tr>
+              <td colspan="3" class="py-2.5 px-3 uppercase">
+                Total ({{ operations.length }} {{ operations.length === 1 ? 'lançamento' : 'lançamentos' }})
+              </td>
+              <td class="py-2.5 px-3 text-right whitespace-nowrap" [ngClass]="periodNet >= 0 ? 'text-emerald-500' : 'text-rose-500'">
+                {{ periodNet | moneyPipe }}
+              </td>
+              <td class="py-2.5 px-3"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <div class="border-muted/20 bg-background flex min-h-[200px] flex-col items-center justify-center rounded-xl border p-8 text-center">
+      <div class="bg-muted flex h-12 w-12 items-center justify-center rounded-full text-muted-foreground mb-3">
+        <i class="fa-solid fa-receipt text-lg"></i>
+      </div>
+      <h4 class="text-foreground text-sm font-semibold">Nenhuma operação encontrada</h4>
+      <p class="text-muted-foreground text-xs mt-1">Não existem operações registradas para este banco no período selecionado.</p>
+    </div>
+  }
+
+  <div class="mt-5 flex justify-end">
+    <app-button (buttonClick)="close()" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-xmark mr-1.5"></i> Fechar
+    </app-button>
+  </div>
+</div>

@@ -5,6 +5,7 @@ import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadc
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { Dialog } from '@angular/cdk/dialog';
 import { BankModalComponent } from '../components/modal/bank-modal.component';
+import { BankOperationsModalComponent } from '../components/bank-operations-modal/bank-operations-modal.component';
 import { ResetPagination, TPagination } from 'src/app/shared/models/pagination';
 import { api } from 'src/app/shared/api/api';
 import Swal from 'sweetalert2';
@@ -127,6 +128,16 @@ export class BankComponent extends MyFinance implements OnInit {
       if (result) {
         await this.loadData(this.pagination.currentPage || 1);
       }
+    });
+  }
+
+  openOperationsModal(item: any): void {
+    this.dialog.open(BankOperationsModalComponent, {
+      data: {
+        bankId: item.id,
+        bankName: item.name,
+        balance: item.balance,
+      },
     });
   }
 

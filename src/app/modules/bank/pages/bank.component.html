@@ -92,7 +92,18 @@
         @for (item of pagination.data; track $index) {
         <tr class="hover:bg-card/50 transition-colors">
           <td class="py-3 px-4 font-medium text-foreground">{{item.name}}</td>
-          <td class="py-3 px-4 font-medium text-foreground">{{ (item.balance || 0) | moneyPipe }}</td>
+          <td class="py-3 px-4 font-medium text-foreground">
+            <div class="inline-flex items-center gap-2">
+              <span>{{ (item.balance || 0) | moneyPipe }}</span>
+              <button
+                type="button"
+                (click)="openOperationsModal(item)"
+                class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
+                title="Ver operações do banco">
+                <i class="fa-solid fa-eye text-xs"></i>
+              </button>
+            </div>
+          </td>
           <td class="py-3 px-4 text-xs text-muted-foreground">{{item.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>
           <td class="py-3 px-4 text-right">
             <button type="button" (click)="openModal(item.id)"
