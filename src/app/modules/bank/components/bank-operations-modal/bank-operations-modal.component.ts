@@ -41,21 +41,16 @@ export class BankOperationsModalComponent extends MyFinance implements OnInit {
   }
 
   ngOnInit(): void {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-
-    this.startDate = `${year}-${month}-01`;
-    this.endDate = `${year}-${month}-${day}`;
-
-    this.loadOperations();
+    this.startDate = '';
+    this.endDate = '';
+    this.loadOperations(true);
   }
 
   get sortedOperations(): any[] {
     const list = this.operations || [];
     if (this.sortColumn) {
-      return this.sortData(list, this.sortColumn, this.sortColumn, this.sortDirection).list;
+      const inverted = this.sortDirection === 'desc' ? 'asc' : 'desc';
+      return this.sortData(list, this.sortColumn, this.sortColumn, inverted).list;
     }
     return list;
   }
@@ -96,10 +91,10 @@ export class BankOperationsModalComponent extends MyFinance implements OnInit {
   async clearFilters(): Promise<void> {
     this.startDate = '';
     this.endDate = '';
-    await this.loadOperations();
+    await this.loadOperations(true);
   }
 
-  async loadOperations(): Promise<void> {
+  async loadOperations(autoFillDates: boolean = false): Promise<void> {
     try {
       this.isLoading = true;
       this.cdr.markForCheck();
@@ -131,6 +126,13 @@ export class BankOperationsModalComponent extends MyFinance implements OnInit {
       this.operations = Array.from(map.values()).sort((a, b) =>
         String(b.createdAt || '').localeCompare(String(a.createdAt || '')),
       );
+
+      if (autoFillDates && this.operations.length > 0) {
+        const latest = String(this.operations[0].createdAt || '').split('T')[0];
+        const earliest = String(this.operations[this.operations.length - 1].createdAt || '').split('T')[0];
+        if (earliest) this.startDate = earliest;
+        if (latest) this.endDate = latest;
+      }
     } catch (error) {
       this.normalizeErr(error);
     } finally {
