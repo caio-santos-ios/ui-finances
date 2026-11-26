@@ -1,0 +1,189 @@
+<div class="border-muted/20 bg-background rounded-xl border p-5 shadow-xs">
+  <!-- Cabeçalho -->
+  <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        <i class="fa-solid fa-crystal-ball fa-chart-line text-base"></i>
+      </div>
+      <div>
+        <h2 class="text-foreground text-base font-bold">Saldo Projetado (Fluxo de Caixa Futuro)</h2>
+        <p class="text-muted-foreground text-xs">Previsão de fechamento do mês considerando contas a vencer e receitas previstas</p>
+      </div>
+    </div>
+
+    <!-- Filtro de Mês/Ano -->
+    <div class="flex items-center gap-2">
+      <select [(ngModel)]="selectedMonth" (change)="onFilterChange()"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary rounded-lg border px-2.5 py-1.5 text-xs font-medium outline-none transition">
+        @for (m of months; track m.value) {
+          <option [ngValue]="m.value">{{ m.label }}</option>
+        }
+      </select>
+      <select [(ngModel)]="selectedYear" (change)="onFilterChange()"
+        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary rounded-lg border px-2.5 py-1.5 text-xs font-medium outline-none transition">
+        @for (y of years; track y) {
+          <option [ngValue]="y">{{ y }}</option>
+        }
+      </select>
+      <button type="button" (click)="loadData()" [disabled]="loading"
+        class="border-muted/20 bg-card text-muted-foreground hover:text-foreground inline-flex h-8 w-8 items-center justify-center rounded-lg border transition-colors cursor-pointer disabled:opacity-50"
+        title="Recalcular projeção">
+        <i class="fa-solid fa-rotate text-xs {{ loading ? 'animate-spin' : '' }}"></i>
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="flex min-h-[200px] items-center justify-center">
+      <i class="fa-solid fa-spinner text-primary animate-spin text-2xl"></i>
+    </div>
+  } @else if (error) {
+    <div class="rounded-lg border border-rose-500/20 bg-rose-500/10 p-4 text-xs text-rose-400">
+      <i class="fa-solid fa-circle-exclamation mr-1.5"></i> {{ error }}
+    </div>
+  } @else if (data) {
+    <!-- 1. Cards de Resumo -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- Saldo Atual -->
+      <div class="border-muted/20 bg-card/60 rounded-xl border p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Saldo Atual</span>
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <i class="fa-solid fa-building-columns text-xs"></i>
+          </div>
+        </div>
+        <div class="mt-2.5">
+          <span class="text-foreground text-xl font-bold">{{ data.currentBalance | moneyPipe }}</span>
+          <p class="text-muted-foreground mt-1 text-[11px]">Soma das contas bancárias hoje</p>
+        </div>
+      </div>
+
+      <!-- Receitas a Cair -->
+      <div class="border-muted/20 bg-card/60 rounded-xl border p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Receitas a Cair</span>
+          <span class="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-500">+ Previsto</span>
+        </div>
+        <div class="mt-2.5">
+          <span class="text-emerald-500 text-xl font-bold">+ {{ data.pendingRevenues | moneyPipe }}</span>
+          <p class="text-muted-foreground mt-1 text-[11px]">Entradas previstas até o fim do mês</p>
+        </div>
+      </div>
+
+      <!-- Contas a Vencer -->
+      <div class="border-muted/20 bg-card/60 rounded-xl border p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Contas a Vencer</span>
+          <span class="rounded-full bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 text-[10px] font-semibold text-rose-500">- Previsto</span>
+        </div>
+        <div class="mt-2.5">
+          <span class="text-rose-500 text-xl font-bold">- {{ data.pendingExpenses | moneyPipe }}</span>
+          <p class="text-muted-foreground mt-1 text-[11px]">Recorrências, dívidas e agendadas</p>
+        </div>
+      </div>
+
+      <!-- Saldo Projetado no Fim do Mês -->
+      <div class="rounded-xl border p-4 {{ data.status === 'positive' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-rose-500/30 bg-rose-500/5' }}">
+        <div class="flex items-center justify-between">
+          <span class="text-muted-foreground text-xs font-semibold uppercase tracking-wider">Saldo Projetado</span>
+          @if (data.status === 'positive') {
+            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-500">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Fechando no Azul
+            </span>
+          } @else {
+            <span class="inline-flex items-center gap-1 rounded-full bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-500">
+              <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> Risco de Déficit
+            </span>
+          }
+        </div>
+        <div class="mt-2.5">
+          <span class="text-2xl font-extrabold {{ data.status === 'positive' ? 'text-emerald-500' : 'text-rose-500' }}">
+            {{ data.projectedEndBalance | moneyPipe }}
+          </span>
+          <p class="text-muted-foreground mt-1 text-[11px]">Previsão para o fechamento do mês</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Alerta de Déficit Temporário -->
+    @if (data.lowestPoint && data.lowestPoint.isDeficit) {
+      <div class="mt-4 flex items-start gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-400">
+        <i class="fa-solid fa-triangle-exclamation mt-0.5 text-sm shrink-0"></i>
+        <span>
+          <strong>Atenção:</strong> No dia <strong>{{ data.lowestPoint.day }}</strong> seu saldo projetado atinge
+          <strong>{{ data.lowestPoint.balance | moneyPipe }}</strong>. Verifique suas datas de vencimento.
+        </span>
+      </div>
+    }
+
+    <!-- 3. Gráfico de Linha do Tempo + Lista Rápida de Próximos Vencimentos -->
+    <div class="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-12">
+      <!-- Gráfico -->
+      <div class="border-muted/20 bg-card/40 rounded-xl border p-4 lg:col-span-7">
+        <div class="mb-2 flex items-center justify-between">
+          <h3 class="text-foreground text-xs font-semibold uppercase tracking-wider">Evolução Diária do Saldo</h3>
+          <span class="text-muted-foreground text-[11px]">Passe o mouse nos pontos para ver os vencimentos</span>
+        </div>
+        @if (data.dailyTimeline.length > 0) {
+          <apx-chart
+            [series]="chartSeries"
+            [chart]="chartOptions.chart"
+            [colors]="chartOptions.colors"
+            [stroke]="chartOptions.stroke"
+            [fill]="chartOptions.fill"
+            [dataLabels]="chartOptions.dataLabels"
+            [markers]="chartOptions.markers"
+            [grid]="chartOptions.grid"
+            [xaxis]="chartOptions.xaxis"
+            [yaxis]="chartOptions.yaxis"
+            [annotations]="chartOptions.annotations"
+            [tooltip]="chartOptions.tooltip">
+          </apx-chart>
+        } @else {
+          <div class="flex h-[220px] items-center justify-center text-xs text-muted-foreground">
+            Sem dados de projeção para o período selecionado.
+          </div>
+        }
+      </div>
+
+      <!-- Lista Rápida de Próximos Vencimentos -->
+      <div class="border-muted/20 bg-card/40 flex flex-col rounded-xl border p-4 lg:col-span-5">
+        <div class="mb-3 flex items-center justify-between">
+          <h3 class="text-foreground text-xs font-semibold uppercase tracking-wider">Próximos Vencimentos</h3>
+          <span class="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">{{ data.pendingItems.length }}</span>
+        </div>
+
+        @if (data.pendingItems.length > 0) {
+          <div class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[230px] divide-y divide-muted/15 overflow-y-auto pr-1">
+            @for (item of data.pendingItems; track $index) {
+              <div class="flex items-center justify-between gap-2 py-2.5 text-xs">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[10px] font-bold {{ item.type === 'revenue' ? 'bg-emerald-500/15 text-emerald-500' : 'bg-rose-500/15 text-rose-500' }}">
+                      <i class="fa-solid {{ item.type === 'revenue' ? 'fa-arrow-up' : 'fa-arrow-down' }}"></i>
+                    </span>
+                    <span class="text-foreground font-medium truncate" [title]="item.description">{{ item.description }}</span>
+                  </div>
+                  <div class="mt-0.5 flex items-center gap-2 pl-6 text-[11px] text-muted-foreground">
+                    <span>Dia {{ item.dueDay < 10 ? '0' + item.dueDay : item.dueDay }}</span>
+                    <span>&bull;</span>
+                    <span>{{ getSourceLabel(item.source) }}</span>
+                  </div>
+                </div>
+                <span class="shrink-0 font-bold {{ item.type === 'revenue' ? 'text-emerald-500' : 'text-rose-500' }}">
+                  {{ item.type === 'revenue' ? '+' : '-' }} {{ item.value | moneyPipe }}
+                </span>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="flex flex-1 flex-col items-center justify-center py-8 text-center">
+            <i class="fa-solid fa-circle-check text-emerald-500/70 mb-2 text-2xl"></i>
+            <p class="text-foreground text-xs font-semibold">Tudo em dia!</p>
+            <p class="text-muted-foreground mt-1 text-[11px]">Nenhuma receita ou despesa pendente até o fim deste mês.</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
