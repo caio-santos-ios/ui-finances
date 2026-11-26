@@ -44,6 +44,7 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     this.form = this.formBuilder.group({
       type: ['installment', [Validators.required]],
       amount: [defaultAmount, [Validators.required]],
+      interest: [0],
       installmentsCount: [1, [Validators.min(0)]],
       bankId: [this.debt.bankId || ''],
       createExpenseOperation: [true],
@@ -66,9 +67,16 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     if (val === null || val === undefined || val === '') return 0;
     if (typeof val === 'number') return isNaN(val) ? 0 : val;
     const str = String(val).replace(/R\$\s?/g, '').trim();
-    const cleaned = str.replace(/\./g, '').replace(',', '.');
+    const cleaned = str.includes(',') ? str.replace(/\./g, '').replace(',', '.') : str;
     const num = Number(cleaned);
     return isNaN(num) ? 0 : num;
+  }
+
+  get totalAmount(): number {
+    if (!this.form) return 0;
+    const amount = this.parseMoney(this.form.get('amount')?.value);
+    const interest = this.parseMoney(this.form.get('interest')?.value);
+    return Math.round((amount + interest) * 100) / 100;
   }
 
   private parseDate(val: any): string {
@@ -128,6 +136,7 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
       this.form.reset({
         type: 'installment',
         amount: defaultAmount,
+        interest: 0,
         installmentsCount: 1,
         bankId: this.debt.bankId || '',
         createExpenseOperation: true,
@@ -146,6 +155,7 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     this.form.patchValue({
       type: item.type,
       amount: item.amount,
+      interest: item.interest || 0,
       installmentsCount: item.installmentsCount,
       bankId: item.bankId || '',
       createExpenseOperation: false,
@@ -169,6 +179,7 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
     this.form.reset({
       type: 'installment',
       amount: defaultAmount,
+      interest: 0,
       installmentsCount: 1,
       bankId: this.debt.bankId || '',
       createExpenseOperation: true,
@@ -194,9 +205,11 @@ export class DebtHistoryModalComponent extends MyFinance implements OnInit {
       this.isSaving = true;
       const raw = this.form.value;
       const amount = this.parseMoney(raw.amount);
+      const interest = this.parseMoney(raw.interest);
       const payload = {
         type: raw.type,
         amount,
+        interest,
         installmentsCount: Number(raw.installmentsCount || 0),
         bankId: raw.bankId || null,
         createExpenseOperation: !this.editingId && !!raw.createExpenseOperation,

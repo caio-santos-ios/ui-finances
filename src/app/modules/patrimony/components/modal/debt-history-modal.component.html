@@ -46,6 +46,18 @@
         </div>
 
         <div>
+          <label class="text-foreground mb-1 block text-xs font-semibold">Juros (R$)</label>
+          <input type="text" formControlName="interest" mask="separator.2" thousandSeparator="." decimalMarker="," prefix="R$ " placeholder="R$ 0,00"
+            class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition font-semibold" />
+        </div>
+
+        <div>
+          <label class="text-foreground mb-1 block text-xs font-semibold">Total</label>
+          <input type="text" [value]="totalAmount | moneyPipe" disabled
+            class="border-muted/20 bg-muted/30 text-foreground w-full rounded-lg border px-3 py-2 text-sm font-bold cursor-not-allowed opacity-85" />
+        </div>
+
+        <div>
           <label class="text-foreground mb-1 block text-xs font-semibold">Data do Pagamento</label>
           <input type="date" formControlName="paymentDate"
             class="border-muted/20 bg-background text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
@@ -131,6 +143,11 @@
                   <span class="text-base font-bold text-foreground">
                     {{ item.amount | moneyPipe }}
                   </span>
+                  @if (item.interest > 0) {
+                    <span class="text-amber-400 ml-1.5 text-xs font-semibold">
+                      + {{ item.interest | moneyPipe }} juros = {{ (item.totalAmount || (item.amount + item.interest)) | moneyPipe }}
+                    </span>
+                  }
                   <span class="text-muted-foreground ml-2 text-xs">
                     (Saldo devedor: <span class="font-semibold text-rose-500">{{ (item.remainingAmountAfter ?? item.newRemainingAmount) | moneyPipe }}</span>)
                   </span>

@@ -50,7 +50,8 @@ export class PayInstallmentModalComponent extends MyFinance implements OnInit {
   private toNumber(val: any): number {
     if (val === null || val === undefined || val === '') return 0;
     if (typeof val === 'number') return isNaN(val) ? 0 : val;
-    const cleaned = String(val).replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.').trim();
+    const str = String(val).replace(/R\$\s?/g, '').trim();
+    const cleaned = str.includes(',') ? str.replace(/\./g, '').replace(',', '.') : str;
     const num = Number(cleaned);
     return isNaN(num) ? 0 : num;
   }

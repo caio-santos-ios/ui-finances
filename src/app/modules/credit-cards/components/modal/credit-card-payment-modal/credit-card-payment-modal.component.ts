@@ -84,9 +84,10 @@ export class CreditCardPaymentModalComponent extends MyFinance implements OnInit
       this.cdr.markForCheck();
 
       const raw = this.form.value;
+      const valStr = String(raw.value ?? '').replace(/R\$\s?/g, '').trim();
       const val = typeof raw.value === 'number'
         ? raw.value
-        : Number(String(raw.value).replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.').trim());
+        : Number(valStr.includes(',') ? valStr.replace(/\./g, '').replace(',', '.') : valStr);
 
       const paidAtIso = raw.paidAt.includes('T') ? raw.paidAt : `${raw.paidAt}T12:00:00.000Z`;
 

@@ -92,9 +92,10 @@ export class CreditCardModalComponent extends MyFinance implements OnInit {
       this.cdr.markForCheck();
 
       const raw = this.form.value;
+      const limitStr = String(raw.limit ?? '').replace(/R\$\s?/g, '').trim();
       const limitNum = typeof raw.limit === 'number'
         ? raw.limit
-        : Number(String(raw.limit).replace(/R\$\s?/g, '').replace(/\./g, '').replace(',', '.').trim());
+        : Number(limitStr.includes(',') ? limitStr.replace(/\./g, '').replace(',', '.') : limitStr);
 
       const payload = {
         name: raw.name?.trim(),
