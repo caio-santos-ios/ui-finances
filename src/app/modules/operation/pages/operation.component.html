@@ -175,7 +175,15 @@
             }
           </td>
           <td class="py-3 px-4 text-xs text-muted-foreground">{{item.createdAt | date: 'dd/MM/yyyy HH:mm':'UTC'}}</td>
-          <td class="py-3 px-4 text-right">
+          <td class="py-3 px-4 text-right whitespace-nowrap">
+            <button
+              type="button"
+              (click)="duplicateOperation(item)"
+              [disabled]="duplicatingId === item.id"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors disabled:opacity-40"
+              title="Duplicar Operação">
+              <i class="fa-solid {{ duplicatingId === item.id ? 'fa-spinner fa-spin' : 'fa-copy' }} text-sm"></i>
+            </button>
             <button
               type="button"
               (click)="openModal(item.id)"

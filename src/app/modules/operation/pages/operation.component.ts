@@ -149,6 +149,42 @@ export class OperationComponent extends MyFinance implements OnInit {
     return pages;
   }
 
+  duplicatingId: string | null = null;
+
+  async duplicateOperation(item: any) {
+    if (!item?.id || this.duplicatingId) return;
+    this.duplicatingId = item.id;
+    this.cdr.markForCheck();
+    try {
+      const now = new Date();
+      const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const timePart = now.toTimeString().slice(0, 5);
+
+      const body = {
+        type: item.type,
+        categoryId: item.categoryId || '',
+        bankId: item.bankId || '',
+        destinationBankId: item.destinationBankId || '',
+        value: Number(item.value) || 0,
+        createdAt: `${datePart}T${timePart}:00Z`,
+        description: item.description || '',
+        repeat: !!item.repeat,
+        recurrence: item.repeat ? (item.recurrence || '') : '',
+        payeeName: item.payeeName || '',
+        payeeDocument: item.payeeDocument || '',
+      };
+
+      await api.post('/operations', body);
+      this.toastSuccess('Operação duplicada com sucesso.');
+      await this.loadData(this.pagination.currentPage || 1);
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.duplicatingId = null;
+      this.cdr.markForCheck();
+    }
+  }
+
   async openModal(id: string = '') {
     const ref = this.dialog.open(OperationModalComponent, { data: { id } });
 
