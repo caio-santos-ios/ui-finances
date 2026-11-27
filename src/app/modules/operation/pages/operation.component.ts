@@ -157,8 +157,7 @@ export class OperationComponent extends MyFinance implements OnInit {
     this.cdr.markForCheck();
     try {
       const now = new Date();
-      const datePart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      const timePart = now.toTimeString().slice(0, 5);
+      const fallbackDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}T${now.toTimeString().slice(0, 5)}:00Z`;
 
       const body = {
         type: item.type,
@@ -166,7 +165,7 @@ export class OperationComponent extends MyFinance implements OnInit {
         bankId: item.bankId || '',
         destinationBankId: item.destinationBankId || '',
         value: Number(item.value) || 0,
-        createdAt: `${datePart}T${timePart}:00Z`,
+        createdAt: item.createdAt || fallbackDate,
         description: item.description || '',
         repeat: !!item.repeat,
         recurrence: item.repeat ? (item.recurrence || '') : '',
