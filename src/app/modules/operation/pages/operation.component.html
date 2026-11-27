@@ -2,6 +2,25 @@
   <app-button (buttonClick)="toggleFilters()" impact="bold" tone="light" shape="rounded" size="medium">
     <i class="fa-solid fa-filter mr-1.5"></i> Filtros
   </app-button>
+  @if (!selectionMode) {
+    <app-button (buttonClick)="toggleSelectionMode()" impact="light" tone="danger" shape="rounded" size="medium">
+      <i class="fa-solid fa-trash-can mr-1.5"></i> Excluir em Massa
+    </app-button>
+  } @else {
+    <app-button (buttonClick)="toggleSelectionMode()" impact="bold" tone="light" shape="rounded" size="medium">
+      <i class="fa-solid fa-xmark mr-1.5"></i> Cancelar
+    </app-button>
+    <app-button
+      (buttonClick)="bulkDeleteConfirm()"
+      [disabled]="selectedIds.size === 0 || isBulkDeleting"
+      [isLoading]="isBulkDeleting"
+      impact="bold"
+      tone="danger"
+      shape="rounded"
+      size="medium">
+      <i class="fa-solid fa-trash mr-1.5"></i> Excluir ({{ selectedIds.size }})
+    </app-button>
+  }
   <app-button (buttonClick)="openModal()" impact="bold" tone="primary" shape="rounded" size="medium">
     <i class="fa-solid fa-plus mr-1.5"></i> Adicionar Operação
   </app-button>
@@ -103,6 +122,16 @@
       class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
       <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
         <tr>
+          @if (selectionMode) {
+            <th class="py-3 px-4 w-10">
+              <input
+                type="checkbox"
+                [checked]="allOnPageSelected"
+                (change)="toggleSelectAllOnPage($event)"
+                class="h-4 w-4 cursor-pointer rounded border-muted/40 bg-card text-primary focus:ring-primary"
+                title="Selecionar todos da página" />
+            </th>
+          }
           <th (click)="onSort('categoryName')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
             <div class="inline-flex items-center gap-1.5">
               <span>Categoria</span>
@@ -143,8 +172,19 @@
         </tr>
       </thead>
       <tbody class="divide-muted/10 divide-y text-sm">
-        @for (item of pagination.data; track $index) {
-        <tr class="hover:bg-card/50 transition-colors">
+        @for (item of pagination.data; track item.id) {
+        <tr
+          class="hover:bg-card/50 transition-colors"
+          [class.bg-rose-500/5]="selectionMode && selectedIds.has(item.id)">
+          @if (selectionMode) {
+            <td class="py-3 px-4 w-10">
+              <input
+                type="checkbox"
+                [checked]="selectedIds.has(item.id)"
+                (change)="toggleSelectItem(item.id)"
+                class="h-4 w-4 cursor-pointer rounded border-muted/40 bg-card text-primary focus:ring-primary" />
+            </td>
+          }
           <td class="py-3 px-4 font-medium text-foreground">{{item.categoryName || "-"}}</td>
           <td class="py-3 px-4 font-medium text-foreground">
             @if (item.type === 'transfer') {

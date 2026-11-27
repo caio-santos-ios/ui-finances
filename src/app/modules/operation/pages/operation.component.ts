@@ -40,6 +40,89 @@ export class OperationComponent extends MyFinance implements OnInit {
   };
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' | '' = '';
+  selectionMode = false;
+  selectedIds = new Set<string>();
+  isBulkDeleting = false;
+
+  get allOnPageSelected(): boolean {
+    const items = this.pagination.data || [];
+    return items.length > 0 && items.every((item: any) => this.selectedIds.has(item.id));
+  }
+
+  toggleSelectionMode(): void {
+    this.selectionMode = !this.selectionMode;
+    if (!this.selectionMode) {
+      this.selectedIds.clear();
+    }
+    this.cdr.markForCheck();
+  }
+
+  toggleSelectItem(id: string): void {
+    if (this.selectedIds.has(id)) {
+      this.selectedIds.delete(id);
+    } else {
+      this.selectedIds.add(id);
+    }
+    this.cdr.markForCheck();
+  }
+
+  toggleSelectAllOnPage(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const items = this.pagination.data || [];
+    for (const item of items) {
+      if (checked) {
+        this.selectedIds.add(item.id);
+      } else {
+        this.selectedIds.delete(item.id);
+      }
+    }
+    this.cdr.markForCheck();
+  }
+
+  async bulkDeleteConfirm(): Promise<void> {
+    const ids = Array.from(this.selectedIds);
+    if (ids.length === 0 || this.isBulkDeleting) return;
+
+    const result = await Swal.fire({
+      title: `Excluir ${ids.length} ${ids.length === 1 ? 'operação' : 'operações'}?`,
+      text: `Deseja realmente excluir ${ids.length === 1 ? 'a operação selecionada' : `as ${ids.length} operações selecionadas`}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Excluir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        popup: 'bg-card text-foreground border border-border rounded-xl shadow-2xl',
+        title: 'text-foreground font-semibold',
+        htmlContainer: 'text-muted-foreground',
+        confirmButton: 'bg-rose-600 text-white font-semibold px-4 py-2 rounded-lg transition-opacity hover:opacity-90',
+        cancelButton: 'bg-muted text-muted-foreground font-semibold px-4 py-2 rounded-lg transition-opacity hover:opacity-90',
+        actions: 'gap-2',
+      },
+      buttonsStyling: false,
+    });
+    if (!result.isConfirmed) return;
+
+    this.isBulkDeleting = true;
+    this.cdr.markForCheck();
+    try {
+      await Promise.all(ids.map((id) => api.delete(`/operations/${id}`)));
+      const deletedCount = ids.length;
+      this.selectedIds.clear();
+      this.selectionMode = false;
+      this.toastSuccess(`${deletedCount} ${deletedCount === 1 ? 'operação excluída' : 'operações excluídas'} com sucesso.`);
+
+      const remainingOnPage = (this.pagination.data || []).filter((x: any) => !ids.includes(x.id)).length;
+      const targetPage = remainingOnPage === 0 && this.pagination.currentPage > 1
+        ? this.pagination.currentPage - 1
+        : (this.pagination.currentPage || 1);
+      await this.loadData(targetPage);
+    } catch (error) {
+      this.normalizeErr(error);
+    } finally {
+      this.isBulkDeleting = false;
+      this.cdr.markForCheck();
+    }
+  }
 
   async ngOnInit(): Promise<void> {
     await Promise.all([
