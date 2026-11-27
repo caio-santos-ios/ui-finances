@@ -8,10 +8,33 @@ import { MenuItem, SubMenuItem } from 'src/app/core/models/menu.model';
   providedIn: 'root',
 })
 export class MenuService implements OnDestroy {
-  private _showSidebar = signal(true);
+  private readonly SIDEBAR_STORAGE_KEY = 'sidebar_open';
+  private _showSidebar = signal(this.readSidebarState());
   private _showMobileMenu = signal(false);
   private _pagesMenu = signal<MenuItem[]>([]);
   private _subscription = new Subscription();
+
+  private readSidebarState(): boolean {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem(this.SIDEBAR_STORAGE_KEY);
+        if (saved !== null) return saved === 'true';
+      }
+    } catch {
+      // ignore storage errors
+    }
+    return true;
+  }
+
+  private saveSidebarState(value: boolean): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(this.SIDEBAR_STORAGE_KEY, String(value));
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }
 
   constructor(private router: Router) {
     this._pagesMenu.set(Menu.pages);
@@ -56,13 +79,14 @@ export class MenuService implements OnDestroy {
 
   set showSideBar(value: boolean) {
     this._showSidebar.set(value);
+    this.saveSidebarState(value);
   }
   set showMobileMenu(value: boolean) {
     this._showMobileMenu.set(value);
   }
 
   public toggleSidebar() {
-    this._showSidebar.set(!this._showSidebar());
+    this.showSideBar = !this._showSidebar();
   }
 
   public toggleMenu(menu: SubMenuItem) {
