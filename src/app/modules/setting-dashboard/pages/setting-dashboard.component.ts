@@ -1,32 +1,33 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Dialog } from '@angular/cdk/dialog';
+import Swal from 'sweetalert2';
 import { BreadcrumbComponent } from 'src/app/shared/components/breadcrumb/breadcrumb.component';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
-import { Dialog } from '@angular/cdk/dialog';
+import { DashboardCardComponent } from 'src/app/modules/dashboard/components/dashboard-card/dashboard-card.component';
 import { SettingDashboardModalComponent } from '../components/modal/setting-dashboard-modal.component';
-import { ResetPagination, TPagination } from 'src/app/shared/models/pagination';
 import { api } from 'src/app/shared/api/api';
-import Swal from 'sweetalert2';
 import { MyFinance } from 'src/app/core/utils/my-finance.util';
 
 @Component({
   selector: 'app-setting-dashboard',
   templateUrl: './setting-dashboard.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [CommonModule, FormsModule, BreadcrumbComponent, ButtonComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormsModule, DragDropModule, BreadcrumbComponent, ButtonComponent, DashboardCardComponent],
 })
 export class SettingDashboardComponent extends MyFinance implements OnInit {
-  constructor(
-    private dialog: Dialog,
-  ) {
+  constructor(private dialog: Dialog) {
     super();
   }
 
-  pagination: TPagination = ResetPagination;
-  totalPages: any[] = [];
+  dashboards: any[] = [];
+  filteredDashboards: any[] = [];
   loading = true;
+  isReordering = false;
   showFilters = false;
+
   filters = {
     name: '',
     type: '',
@@ -34,22 +35,47 @@ export class SettingDashboardComponent extends MyFinance implements OnInit {
     startDate: '',
     endDate: '',
   };
-  sortColumn: string = '';
-  sortDirection: 'asc' | 'desc' | '' = '';
+
+  get hasActiveFilters(): boolean {
+    return !!(
+      this.filters.name.trim() ||
+      this.filters.type ||
+      this.filters.collection ||
+      this.filters.startDate ||
+      this.filters.endDate
+    );
+  }
 
   async ngOnInit(): Promise<void> {
-    await this.loadData(1);
+    await this.loadData();
   }
 
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
+    this.cdr.markForCheck();
   }
 
-  async applyFilters(): Promise<void> {
-    await this.loadData(1);
+  applyFilters(): void {
+    const nameTerm = this.filters.name.trim().toLowerCase();
+    const startMs = this.filters.startDate ? Date.parse(`${this.filters.startDate}T00:00:00Z`) : null;
+    const endMs = this.filters.endDate ? Date.parse(`${this.filters.endDate}T23:59:59Z`) : null;
+
+    this.filteredDashboards = this.dashboards.filter((item) => {
+      if (nameTerm && !String(item.name || '').toLowerCase().includes(nameTerm)) return false;
+      if (this.filters.type && item.type !== this.filters.type) return false;
+      if (this.filters.collection && item.collection !== this.filters.collection) return false;
+      if (startMs || endMs) {
+        const createdMs = item.createdAt ? Date.parse(item.createdAt) : NaN;
+        if (isNaN(createdMs)) return false;
+        if (startMs && createdMs < startMs) return false;
+        if (endMs && createdMs > endMs) return false;
+      }
+      return true;
+    });
+    this.cdr.markForCheck();
   }
 
-  async clearFilters(): Promise<void> {
+  clearFilters(): void {
     this.filters = {
       name: '',
       type: '',
@@ -57,35 +83,22 @@ export class SettingDashboardComponent extends MyFinance implements OnInit {
       startDate: '',
       endDate: '',
     };
-    await this.loadData(1);
+    this.applyFilters();
   }
 
-  async loadData(page: number) {
+  async loadData(): Promise<void> {
     this.loading = true;
     this.cdr.markForCheck();
     try {
-      const params = new URLSearchParams({
-        deleted: 'false',
-        pageNumber: String(page),
-        pageSize: '10',
-        orderBy: 'sequence',
-        sort: 'asc',
-      });
-
-      if (this.filters.name.trim()) params.append('regex$name', this.filters.name.trim());
-      if (this.filters.type) params.append('type', this.filters.type);
-      if (this.filters.collection) params.append('collection', this.filters.collection);
-      if (this.filters.startDate) params.append('gte$createdAt', this.filters.startDate);
-      if (this.filters.endDate) params.append('lte$createdAt', this.filters.endDate);
-
-      const { data } = await api.get(`/dashboard?${params.toString()}`);
-      this.pagination = data.data;
-      if (this.sortColumn && this.pagination.data?.length) {
-        const res = this.sortData(this.pagination.data, this.sortColumn, '', this.sortDirection);
-        this.pagination.data = res.list;
-      }
-      const count = Number(this.pagination.totalPages) || 0;
-      this.totalPages = Array.from({ length: count }, (_, i) => i + 1);
+      const { data } = await api.get('/dashboard/dash');
+      const items: any[] = data?.data ?? [];
+      this.dashboards = items.map((item, idx) => ({
+        ...item,
+        sequence: Number(item.sequence) || idx + 1,
+        wrapperClass: this.buildCardWrapperClass(item.cardClass),
+        renderItem: { ...item, cardClass: '' },
+      }));
+      this.applyFilters();
     } catch (error) {
       this.normalizeErr(error);
     } finally {
@@ -94,50 +107,60 @@ export class SettingDashboardComponent extends MyFinance implements OnInit {
     }
   }
 
-  onPageChange(page: number) {
-    if (page < 1 || page > this.pagination.totalPages || page === this.pagination.currentPage) return;
-    this.loadData(page);
+  private buildCardWrapperClass(cardClass?: string): string {
+    const raw = (cardClass || 'col-span-12 lg:col-span-6').trim();
+    const parts: string[] = [raw];
+    if (!/\bcol-span-/.test(raw)) parts.push('col-span-12 lg:col-span-6');
+    if (!/\brounded-/.test(raw)) parts.push('rounded-xl');
+    if (!/\bborder\b/.test(raw)) parts.push('border border-muted/20');
+    if (!/\bbg-/.test(raw)) parts.push('bg-background');
+    if (!/\bp-\d/.test(raw)) parts.push('p-4');
+    return parts.join(' ');
   }
 
-  onSort(column: string) {
-    if (!this.pagination.data?.length) return;
-    const res = this.sortData(this.pagination.data, column, this.sortColumn, this.sortDirection);
-    this.pagination.data = res.list;
-    this.sortColumn = res.column;
-    this.sortDirection = res.direction;
+  async onDrop(event: CdkDragDrop<any[]>): Promise<void> {
+    if (this.hasActiveFilters || this.isReordering) return;
+    if (event.previousIndex === event.currentIndex) return;
+
+    const previous = this.dashboards.map((d) => ({ ...d }));
+    moveItemInArray(this.dashboards, event.previousIndex, event.currentIndex);
+    this.dashboards.forEach((item, index) => {
+      item.sequence = index + 1;
+    });
+    this.applyFilters();
+
+    this.isReordering = true;
     this.cdr.markForCheck();
+    try {
+      const payload = {
+        items: this.dashboards.map((item) => ({
+          id: item.id,
+          sequence: item.sequence,
+        })),
+      };
+      await api.put('/dashboard/reorder', payload);
+      this.toastSuccess('Sequência atualizada com sucesso.');
+    } catch (error) {
+      this.dashboards = previous;
+      this.applyFilters();
+      this.normalizeErr(error);
+    } finally {
+      this.isReordering = false;
+      this.cdr.markForCheck();
+    }
   }
 
-  get pages(): (number | '...')[] {
-    const { currentPage: c, totalPages: t } = this.pagination;
-
-    if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1);
-
-    let start = Math.max(2, c - 1);
-    let end = Math.min(t - 1, c + 1);
-    if (c <= 3) end = 4;
-    if (c >= t - 2) start = t - 3;
-
-    const pages: (number | '...')[] = [1];
-    if (start > 2) pages.push('...');
-    for (let i = start; i <= end; i++) pages.push(i);
-    if (end < t - 1) pages.push('...');
-    pages.push(t);
-
-    return pages;
-  }
-
-  async openModal(id: string = '') {
+  openModal(id: string = ''): void {
     const ref = this.dialog.open(SettingDashboardModalComponent, { data: { id } });
 
     ref.closed.subscribe(async (result) => {
       if (result) {
-        await this.loadData(this.pagination.currentPage || 1);
+        await this.loadData();
       }
     });
   }
 
-  async deleteConfirm(id: string) {
+  async deleteConfirm(id: string): Promise<void> {
     try {
       const result = await Swal.fire({
         title: 'Excluir configuração?',
@@ -160,18 +183,9 @@ export class SettingDashboardComponent extends MyFinance implements OnInit {
 
       const { data } = await api.delete(`/dashboard/${id}`);
       this.toastSuccess(data?.message || 'Configuração do dashboard excluída com sucesso.');
-      const isLastItemOnPage = this.pagination.data?.length === 1;
-      const targetPage = isLastItemOnPage && this.pagination.currentPage > 1
-        ? this.pagination.currentPage - 1
-        : (this.pagination.currentPage || 1);
-      await this.loadData(targetPage);
+      await this.loadData();
     } catch (error) {
       this.normalizeErr(error);
     }
-  }
-
-  normalizeMaxText(text: string, max: number) {
-    if (!text) return '';
-    return text.length > max ? `${text.slice(0, max)}...` : text;
   }
 }

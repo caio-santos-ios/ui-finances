@@ -8,206 +8,185 @@
 </app-breadcrumb>
 
 @if (showFilters) {
-<div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-    <div>
-      <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome</label>
-      <input
-        type="text"
-        [(ngModel)]="filters.name"
-        (keyup.enter)="applyFilters()"
-        placeholder="Buscar por nome..."
-        class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+  <div class="border-muted/20 bg-background mb-4 rounded-xl border p-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold">Nome</label>
+        <input
+          type="text"
+          [(ngModel)]="filters.name"
+          (keyup.enter)="applyFilters()"
+          placeholder="Buscar por nome..."
+          class="border-muted/20 bg-card text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold">Tipo</label>
+        <select
+          [(ngModel)]="filters.type"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Todos</option>
+          <option value="kpi">KPI (Indicador)</option>
+          <option value="bar">Barra (Gráfico)</option>
+          <option value="stacked-bar">Barra Empilhada (Gráfico)</option>
+          <option value="line">Linha (Gráfico)</option>
+          <option value="pie">Pizza (Gráfico)</option>
+          <option value="table">Tabela</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold">Collection</label>
+        <select
+          [(ngModel)]="filters.collection"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
+          <option value="">Todas</option>
+          <option value="operations">operations</option>
+          <option value="categories">categories</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Inicial</label>
+        <input
+          type="date"
+          [(ngModel)]="filters.startDate"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
+
+      <div>
+        <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Final</label>
+        <input
+          type="date"
+          [(ngModel)]="filters.endDate"
+          class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+      </div>
     </div>
 
-    <div>
-      <label class="text-foreground mb-1.5 block text-xs font-semibold">Tipo</label>
-      <select
-        [(ngModel)]="filters.type"
-        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-        <option value="">Todos</option>
-        <option value="kpi">KPI (Indicador)</option>
-        <option value="bar">Barra (Gráfico)</option>
-        <option value="stacked-bar">Barra Empilhada (Gráfico)</option>
-        <option value="line">Linha (Gráfico)</option>
-        <option value="pie">Pizza (Gráfico)</option>
-        <option value="table">Tabela</option>
-      </select>
-    </div>
-
-    <div>
-      <label class="text-foreground mb-1.5 block text-xs font-semibold">Collection</label>
-      <select
-        [(ngModel)]="filters.collection"
-        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition">
-        <option value="">Todas</option>
-        <option value="operations">operations</option>
-        <option value="categories">categories</option>
-      </select>
-    </div>
-
-    <div>
-      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Inicial</label>
-      <input
-        type="date"
-        [(ngModel)]="filters.startDate"
-        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
-    </div>
-
-    <div>
-      <label class="text-foreground mb-1.5 block text-xs font-semibold">Data Final</label>
-      <input
-        type="date"
-        [(ngModel)]="filters.endDate"
-        class="border-muted/20 bg-card text-foreground focus:border-primary focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm outline-none transition" />
+    <div class="mt-4 flex justify-end gap-2">
+      <app-button (buttonClick)="clearFilters()" impact="bold" tone="light" shape="rounded" size="small">
+        <i class="fa-solid fa-rotate-left mr-1.5"></i> Limpar
+      </app-button>
+      <app-button (buttonClick)="applyFilters()" impact="bold" tone="primary" shape="rounded" size="small">
+        <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Filtrar
+      </app-button>
     </div>
   </div>
-
-  <div class="mt-4 flex justify-end gap-2">
-    <app-button (buttonClick)="clearFilters()" impact="bold" tone="light" shape="rounded" size="small">
-      <i class="fa-solid fa-rotate-left mr-1.5"></i> Limpar
-    </app-button>
-    <app-button (buttonClick)="applyFilters()" impact="bold" tone="primary" shape="rounded" size="small">
-      <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Filtrar
-    </app-button>
-  </div>
-</div>
 }
 
 @if (loading) {
-<div class="border-muted/20 bg-background flex min-h-[300px] flex-col items-center justify-center rounded-xl border p-12 text-center">
-  <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-    <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-    </svg>
+  <div class="border-muted/20 bg-background flex min-h-[350px] flex-col items-center justify-center rounded-xl border p-12 text-center">
+    <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+      <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+    </div>
+    <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando dashboard...</p>
   </div>
-  <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando configurações...</p>
-</div>
-} @else if (pagination.totalCount > 0) {
-<div class="border-muted/20 bg-background flex min-w-full flex-col rounded-xl border p-2">
+} @else if (filteredDashboards.length > 0) {
+  <div class="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+    <div class="inline-flex items-center gap-2">
+      @if (hasActiveFilters) {
+        <i class="fa-solid fa-circle-info text-amber-500"></i>
+        <span>Limpe os filtros para arrastar e reordenar os cards.</span>
+      } @else {
+        <i class="fa-solid fa-grip-vertical text-primary"></i>
+        <span>Arraste os cards para alterar a sequência de exibição no Dashboard.</span>
+      }
+    </div>
+    <span class="font-medium">
+      {{ filteredDashboards.length }} {{ filteredDashboards.length === 1 ? 'card' : 'cards' }}
+      @if (isReordering) {
+        <span class="ml-2 text-primary"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando ordem...</span>
+      }
+    </span>
+  </div>
+
   <div
-    style="max-height: calc(100vh - 15rem);"
-    class="scrollbar-thumb-rounded scrollbar-track-rounded scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted max-h-[calc(100vh_-_15rem)] grow overflow-auto px-5">
-    <table
-      class="text-muted-foreground table w-full table-auto border-collapse border-0 text-left align-middle leading-5">
-      <thead class="border-muted/20 bg-background text-muted-foreground sticky top-0 z-10 border-b text-xs font-semibold uppercase">
-        <tr>
-          <th (click)="onSort('name')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
-            <div class="inline-flex items-center gap-1.5">
-              <span>Nome</span>
-              <i class="fa-solid {{ sortColumn === 'name' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
-            </div>
-          </th>
-          <th (click)="onSort('type')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
-            <div class="inline-flex items-center gap-1.5">
-              <span>Tipo</span>
-              <i class="fa-solid {{ sortColumn === 'type' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
-            </div>
-          </th>
-          <th (click)="onSort('collection')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
-            <div class="inline-flex items-center gap-1.5">
-              <span>Collection</span>
-              <i class="fa-solid {{ sortColumn === 'collection' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
-            </div>
-          </th>
-          <th (click)="onSort('cardClass')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
-            <div class="inline-flex items-center gap-1.5">
-              <span>Card Class</span>
-              <i class="fa-solid {{ sortColumn === 'cardClass' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
-            </div>
-          </th>
-          <th (click)="onSort('sequence')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
-            <div class="inline-flex items-center gap-1.5">
-              <span>Sequência</span>
-              <i class="fa-solid {{ sortColumn === 'sequence' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
-            </div>
-          </th>
-          <th (click)="onSort('createdAt')" class="py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors group">
-            <div class="inline-flex items-center gap-1.5">
-              <span>Data de Criação</span>
-              <i class="fa-solid {{ sortColumn === 'createdAt' ? (sortDirection === 'asc' ? 'fa-arrow-up-long text-primary' : 'fa-arrow-down-long text-primary') : 'fa-sort text-muted-foreground/30 group-hover:text-muted-foreground/70' }} text-[11px] transition-colors"></i>
-            </div>
-          </th>
-          <th class="py-3 px-4 text-right">Ações</th>
-        </tr>
-      </thead>
-      <tbody class="divide-muted/10 divide-y text-sm">
-        @for (item of pagination.data; track $index) {
-        <tr class="hover:bg-card/50 transition-colors">
-          <td class="py-3 px-4 font-medium text-foreground">{{item.name}}</td>
-          <td class="py-3 px-4">
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-              <i class="fa-solid fa-chart-simple text-[10px]"></i> {{item.type}}
+    cdkDropList
+    cdkDropListOrientation="mixed"
+    [cdkDropListData]="filteredDashboards"
+    (cdkDropListDropped)="onDrop($event)"
+    class="grid grid-cols-12 gap-4">
+    @for (item of filteredDashboards; track item.id) {
+      <div
+        cdkDrag
+        [cdkDragDisabled]="hasActiveFilters || isReordering"
+        [class]="item.wrapperClass + ' relative group transition-all hover:border-primary/40'">
+        <div
+          *cdkDragPlaceholder
+          [class]="item.wrapperClass + ' border-2 border-dashed border-primary/50 bg-primary/5 min-h-[140px] opacity-60'">
+        </div>
+
+        <!-- Barra de controle do card -->
+        <div class="mb-3 flex items-center justify-between gap-2 border-b border-muted/15 pb-2">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              cdkDragHandle
+              [disabled]="hasActiveFilters || isReordering"
+              class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              [class.cursor-grab]="!hasActiveFilters && !isReordering"
+              [class.active:cursor-grabbing]="!hasActiveFilters && !isReordering"
+              [class.opacity-40]="hasActiveFilters || isReordering"
+              [class.cursor-not-allowed]="hasActiveFilters || isReordering"
+              title="Arrastar para reordenar">
+              <i class="fa-solid fa-grip-vertical text-xs"></i>
+            </button>
+            <span class="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+              #{{ item.sequence }}
             </span>
-          </td>
-          <td class="py-3 px-4 text-xs font-mono text-muted-foreground">{{item.collection}}</td>
-          <td class="py-3 px-4 text-xs font-mono text-muted-foreground" [title]="item.cardClass || ''">
-            {{normalizeMaxText(item.cardClass || '-', 25)}}
-          </td>
-          <td class="py-3 px-4 text-xs font-mono text-muted-foreground">{{item.sequence}}</td>
-          <td class="py-3 px-4 text-xs text-muted-foreground">{{item.createdAt | date: 'dd/MM/yyyy HH:mm'}}</td>
-          <td class="py-3 px-4 text-right">
-            <button type="button" (click)="openModal(item.id)"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            @if (item.collection) {
+              <span class="hidden sm:inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
+                {{ item.collection }}
+              </span>
+            }
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              (click)="openModal(item.id)"
+              class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               title="Editar Configuração">
-              <i class="fa-solid fa-pen-to-square text-sm"></i>
+              <i class="fa-solid fa-pen-to-square text-xs"></i>
             </button>
-            <button type="button" (click)="deleteConfirm(item.id)"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            <button
+              type="button"
+              (click)="deleteConfirm(item.id)"
+              class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-rose-500 transition-colors"
               title="Excluir Configuração">
-              <i class="fa-solid fa-trash text-sm"></i>
+              <i class="fa-solid fa-trash text-xs"></i>
             </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</div>
+          </div>
+        </div>
 
-<div
-  class="flex flex-col gap-3 px-5 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 rounded-b-xl sm:flex-row sm:items-center sm:justify-between">
-  <span class="shrink-0 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400">
-    Página <strong>{{ pagination.currentPage }}</strong> de <strong>{{ pagination.totalPages }}</strong>
-    ({{ pagination.totalCount }} no total)
-  </span>
-
-  <div class="flex flex-wrap items-center gap-1.5 sm:justify-end">
-    <button type="button" (click)="onPageChange(pagination.currentPage - 1)" [disabled]="pagination.currentPage <= 1"
-      class="inline-flex shrink-0 items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-      <i class="fa-solid fa-chevron-left text-[10px]"></i> Anterior
-    </button>
-
-    @for (p of pages; track $index) {
-    @if (p === '...') {
-    <span class="px-1 text-xs text-slate-400">…</span>
-    } @else {
-    <button type="button" (click)="onPageChange(+p)" [attr.aria-current]="p === pagination.currentPage ? 'page' : null"
-      class="min-w-7 px-2 py-1 text-xs font-semibold rounded border transition-colors" [class]="p === pagination.currentPage
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'">
-      {{ p }}
-    </button>
+        <app-dashboard-card [dashboard]="item.renderItem" />
+      </div>
     }
-    }
-
-    <button type="button" (click)="onPageChange(pagination.currentPage + 1)"
-      [disabled]="pagination.currentPage >= pagination.totalPages"
-      class="inline-flex shrink-0 items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-      Próxima <i class="fa-solid fa-chevron-right text-[10px]"></i>
-    </button>
   </div>
-</div>
 } @else {
-<div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
-  <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
-    <i class="fa-solid fa-sliders text-xl"></i>
+  <div class="border-muted/20 bg-background flex flex-col items-center justify-center rounded-xl border p-12 text-center">
+    <div class="bg-muted flex h-14 w-14 items-center justify-center rounded-full text-muted-foreground mb-4">
+      <i class="fa-solid fa-sliders text-xl"></i>
+    </div>
+    <h3 class="text-foreground text-base font-semibold">Nenhuma configuração encontrada</h3>
+    <p class="text-muted-foreground text-sm mt-1 mb-5">
+      @if (hasActiveFilters) {
+        Nenhum card corresponde aos filtros informados.
+      } @else {
+        Comece adicionando uma configuração de gráfico ou KPI ao dashboard.
+      }
+    </p>
+    @if (hasActiveFilters) {
+      <app-button (buttonClick)="clearFilters()" impact="bold" tone="light" shape="rounded" size="medium">
+        <i class="fa-solid fa-rotate-left mr-1.5"></i> Limpar Filtros
+      </app-button>
+    } @else {
+      <app-button (buttonClick)="openModal()" impact="bold" tone="primary" shape="rounded" size="medium">
+        <i class="fa-solid fa-plus mr-1.5"></i> Adicionar Configuração
+      </app-button>
+    }
   </div>
-  <h3 class="text-foreground text-base font-semibold">Nenhuma configuração encontrada</h3>
-  <p class="text-muted-foreground text-sm mt-1 mb-4">Comece adicionando uma nova configuração para seu dashboard.</p>
-  <app-button (buttonClick)="openModal()" impact="bold" tone="primary" shape="rounded" size="medium">
-    <i class="fa-solid fa-plus mr-1.5"></i> Adicionar Configuração
-  </app-button>
-</div>
 }
