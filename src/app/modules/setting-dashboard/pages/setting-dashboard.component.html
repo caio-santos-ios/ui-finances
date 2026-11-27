@@ -85,24 +85,6 @@
     <p class="text-muted-foreground mt-4 text-sm font-medium">Carregando dashboard...</p>
   </div>
 } @else if (filteredDashboards.length > 0) {
-  <div class="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-    <div class="inline-flex items-center gap-2">
-      @if (hasActiveFilters) {
-        <i class="fa-solid fa-circle-info text-amber-500"></i>
-        <span>Limpe os filtros para arrastar e reordenar os cards.</span>
-      } @else {
-        <i class="fa-solid fa-grip-vertical text-primary"></i>
-        <span>Arraste os cards para alterar a sequência de exibição no Dashboard.</span>
-      }
-    </div>
-    <span class="font-medium">
-      {{ filteredDashboards.length }} {{ filteredDashboards.length === 1 ? 'card' : 'cards' }}
-      @if (isReordering) {
-        <span class="ml-2 text-primary"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Salvando ordem...</span>
-      }
-    </span>
-  </div>
-
   <div
     cdkDropList
     cdkDropListOrientation="mixed"
