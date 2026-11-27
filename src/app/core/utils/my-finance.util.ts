@@ -61,6 +61,14 @@ export class MyFinance {
     if (status >= 400 && status < 500) {
       const data = err?.response?.data;
       let message = data?.message;
+      if (!message && data?.errors && typeof data.errors === 'object') {
+        const firstKey = Object.keys(data.errors)[0];
+        const firstErr = firstKey ? data.errors[firstKey] : null;
+        message = Array.isArray(firstErr) ? firstErr[0] : String(firstErr || '');
+      }
+      if (!message) {
+        message = data?.title || 'Verifique os dados informados e tente novamente.';
+      }
       this.toastWarning(message, 6000);
       return;
     }

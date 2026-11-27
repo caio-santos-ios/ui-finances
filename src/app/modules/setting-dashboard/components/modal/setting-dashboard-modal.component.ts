@@ -73,11 +73,11 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
         return !isNaN(num) && num > max ? num : max;
       }, 0);
       if (!this.form.get('sequence')?.value) {
-        this.form.patchValue({ sequence: String(maxSeq + 1) });
+        this.form.patchValue({ sequence: maxSeq + 1 });
       }
     } catch {
       if (!this.form.get('sequence')?.value) {
-        this.form.patchValue({ sequence: '1' });
+        this.form.patchValue({ sequence: 1 });
       }
     } finally {
       this.cdr.markForCheck();
@@ -123,12 +123,15 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
     try {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
+        this.toastWarning('Preencha todos os campos obrigatórios corretamente.');
         return;
       }
       this.isLoading = true;
       const raw = this.form.value;
       const body = {
         ...raw,
+        sequence: Number(raw.sequence) || 1,
+        cardClass: String(raw.cardClass ?? '').trim(),
         formats: this.parseFormats(raw.formats),
       };
       await api.post('/dashboard', body);
@@ -147,12 +150,15 @@ export class SettingDashboardModalComponent extends MyFinance implements OnInit 
     try {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
+        this.toastWarning('Preencha todos os campos obrigatórios corretamente.');
         return;
       }
       this.isLoading = true;
       const raw = this.form.value;
       const body = {
         ...raw,
+        sequence: Number(raw.sequence) || 1,
+        cardClass: String(raw.cardClass ?? '').trim(),
         formats: this.parseFormats(raw.formats),
         id: this.dialogData.id,
       };
